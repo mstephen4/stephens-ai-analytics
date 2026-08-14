@@ -1,4 +1,4 @@
-# The Arena
+# The AI Olympiad
 
 A Bring-Your-Own-Key (BYOK) Progressive Web App that treats multi-model generation like a decathlon. Users act as General Manager, deploy provider models as athletes, and optionally unlock **The Coach** (cost-aware routing) and **The Podium** (three-lane concurrent generation with an impartial judge).
 
