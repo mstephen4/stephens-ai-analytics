@@ -1,0 +1,708 @@
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { streamChat } from "@/lib/client-stream";
+import { recommendAthlete } from "@/lib/classifier";
+import { featureLocked, isPremiumActive } from "@/lib/gating";
+import { DEFAULT_PODIUM, DEFAULT_SINGLE, emptyKeys, hasAnyKey } from "@/lib/models";
+import {
+  deleteEvent,
+  getOrCreateInstanceName,
+  listEvents,
+  loadLicense,
+  loadSettings,
+  loadVaultState,
+  putEvent,
+  saveEncryptedKeys,
+  saveLicense,
+  savePlainKeys,
+  saveSettings,
+  unlockVault,
+} from "@/lib/storage";
+import type {
+  ArenaEvent,
+  ArenaMessage,
+  CoachRecommendation,
+  ContenderResult,
+  LicenseRecord,
+  ProviderKeys,
+} from "@/lib/types";
+import { keyHeaders, titleFromPrompt, uid } from "@/lib/utils";
+
+type Paywall = "coach" | "podium" | null;
+type LockerTab = "vault" | "pass" | "about";
+
+interface ArenaContextValue {
+  ready: boolean;
+  events: ArenaEvent[];
+  activeEvent: ArenaEvent | null;
+  keys: ProviderKeys;
+  vaultEncrypted: boolean;
+  vaultUnlocked: boolean;
+  license: LicenseRecord | null;
+  premium: boolean;
+  coachEnabled: boolean;
+  mode: "single" | "podium";
+  selectedAthleteId: string;
+  podiumAthleteIds: [string, string, string];
+  recommendation: CoachRecommendation | null;
+  paywall: Paywall;
+  lockerOpen: boolean;
+  lockerTab: LockerTab;
+  railOpen: boolean;
+  sending: boolean;
+  licenseMessage: string | null;
+  setSelectedAthleteId: (id: string) => void;
+  setPodiumAthlete: (index: 0 | 1 | 2, id: string) => void;
+  setCoachEnabled: (on: boolean) => void;
+  setMode: (mode: "single" | "podium") => void;
+  setPaywall: (paywall: Paywall) => void;
+  setLockerOpen: (open: boolean, tab?: LockerTab) => void;
+  setRailOpen: (open: boolean) => void;
+  newEvent: () => void;
+  selectEvent: (id: string) => void;
+  removeEvent: (id: string) => Promise<void>;
+  requestCoach: (prompt: string) => void;
+  sendPrompt: (prompt: string) => Promise<boolean>;
+  saveKeys: (keys: ProviderKeys, password?: string) => Promise<void>;
+  unlock: (password: string) => Promise<void>;
+  lock: () => void;
+  activate: (licenseKey: string) => Promise<void>;
+  clearLicense: () => void;
+}
+
+const ArenaContext = createContext<ArenaContextValue | null>(null);
+
+function createEvent(mode: "single" | "podium"): ArenaEvent {
+  const now = Date.now();
+  return {
+    id: uid(),
+    title: "New Event",
+    createdAt: now,
+    updatedAt: now,
+    mode,
+    messages: [],
+  };
+}
+
+export function ArenaProvider({ children }: { children: ReactNode }) {
+  const [ready, setReady] = useState(false);
+  const [events, setEvents] = useState<ArenaEvent[]>([]);
+  const [activeEventId, setActiveEventId] = useState<string | null>(null);
+  const [keys, setKeys] = useState<ProviderKeys>(emptyKeys());
+  const [vaultEncrypted, setVaultEncrypted] = useState(false);
+  const [vaultUnlocked, setVaultUnlocked] = useState(false);
+  const [license, setLicense] = useState<LicenseRecord | null>(null);
+  const [coachEnabled, setCoachEnabledState] = useState(false);
+  const [mode, setModeState] = useState<"single" | "podium">("single");
+  const [selectedAthleteId, setSelectedAthleteId] = useState(DEFAULT_SINGLE);
+  const [podiumAthleteIds, setPodiumAthleteIds] = useState<[string, string, string]>(DEFAULT_PODIUM);
+  const [recommendation, setRecommendation] = useState<CoachRecommendation | null>(null);
+  const [paywall, setPaywall] = useState<Paywall>(null);
+  const [lockerOpen, setLockerOpenState] = useState(false);
+  const [lockerTab, setLockerTab] = useState<LockerTab>("vault");
+  const [railOpen, setRailOpen] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [licenseMessage, setLicenseMessage] = useState<string | null>(null);
+  const eventsRef = useRef(events);
+  const keysRef = useRef(keys);
+  const activeIdRef = useRef(activeEventId);
+  const persistTimer = useRef<number | null>(null);
+  const coachTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    eventsRef.current = events;
+    keysRef.current = keys;
+    activeIdRef.current = activeEventId;
+  }, [events, keys, activeEventId]);
+  const premium = isPremiumActive(license);
+  const activeEvent = events.find((event) => event.id === activeEventId) ?? events[0] ?? null;
+
+  const commitEvents = useCallback((next: ArenaEvent[], persistId?: string) => {
+    eventsRef.current = next;
+    setEvents(next);
+    if (!persistId) return;
+    const target = next.find((event) => event.id === persistId);
+    if (!target) return;
+    if (persistTimer.current) window.clearTimeout(persistTimer.current);
+    persistTimer.current = window.setTimeout(() => {
+      void putEvent(target);
+    }, 250);
+  }, []);
+
+  const patchEvent = useCallback(
+    (id: string, updater: (event: ArenaEvent) => ArenaEvent, persist = true) => {
+      const current = eventsRef.current.find((event) => event.id === id);
+      if (!current) return;
+      const nextEvent = updater({ ...current, updatedAt: Date.now() });
+      const nextList = [nextEvent, ...eventsRef.current.filter((event) => event.id !== id)].sort(
+        (a, b) => b.updatedAt - a.updatedAt,
+      );
+      commitEvents(nextList, persist ? id : undefined);
+    },
+    [commitEvents],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const vault = loadVaultState();
+      const storedLicense = loadLicense();
+      const settings = loadSettings();
+      const storedEvents = await listEvents();
+      if (cancelled) return;
+
+      if (vault?.encrypted) {
+        setVaultEncrypted(true);
+        setVaultUnlocked(false);
+        setLockerOpenState(true);
+        setLockerTab("vault");
+      } else if (vault && !vault.encrypted) {
+        setKeys(vault.keys);
+        setVaultUnlocked(true);
+      }
+
+      setLicense(storedLicense);
+      if (settings.selectedAthleteId) setSelectedAthleteId(settings.selectedAthleteId);
+      if (settings.podiumAthleteIds) setPodiumAthleteIds(settings.podiumAthleteIds);
+      const premiumNow = isPremiumActive(storedLicense);
+      setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow));
+      setModeState(settings.mode === "podium" && premiumNow ? "podium" : "single");
+
+      if (storedEvents.length > 0) {
+        setEvents(storedEvents);
+        setActiveEventId(storedEvents[0].id);
+      } else {
+        const fresh = createEvent("single");
+        setEvents([fresh]);
+        setActiveEventId(fresh.id);
+        await putEvent(fresh);
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    saveSettings({
+      selectedAthleteId,
+      podiumAthleteIds,
+      coachEnabled,
+      mode,
+    });
+  }, [ready, selectedAthleteId, podiumAthleteIds, coachEnabled, mode]);
+
+  const revalidateLicense = useCallback(async (record: LicenseRecord) => {
+    try {
+      const response = await fetch("/api/license/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          licenseKey: record.licenseKey,
+          instanceId: record.instanceId,
+          instanceName: record.instanceName,
+        }),
+      });
+      const json = (await response.json()) as {
+        ok: boolean;
+        expired?: boolean;
+        error?: string;
+        record?: LicenseRecord;
+      };
+      if (json.ok && json.record) {
+        setLicense(json.record);
+        saveLicense(json.record);
+        setLicenseMessage(null);
+        return;
+      }
+      const degraded: LicenseRecord = json.record ?? {
+        ...record,
+        status: json.expired ? "expired" : "disabled",
+        lastValidatedAt: Date.now(),
+      };
+      if (!isPremiumActive(degraded)) {
+        setCoachEnabledState(false);
+        setModeState("single");
+      }
+      setLicense(degraded);
+      saveLicense(degraded);
+      setLicenseMessage(json.error || "Pass expired — back to Free Player. History is intact.");
+    } catch {
+      setLicenseMessage("Could not re-validate the pass right now. Premium stays cached until the next check.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return undefined;
+    const boot = window.setTimeout(() => {
+      const latest = loadLicense();
+      if (latest?.licenseKey) void revalidateLicense(latest);
+    }, 0);
+    const timer = window.setInterval(() => {
+      const latest = loadLicense();
+      if (latest?.licenseKey) void revalidateLicense(latest);
+    }, 30 * 60 * 1000);
+    return () => {
+      window.clearTimeout(boot);
+      window.clearInterval(timer);
+    };
+  }, [ready, revalidateLicense]);
+
+  const setCoachEnabled = useCallback(
+    (on: boolean) => {
+      if (on && featureLocked("coach", license)) {
+        setPaywall("coach");
+        return;
+      }
+      setCoachEnabledState(on);
+    },
+    [license],
+  );
+
+  const setMode = useCallback(
+    (next: "single" | "podium") => {
+      if (next === "podium" && featureLocked("podium", license)) {
+        setPaywall("podium");
+        return;
+      }
+      setModeState(next);
+    },
+    [license],
+  );
+
+  const setLockerOpen = useCallback((open: boolean, tab?: LockerTab) => {
+    setLockerOpenState(open);
+    if (tab) setLockerTab(tab);
+  }, []);
+
+  const newEvent = useCallback(() => {
+    const fresh = createEvent(mode);
+    setEvents((current) => [fresh, ...current]);
+    setActiveEventId(fresh.id);
+    setRecommendation(null);
+    void putEvent(fresh);
+    setRailOpen(false);
+  }, [mode]);
+
+  const selectEvent = useCallback((id: string) => {
+    setActiveEventId(id);
+    setRailOpen(false);
+  }, []);
+
+  const removeEvent = useCallback(
+    async (id: string) => {
+      await deleteEvent(id);
+      setEvents((current) => {
+        const next = current.filter((event) => event.id !== id);
+        if (next.length === 0) {
+          const fresh = createEvent(mode);
+          void putEvent(fresh);
+          setActiveEventId(fresh.id);
+          return [fresh];
+        }
+        if (activeEventId === id) setActiveEventId(next[0].id);
+        return next;
+      });
+    },
+    [activeEventId, mode],
+  );
+
+  const requestCoach = useCallback(
+    (prompt: string) => {
+      if (!coachEnabled || !premium) {
+        setRecommendation(null);
+        return;
+      }
+      if (coachTimer.current) window.clearTimeout(coachTimer.current);
+      if (prompt.trim().length < 12) {
+        setRecommendation(null);
+        return;
+      }
+      coachTimer.current = window.setTimeout(async () => {
+        const local = recommendAthlete(prompt, keysRef.current, "heuristic");
+        if (local) setRecommendation(local);
+        try {
+          const response = await fetch("/api/coach", {
+            method: "POST",
+            headers: keyHeaders(keysRef.current),
+            body: JSON.stringify({ prompt }),
+          });
+          const json = (await response.json()) as { recommendation?: CoachRecommendation | null };
+          if (json.recommendation) setRecommendation(json.recommendation);
+        } catch {
+          // keep heuristic
+        }
+      }, 450);
+    },
+    [coachEnabled, premium],
+  );
+
+  const sendPrompt = useCallback(
+    async (prompt: string) => {
+      const trimmed = prompt.trim();
+      if (!trimmed || sending) return false;
+      if (!hasAnyKey(keysRef.current)) {
+        setLockerOpen(true, "vault");
+        return false;
+      }
+      if (mode === "podium" && featureLocked("podium", license)) {
+        setPaywall("podium");
+        return false;
+      }
+
+      setSending(true);
+      try {
+      const eventId = activeIdRef.current ?? activeEvent?.id;
+      if (!eventId) {
+        return false;
+      }
+
+      const userMessage: ArenaMessage = {
+        id: uid(),
+        role: "user",
+        content: trimmed,
+        createdAt: Date.now(),
+      };
+
+      const history = (activeEvent?.messages ?? [])
+        .filter((message) => message.role === "user" || (message.role === "assistant" && message.content))
+        .map((message) => ({
+          role: message.role,
+          content:
+            message.role === "assistant" && message.contenders
+              ? message.contenders.find((c) => c.place === 1)?.content || message.content
+              : message.content,
+        }));
+
+      const appendDelta = (assistantId: string, athleteId: string, text: string) => {
+        patchEvent(
+          eventId,
+          (event) => ({
+            ...event,
+            messages: event.messages.map((message) =>
+              message.id === assistantId
+                ? {
+                    ...message,
+                    content: message.athleteId === athleteId ? message.content + text : message.content,
+                    contenders: message.contenders?.map((c) =>
+                      c.athleteId === athleteId ? { ...c, content: c.content + text } : c,
+                    ),
+                  }
+                : message,
+            ),
+          }),
+          false,
+        );
+      };
+
+      const finishLane = (
+        assistantId: string,
+        athleteId: string,
+        result: Awaited<ReturnType<typeof streamChat>>,
+      ) => {
+        patchEvent(eventId, (event) => ({
+          ...event,
+          messages: event.messages.map((message) =>
+            message.id === assistantId
+              ? {
+                  ...message,
+                  contenders: message.contenders?.map((c) =>
+                    c.athleteId === athleteId
+                      ? {
+                          ...c,
+                          status: result.error ? (result.error.code === "DQ" ? "dq" : "false_start") : "done",
+                          error: result.error?.message,
+                          stats: result.stats,
+                        }
+                      : c,
+                  ),
+                }
+              : message,
+          ),
+        }));
+      };
+
+      if (mode === "single") {
+        const athleteId = selectedAthleteId;
+        const assistant: ArenaMessage = {
+          id: uid(),
+          role: "assistant",
+          content: "",
+          athleteId,
+          contenders: [{ athleteId, content: "", status: "streaming" }],
+          createdAt: Date.now(),
+        };
+        patchEvent(eventId, (event) => ({
+          ...event,
+          title: event.messages.length === 0 ? titleFromPrompt(trimmed) : event.title,
+          mode: "single",
+          messages: [...event.messages, userMessage, assistant],
+        }));
+
+        const result = await streamChat({
+          athleteId,
+          keys: keysRef.current,
+          messages: [...history, { role: "user", content: trimmed }],
+          onDelta: (text) => appendDelta(assistant.id, athleteId, text),
+        });
+        finishLane(assistant.id, athleteId, result);
+      } else {
+        const lanes = podiumAthleteIds;
+        const assistant: ArenaMessage = {
+          id: uid(),
+          role: "assistant",
+          content: "",
+          contenders: lanes.map((athleteId) => ({
+            athleteId,
+            content: "",
+            status: "streaming" as const,
+          })),
+          createdAt: Date.now(),
+        };
+        patchEvent(eventId, (event) => ({
+          ...event,
+          title: event.messages.length === 0 ? titleFromPrompt(trimmed) : event.title,
+          mode: "podium",
+          messages: [...event.messages, userMessage, assistant],
+        }));
+
+        const collected: ContenderResult[] = lanes.map((athleteId) => ({
+          athleteId,
+          content: "",
+          status: "streaming",
+        }));
+
+        await Promise.all(
+          lanes.map(async (athleteId, index) => {
+            const result = await streamChat({
+              athleteId,
+              keys: keysRef.current,
+              messages: [...history, { role: "user", content: trimmed }],
+              onDelta: (text) => {
+                collected[index] = {
+                  ...collected[index],
+                  content: collected[index].content + text,
+                };
+                appendDelta(assistant.id, athleteId, text);
+              },
+            });
+            collected[index] = {
+              ...collected[index],
+              status: result.error ? (result.error.code === "DQ" ? "dq" : "false_start") : "done",
+              error: result.error?.message,
+              stats: result.stats,
+            };
+            finishLane(assistant.id, athleteId, result);
+          }),
+        );
+
+        const successful = collected.filter((c) => c.status === "done" && c.content.trim());
+        if (successful.length >= 2) {
+          try {
+            const response = await fetch("/api/judge", {
+              method: "POST",
+              headers: keyHeaders(keysRef.current),
+              body: JSON.stringify({
+                prompt: trimmed,
+                contenders: successful.map((c) => ({ athleteId: c.athleteId, content: c.content })),
+              }),
+            });
+            const json = (await response.json()) as {
+              ranking?: { athleteId: string; place: 1 | 2 | 3; reason?: string }[];
+              citation?: string;
+            };
+            if (json.ranking?.length) {
+              patchEvent(eventId, (event) => ({
+                ...event,
+                messages: event.messages.map((message) =>
+                  message.id === assistant.id
+                    ? {
+                        ...message,
+                        contenders: applyRanking(message.contenders ?? [], json.ranking ?? [], json.citation),
+                      }
+                    : message,
+                ),
+              }));
+            }
+          } catch {
+            // leave unranked
+          }
+        }
+      }
+
+      const finalEvent = eventsRef.current.find((event) => event.id === eventId);
+      if (finalEvent) await putEvent(finalEvent);
+      return true;
+      } finally {
+        setSending(false);
+      }
+    },
+    [activeEvent, license, mode, patchEvent, podiumAthleteIds, selectedAthleteId, sending, setLockerOpen],
+  );
+
+  const saveKeys = useCallback(async (next: ProviderKeys, password?: string) => {
+    setKeys(next);
+    if (password) {
+      await saveEncryptedKeys(next, password);
+      setVaultEncrypted(true);
+      setVaultUnlocked(true);
+    } else {
+      savePlainKeys(next);
+      setVaultEncrypted(false);
+      setVaultUnlocked(true);
+    }
+  }, []);
+
+  const unlock = useCallback(async (password: string) => {
+    const next = await unlockVault(password);
+    setKeys(next);
+    setVaultUnlocked(true);
+  }, []);
+
+  const lock = useCallback(() => {
+    setKeys(emptyKeys());
+    setVaultUnlocked(false);
+  }, []);
+
+  const activate = useCallback(async (licenseKey: string) => {
+    const instanceName = getOrCreateInstanceName();
+    const response = await fetch("/api/license/activate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ licenseKey, instanceName }),
+    });
+    const json = (await response.json()) as { ok: boolean; error?: string; record?: LicenseRecord };
+    if (!json.ok || !json.record) {
+      throw new Error(json.error || "Activation failed.");
+    }
+    setLicense(json.record);
+    saveLicense(json.record);
+    setLicenseMessage(null);
+    setPaywall(null);
+  }, []);
+
+  const clearLicense = useCallback(() => {
+    setLicense(null);
+    saveLicense(null);
+    setCoachEnabledState(false);
+    setModeState("single");
+  }, []);
+
+  const value = useMemo<ArenaContextValue>(
+    () => ({
+      ready,
+      events,
+      activeEvent,
+      keys,
+      vaultEncrypted,
+      vaultUnlocked,
+      license,
+      premium,
+      coachEnabled,
+      mode,
+      selectedAthleteId,
+      podiumAthleteIds,
+      recommendation,
+      paywall,
+      lockerOpen,
+      lockerTab,
+      railOpen,
+      sending,
+      licenseMessage,
+      setSelectedAthleteId,
+      setPodiumAthlete: (index, id) => {
+        setPodiumAthleteIds((current) => {
+          const next = [...current] as [string, string, string];
+          next[index] = id;
+          return next;
+        });
+      },
+      setCoachEnabled,
+      setMode,
+      setPaywall,
+      setLockerOpen,
+      setRailOpen,
+      newEvent,
+      selectEvent,
+      removeEvent,
+      requestCoach,
+      sendPrompt,
+      saveKeys,
+      unlock,
+      lock,
+      activate,
+      clearLicense,
+    }),
+    [
+      activate,
+      activeEvent,
+      clearLicense,
+      coachEnabled,
+      events,
+      keys,
+      license,
+      licenseMessage,
+      lock,
+      lockerOpen,
+      lockerTab,
+      mode,
+      newEvent,
+      paywall,
+      podiumAthleteIds,
+      premium,
+      railOpen,
+      ready,
+      recommendation,
+      removeEvent,
+      requestCoach,
+      saveKeys,
+      selectedAthleteId,
+      selectEvent,
+      sending,
+      sendPrompt,
+      setCoachEnabled,
+      setLockerOpen,
+      setMode,
+      unlock,
+      vaultEncrypted,
+      vaultUnlocked,
+    ],
+  );
+
+  return <ArenaContext.Provider value={value}>{children}</ArenaContext.Provider>;
+}
+
+export function useArena(): ArenaContextValue {
+  const value = useContext(ArenaContext);
+  if (!value) throw new Error("useArena must be used within ArenaProvider");
+  return value;
+}
+
+function applyRanking(
+  contenders: ContenderResult[],
+  ranking: { athleteId: string; place: 1 | 2 | 3; reason?: string }[],
+  citation?: string,
+): ContenderResult[] {
+  return contenders.map((contender) => {
+    const row = ranking.find((entry) => entry.athleteId === contender.athleteId);
+    if (!row) return contender;
+    return {
+      ...contender,
+      place: row.place,
+      citation: row.place === 1 ? citation || row.reason : row.reason,
+    };
+  });
+}
+
