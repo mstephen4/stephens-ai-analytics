@@ -79,7 +79,6 @@ export function HomePage() {
             <div className="card model-card elevated">
               <div className="judges-citation-label">Judge&apos;s Citation</div>
               <div className="model-name">Model name</div>
-              <p>&quot;It sexine, thore denened to word of oalting.&quot;</p>
             </div>
             <div className="card bronze">
               <h2>Bronze</h2>
