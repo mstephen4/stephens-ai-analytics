@@ -76,10 +76,10 @@ export function HomePage() {
             <div className="card silver">
               <h2>Silver</h2>
             </div>
-            <div className="card model-card">
-              <div className="judges-citation-label">Judge&apos;s citation</div>
+            <div className="card model-card elevated">
+              <div className="judges-citation-label">Judge&apos;s Citation</div>
               <div className="model-name">Model name</div>
-              <p>&quot;It sekine, thore denened to word of beking.&quot;</p>
+              <p>&quot;It sexine, thore denened to word of oalting.&quot;</p>
             </div>
             <div className="card bronze">
               <h2>Bronze</h2>

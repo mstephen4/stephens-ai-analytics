@@ -836,8 +836,8 @@ h2,
   inset: 0;
   z-index: 2;
   background:
-    radial-gradient(ellipse 85% 70% at 50% 38%, transparent 0%, rgba(12, 13, 16, 0.35) 55%, rgba(12, 13, 16, 0.88) 100%),
-    linear-gradient(to bottom, rgba(12, 13, 16, 0.55) 0%, transparent 18%, transparent 72%, rgba(12, 13, 16, 0.92) 100%);
+    radial-gradient(ellipse 90% 75% at 50% 42%, transparent 0%, rgba(12, 13, 16, 0.25) 50%, rgba(12, 13, 16, 0.82) 100%),
+    linear-gradient(to bottom, rgba(12, 13, 16, 0.45) 0%, transparent 14%, transparent 78%, rgba(12, 13, 16, 0.94) 100%);
 }
 
 .coliseum-svg {
@@ -932,14 +932,17 @@ h2,
 }
 
 .olympiad-hero-copy h1 {
+  font-family: var(--font-outfit), var(--font-inter), sans-serif;
   font-size: clamp(2.25rem, 4.5vw, 3.75rem);
   margin: 0 0 1rem;
   line-height: 1.1;
   font-weight: 700;
   letter-spacing: -0.02em;
+  text-shadow: 0 0 40px rgba(245, 183, 46, 0.12);
 }
 
 .olympiad-hero-copy p {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(0.65rem, 1.1vw, 0.78rem);
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -959,20 +962,20 @@ h2,
 
 .search-container {
   width: 100%;
-  max-width: 680px;
+  max-width: 720px;
   border: 2px solid transparent;
-  border-radius: 999px;
+  border-radius: 10px;
   background:
-    linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
-    linear-gradient(135deg, #f5b72e 0%, #cd7f32 45%, #f5b72e 100%) border-box;
+    linear-gradient(rgba(14, 16, 20, 0.92), rgba(14, 16, 20, 0.92)) padding-box,
+    linear-gradient(135deg, #f5b72e 0%, #e6a020 50%, #f5b72e 100%) border-box;
   box-shadow:
-    0 0 24px rgba(245, 183, 46, 0.35),
-    0 0 48px rgba(245, 183, 46, 0.12);
+    0 0 20px rgba(245, 183, 46, 0.4),
+    0 0 40px rgba(245, 183, 46, 0.15),
+    inset 0 0 20px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
-  padding: 0.85rem 1.35rem;
+  padding: 0.9rem 1.35rem;
   box-sizing: border-box;
-  backdrop-filter: blur(8px);
 }
 
 .search-container .torch-icon {
@@ -1060,6 +1063,11 @@ h2,
     inset 0 0 30px rgba(245, 183, 46, 0.06);
 }
 
+.model-card.elevated {
+  transform: translateY(-12px);
+  z-index: 1;
+}
+
 .judges-citation-label {
   position: absolute;
   top: -13px;
@@ -1127,6 +1135,10 @@ h2,
 
   .model-card {
     order: -1;
+  }
+
+  .model-card.elevated {
+    transform: none;
   }
 }
 
