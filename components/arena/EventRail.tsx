@@ -23,7 +23,7 @@ export function EventRail() {
             >
               <span className="event-title">{event.title}</span>
               <span className="event-meta">
-                {event.mode === "podium" ? "Podium" : "Single"} ·{" "}
+                {event.mode === "podium" ? "Podium" : event.mode === "compare" ? "Compare" : "Single"} ·{" "}
                 {new Date(event.updatedAt).toLocaleDateString()}
               </span>
             </button>
