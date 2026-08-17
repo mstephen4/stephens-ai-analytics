@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Flame } from "lucide-react";
-import { PRODUCT_NAME } from "@/lib/constants";
-import { HeroArenaGraphic } from "./HeroArenaGraphic";
+import { StadiumDiagram } from "./StadiumDiagram";
 
 export function HomePage() {
   const router = useRouter();
@@ -21,13 +19,15 @@ export function HomePage() {
   };
 
   return (
-    <div className="home-shell">
-      <header className="home-nav">
-        <Link href="/" className="home-logo">
-          <span className="logo-orbit" aria-hidden />
-          <span className="logo-text">{PRODUCT_NAME.toUpperCase()}</span>
+    <div className="olympiad-home">
+      <header className="olympiad-header">
+        <Link href="/" className="logo-container">
+          <span className="logo-icon" aria-hidden>
+            ☼
+          </span>
+          <span className="logo-text">OLYMPIAD</span>
         </Link>
-        <nav className="home-links">
+        <nav className="olympiad-nav">
           <button type="button" onClick={() => launch()}>
             Events
           </button>
@@ -40,54 +40,52 @@ export function HomePage() {
         </nav>
       </header>
 
-      <section className="home-hero">
-        <div className="hero-copy">
-          <h1>The games are always on</h1>
-          <p>
-            One prompt. Multiple models. Side-by-side answers from OpenAI, Anthropic, Google, DeepSeek,
-            Grok, Llama, and Mistral — with your own keys.
-          </p>
+      <main className="olympiad-main">
+        <div className="olympiad-landscape">
+          <div className="olympiad-intro">
+            <h1>The games are always on.</h1>
+            <p>
+              EVERY METRIC. FOR PEAK. A PERPETUAL DATA STREAM, ATHLETES UNIFIED ON A GRAND PLATFORM.
+            </p>
+          </div>
+          <StadiumDiagram />
         </div>
-        <HeroArenaGraphic />
-      </section>
 
-      <form
-        className="home-torch-bar"
-        onSubmit={(e) => {
-          e.preventDefault();
-          launch("compare");
-        }}
-      >
-        <Flame size={20} className="torch-icon" aria-hidden />
-        <input
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Light the torch — ask anything"
-          aria-label="Ask a question"
-        />
-        <button type="submit" className="home-go">
-          Go
-        </button>
-      </form>
+        <form
+          className="input-section"
+          onSubmit={(e) => {
+            e.preventDefault();
+            launch("compare");
+          }}
+        >
+          <div className="search-container">
+            <span className="torch-icon" aria-hidden>
+              🔥
+            </span>
+            <input
+              type="text"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Light the torch — ask anything"
+              aria-label="Ask a question"
+            />
+          </div>
+        </form>
 
-      <section className="home-podium-preview" aria-label="Podium preview">
-        <article className="preview-card silver">
-          <span>Silver</span>
-        </article>
-        <article className="preview-card gold">
-          <span className="citation-badge">Judge&apos;s citation</span>
-          <strong>Model name</strong>
-          <p>Ranked first for accuracy, formatting, and instruction-following.</p>
-        </article>
-        <article className="preview-card bronze">
-          <span>Bronze</span>
-        </article>
-      </section>
-
-      <footer className="home-foot">
-        <p>BYOK · Local history · Installable PWA</p>
-        <Link href="/events">Open events →</Link>
-      </footer>
+        <section className="podium-section" aria-label="Podium preview">
+          <div className="card silver">
+            <h2>Silver</h2>
+          </div>
+          <div className="card model-card">
+            <div className="judges-citation-label">Judge&apos;s citation</div>
+            <div className="model-name">Model name</div>
+            <p>&quot;It excelled in tone, structure, and word choice.&quot;</p>
+          </div>
+          <div className="card bronze">
+            <h2>Bronze</h2>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
