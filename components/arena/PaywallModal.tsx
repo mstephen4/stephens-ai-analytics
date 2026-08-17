@@ -22,13 +22,13 @@ export function PaywallModal() {
         <p className="brand-kicker">OLYMPIC PASS</p>
         <h2>{title} with a Pro or Lifetime Pass.</h2>
         <p>
-          Free Player keeps single-model chat, BYOK, and local history. The Podium and The Coach are reserved for
-          paid lanes.
+          Free Player keeps single-model chat, 2-model compare, BYOK, and local history. The Podium (up to 6 models +
+          judge) and Coach routing are reserved for paid passes.
         </p>
         <div className="paywall-actions">
           {PRO_URL ? (
             <a className="gold-btn" href={PRO_URL} target="_blank" rel="noreferrer">
-              Arena Pro
+              Olympiad Pro
             </a>
           ) : null}
           {LIFETIME_URL ? (

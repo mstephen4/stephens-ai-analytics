@@ -1,6 +1,7 @@
 import type { Athlete, ProviderId, ProviderKeys } from "./types";
 
 export const ATHLETES: Athlete[] = [
+  // OpenAI
   {
     id: "openai:gpt-4o-mini",
     name: "GPT-4o Mini",
@@ -66,6 +67,7 @@ export const ATHLETES: Athlete[] = [
     judgeEligible: false,
     classifierEligible: false,
   },
+  // Anthropic
   {
     id: "anthropic:claude-haiku-3.5",
     name: "Claude 3.5 Haiku",
@@ -105,6 +107,7 @@ export const ATHLETES: Athlete[] = [
     judgeEligible: false,
     classifierEligible: false,
   },
+  // Google
   {
     id: "google:gemini-2.0-flash",
     name: "Gemini 2.0 Flash",
@@ -144,13 +147,154 @@ export const ATHLETES: Athlete[] = [
     judgeEligible: false,
     classifierEligible: false,
   },
+  // DeepSeek
+  {
+    id: "deepseek:deepseek-chat",
+    name: "DeepSeek Chat",
+    shortName: "DeepSeek",
+    provider: "deepseek",
+    apiModel: "deepseek-chat",
+    role: "allrounder",
+    inputCostPer1M: 0.27,
+    outputCostPer1M: 1.1,
+    strengths: ["coding", "value", "general Q&A"],
+    judgeEligible: true,
+    classifierEligible: true,
+  },
+  {
+    id: "deepseek:deepseek-reasoner",
+    name: "DeepSeek Reasoner",
+    shortName: "R1",
+    provider: "deepseek",
+    apiModel: "deepseek-reasoner",
+    role: "heavy",
+    inputCostPer1M: 0.55,
+    outputCostPer1M: 2.19,
+    strengths: ["chain-of-thought", "math", "logic"],
+    judgeEligible: false,
+    classifierEligible: false,
+  },
+  // Groq (Llama)
+  {
+    id: "groq:llama-3.3-70b-versatile",
+    name: "Llama 3.3 70B",
+    shortName: "Llama 3.3",
+    provider: "groq",
+    apiModel: "llama-3.3-70b-versatile",
+    role: "allrounder",
+    inputCostPer1M: 0.59,
+    outputCostPer1M: 0.79,
+    strengths: ["open weights", "fast inference", "generalist"],
+    judgeEligible: true,
+    classifierEligible: false,
+  },
+  {
+    id: "groq:llama-3.1-8b-instant",
+    name: "Llama 3.1 8B",
+    shortName: "Llama 8B",
+    provider: "groq",
+    apiModel: "llama-3.1-8b-instant",
+    role: "sprinter",
+    inputCostPer1M: 0.05,
+    outputCostPer1M: 0.08,
+    strengths: ["ultra-fast", "cheap drafts"],
+    judgeEligible: true,
+    classifierEligible: true,
+  },
+  {
+    id: "groq:mixtral-8x7b-32768",
+    name: "Mixtral 8x7B",
+    shortName: "Mixtral",
+    provider: "groq",
+    apiModel: "mixtral-8x7b-32768",
+    role: "allrounder",
+    inputCostPer1M: 0.24,
+    outputCostPer1M: 0.24,
+    strengths: ["MoE efficiency", "multilingual"],
+    judgeEligible: true,
+    classifierEligible: false,
+  },
+  // xAI Grok
+  {
+    id: "xai:grok-2-1212",
+    name: "Grok 2",
+    shortName: "Grok 2",
+    provider: "xai",
+    apiModel: "grok-2-1212",
+    role: "allrounder",
+    inputCostPer1M: 2,
+    outputCostPer1M: 10,
+    strengths: ["real-time tone", "general reasoning"],
+    judgeEligible: false,
+    classifierEligible: false,
+  },
+  {
+    id: "xai:grok-2-mini",
+    name: "Grok 2 Mini",
+    shortName: "Grok Mini",
+    provider: "xai",
+    apiModel: "grok-2-mini",
+    role: "sprinter",
+    inputCostPer1M: 0.2,
+    outputCostPer1M: 0.4,
+    strengths: ["fast Grok lane", "cheap compare"],
+    judgeEligible: true,
+    classifierEligible: true,
+  },
+  // Mistral
+  {
+    id: "mistral:mistral-small-latest",
+    name: "Mistral Small",
+    shortName: "M. Small",
+    provider: "mistral",
+    apiModel: "mistral-small-latest",
+    role: "sprinter",
+    inputCostPer1M: 0.2,
+    outputCostPer1M: 0.6,
+    strengths: ["EU hosting option", "efficient prose"],
+    judgeEligible: true,
+    classifierEligible: true,
+  },
+  {
+    id: "mistral:mistral-large-latest",
+    name: "Mistral Large",
+    shortName: "M. Large",
+    provider: "mistral",
+    apiModel: "mistral-large-latest",
+    role: "heavy",
+    inputCostPer1M: 2,
+    outputCostPer1M: 6,
+    strengths: ["reasoning", "multilingual", "coding"],
+    judgeEligible: false,
+    classifierEligible: false,
+  },
+  {
+    id: "mistral:codestral-latest",
+    name: "Codestral",
+    shortName: "Codestral",
+    provider: "mistral",
+    apiModel: "codestral-latest",
+    role: "allrounder",
+    inputCostPer1M: 0.3,
+    outputCostPer1M: 0.9,
+    strengths: ["code completion", "refactors"],
+    judgeEligible: false,
+    classifierEligible: false,
+  },
 ];
 
 export const DEFAULT_SINGLE = "openai:gpt-4o-mini";
-export const DEFAULT_PODIUM: [string, string, string] = [
+export const DEFAULT_COMPARE: [string, string] = [
+  "openai:gpt-4o-mini",
+  "google:gemini-2.0-flash",
+];
+export const DEFAULT_PODIUM: string[] = [
   "openai:gpt-4o",
   "anthropic:claude-sonnet-4",
   "google:gemini-2.5-pro",
+  "deepseek:deepseek-chat",
+  "xai:grok-2-1212",
+  "mistral:mistral-large-latest",
 ];
 
 export function getAthlete(id: string): Athlete | undefined {
@@ -166,17 +310,33 @@ export function hasAnyKey(keys: ProviderKeys): boolean {
 }
 
 export function keyHeaderName(provider: ProviderId): string {
-  return {
-    openai: "x-arena-openai-key",
-    anthropic: "x-arena-anthropic-key",
-    google: "x-arena-google-key",
-  }[provider];
+  return `x-olympiad-${provider}-key`;
 }
 
 export function emptyKeys(): ProviderKeys {
-  return { openai: "", anthropic: "", google: "" };
+  return {
+    openai: "",
+    anthropic: "",
+    google: "",
+    deepseek: "",
+    groq: "",
+    xai: "",
+    mistral: "",
+  };
 }
 
 export function providerLabel(provider: ProviderId): string {
-  return { openai: "OpenAI", anthropic: "Anthropic", google: "Google" }[provider];
+  return {
+    openai: "OpenAI",
+    anthropic: "Anthropic",
+    google: "Google",
+    deepseek: "DeepSeek",
+    groq: "Groq",
+    xai: "xAI",
+    mistral: "Mistral",
+  }[provider];
+}
+
+export function mergeKeys(partial: Partial<ProviderKeys>): ProviderKeys {
+  return { ...emptyKeys(), ...partial };
 }

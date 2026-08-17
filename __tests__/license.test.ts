@@ -21,7 +21,7 @@ describe("verifyArenaLicense", () => {
     ).toBe("wrong_variant");
   });
 
-  it("accepts only Arena Pro and Lifetime variants", () => {
+  it("accepts only Olympiad Pro and Lifetime variants", () => {
     expect(verifyArenaLicense({ store_id: 10, product_id: 20, variant_id: 30 }, env)).toEqual({
       ok: true,
       tier: "pro",

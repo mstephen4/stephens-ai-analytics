@@ -11,10 +11,10 @@ export function SingleThread() {
     return (
       <div className="empty-floor">
         <div className="torch-mark large" />
-        <h2>Enter the Coliseum</h2>
+        <h2>Enter the stadium</h2>
         <p>
-          Deploy an athlete against a prompt. Free Player is single-model BYOK. Unlock The Podium and The Coach
-          with a Pro or Lifetime pass.
+          Compare two models for free, or unlock the Podium and Coach with an Olympiad Pro or Lifetime pass.
+          Your keys stay in this browser.
         </p>
         {!vaultUnlocked ? (
           <button className="gold-btn" onClick={() => setLockerOpen(true, "vault")}>
@@ -31,7 +31,7 @@ export function SingleThread() {
         if (message.role === "user") {
           return (
             <div key={message.id} className="user-prompt">
-              <span>General Manager</span>
+              <span>You</span>
               <p>{message.content}</p>
             </div>
           );

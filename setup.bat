@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-echo === The Arena setup ===
+echo === AI Olympiad setup ===
 echo.
 
 where node >nul 2>&1

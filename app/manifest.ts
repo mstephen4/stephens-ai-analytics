@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { PRODUCT_NAME, PRODUCT_SHORT } from "@/lib/constants";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "The Arena",
-    short_name: "Arena",
-    description: "BYOK multi-model AI decathlon. Coach routing, Podium judging, local vault.",
+    name: PRODUCT_NAME,
+    short_name: PRODUCT_SHORT,
+    description: "BYOK multi-model AI compare. Coach routing, Podium judging, local vault.",
     start_url: "/",
     scope: "/",
     display: "standalone",

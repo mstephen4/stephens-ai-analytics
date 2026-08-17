@@ -1,5 +1,5 @@
-import { ArenaApp } from "@/components/arena/ArenaApp";
+import { HomePage } from "@/components/home/HomePage";
 
 export default function Home() {
-  return <ArenaApp />;
+  return <HomePage />;
 }

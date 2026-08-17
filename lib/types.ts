@@ -1,6 +1,13 @@
-export type ProviderId = "openai" | "anthropic" | "google";
+export type ProviderId =
+  | "openai"
+  | "anthropic"
+  | "google"
+  | "deepseek"
+  | "groq"
+  | "xai"
+  | "mistral";
 
-export type ArenaMode = "single" | "podium";
+export type ArenaMode = "single" | "compare" | "podium";
 
 export type LicenseTier = "free" | "pro" | "lifetime";
 
@@ -17,12 +24,7 @@ export type Intent =
 
 export type Complexity = "low" | "mid" | "high";
 
-export type ContenderStatus =
-  | "idle"
-  | "streaming"
-  | "done"
-  | "false_start"
-  | "dq";
+export type ContenderStatus = "idle" | "streaming" | "done" | "false_start" | "dq";
 
 export type Place = 1 | 2 | 3;
 
@@ -44,6 +46,10 @@ export interface ProviderKeys {
   openai: string;
   anthropic: string;
   google: string;
+  deepseek: string;
+  groq: string;
+  xai: string;
+  mistral: string;
 }
 
 export interface ScoreboardStats {

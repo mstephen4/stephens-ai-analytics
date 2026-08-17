@@ -12,9 +12,10 @@ const EVENTS_STORE = "events";
 
 export interface ArenaSettings {
   selectedAthleteId: string;
-  podiumAthleteIds: [string, string, string];
+  compareAthleteIds: [string, string];
+  podiumAthleteIds: string[];
   coachEnabled: boolean;
-  mode: "single" | "podium";
+  mode: "single" | "compare" | "podium";
 }
 
 export type VaultState =
@@ -101,7 +102,7 @@ export function getOrCreateInstanceName(): string {
   if (!canUseStorage()) return "Arena/anonymous";
   const existing = localStorage.getItem(INSTANCE_STORAGE);
   if (existing) return existing;
-  const name = `Arena/${crypto.randomUUID()}`;
+  const name = `Olympiad/${crypto.randomUUID()}`;
   localStorage.setItem(INSTANCE_STORAGE, name);
   return name;
 }

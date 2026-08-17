@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
   const record = toLicenseRecord(
     licenseKey,
-    body.instanceName?.trim() || lemon.instance?.name || "The Arena",
+    body.instanceName?.trim() || lemon.instance?.name || "AI Olympiad",
     lemon,
     verification.tier,
   );

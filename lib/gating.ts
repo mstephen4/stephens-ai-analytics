@@ -26,6 +26,6 @@ export function degradeToFree(record: LicenseRecord): LicenseRecord {
 export function displayTier(tier: LicenseTier, premium: boolean): string {
   if (!premium) return "Free Player";
   if (tier === "lifetime") return "Lifetime Pass";
-  if (tier === "pro") return "Arena Pro";
+  if (tier === "pro") return "Olympiad Pro";
   return "Free Player";
 }

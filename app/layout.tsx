@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { PRODUCT_NAME } from "@/lib/constants";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -15,13 +16,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "The Arena — AI Decathlon",
+  title: `${PRODUCT_NAME} — Multi-model AI compare`,
   description:
-    "A BYOK PWA that treats model generation like a decathlon. Deploy athletes, light The Coach, and judge The Podium.",
-  applicationName: "The Arena",
+    "BYOK PWA to compare OpenAI, Anthropic, Google, DeepSeek, Grok, Llama, and Mistral side by side. Light the Coach, judge the Podium.",
+  applicationName: PRODUCT_NAME,
   appleWebApp: {
     capable: true,
-    title: "The Arena",
+    title: PRODUCT_NAME,
     statusBarStyle: "black-translucent",
   },
   icons: {

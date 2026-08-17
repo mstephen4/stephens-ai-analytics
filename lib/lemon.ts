@@ -10,9 +10,9 @@ export function lemonErrorMessage(reason?: string): string {
     case "wrong_store":
       return "This license belongs to a different Lemon Squeezy store.";
     case "wrong_product":
-      return "This license is not an Arena product key.";
+      return "This license is not an AI Olympiad product key.";
     case "wrong_variant":
-      return "This license variant is not Arena Pro or Lifetime.";
+      return "This license variant is not Olympiad Pro or Lifetime.";
     default:
       return "License could not be verified.";
   }

@@ -5,7 +5,9 @@ import { useArena } from "./ArenaProvider";
 
 export default function PodiumGrid() {
   const { activeEvent } = useArena();
-  const last = [...(activeEvent?.messages ?? [])].reverse().find((message) => message.contenders?.length === 3);
+  const last = [...(activeEvent?.messages ?? [])]
+    .reverse()
+    .find((message) => (message.contenders?.length ?? 0) >= 2);
   const contenders = last?.contenders ?? [];
   const ranked = contenders.some((c) => c.place);
   const gold = contenders.find((c) => c.place === 1);
@@ -20,11 +22,14 @@ export default function PodiumGrid() {
         .slice(-1)
         .map((message) => (
           <div key={message.id} className="user-prompt">
-            <span>Event</span>
+            <span>Prompt</span>
             <p>{message.content}</p>
           </div>
         ))}
-      <section className={ranked ? "podium-grid ranked" : "podium-grid"}>
+      <section
+        className={ranked ? "podium-grid ranked" : "podium-grid"}
+        style={{ gridTemplateColumns: `repeat(${Math.min(contenders.length, 3)}, minmax(0, 1fr))` }}
+      >
         {ordered.map((contender, index) =>
           contender ? (
             <ContenderCard
@@ -36,6 +41,13 @@ export default function PodiumGrid() {
           ) : null,
         )}
       </section>
+      {contenders.length > 3 ? (
+        <section className="podium-grid overflow-row">
+          {contenders.slice(3).map((contender) => (
+            <ContenderCard key={contender.athleteId} contender={contender} defaultCollapsed />
+          ))}
+        </section>
+      ) : null}
     </div>
   );
 }

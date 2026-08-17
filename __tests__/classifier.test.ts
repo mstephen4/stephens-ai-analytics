@@ -6,6 +6,10 @@ const allKeys: ProviderKeys = {
   openai: "sk-test",
   anthropic: "sk-ant",
   google: "google",
+  deepseek: "ds",
+  groq: "groq",
+  xai: "xai",
+  mistral: "mistral",
 };
 
 describe("heuristicClassify", () => {
@@ -38,12 +42,26 @@ describe("recommendAthlete", () => {
       openai: "sk",
       anthropic: "",
       google: "",
+      deepseek: "",
+      groq: "",
+      xai: "",
+      mistral: "",
     });
     expect(rec?.athleteId.startsWith("openai:")).toBe(true);
   });
 
   it("returns null without keys", () => {
-    expect(recommendAthlete("hello", { openai: "", anthropic: "", google: "" })).toBeNull();
+    expect(
+      recommendAthlete("hello", {
+        openai: "",
+        anthropic: "",
+        google: "",
+        deepseek: "",
+        groq: "",
+        xai: "",
+        mistral: "",
+      }),
+    ).toBeNull();
   });
 });
 

@@ -1,3 +1,4 @@
+import { mergeKeys } from "./models";
 import type { ProviderKeys } from "./types";
 
 export function uid(): string {
@@ -5,11 +6,20 @@ export function uid(): string {
 }
 
 export function keyHeaders(keys: ProviderKeys): HeadersInit {
+  const merged = mergeKeys(keys);
   return {
     "Content-Type": "application/json",
-    "x-arena-openai-key": keys.openai,
-    "x-arena-anthropic-key": keys.anthropic,
-    "x-arena-google-key": keys.google,
+    "x-olympiad-openai-key": merged.openai,
+    "x-olympiad-anthropic-key": merged.anthropic,
+    "x-olympiad-google-key": merged.google,
+    "x-olympiad-deepseek-key": merged.deepseek,
+    "x-olympiad-groq-key": merged.groq,
+    "x-olympiad-xai-key": merged.xai,
+    "x-olympiad-mistral-key": merged.mistral,
+    // Legacy headers for in-flight sessions during migration
+    "x-arena-openai-key": merged.openai,
+    "x-arena-anthropic-key": merged.anthropic,
+    "x-arena-google-key": merged.google,
   };
 }
 

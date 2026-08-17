@@ -13,10 +13,18 @@ export class ProviderError extends Error {
 }
 
 export function keysFromHeaders(headers: Headers): ProviderKeys {
+  const read = (provider: keyof ProviderKeys) =>
+    headers.get(`x-olympiad-${provider}-key`)?.trim() ||
+    headers.get(`x-arena-${provider}-key`)?.trim() ||
+    "";
   return {
-    openai: headers.get("x-arena-openai-key")?.trim() ?? "",
-    anthropic: headers.get("x-arena-anthropic-key")?.trim() ?? "",
-    google: headers.get("x-arena-google-key")?.trim() ?? "",
+    openai: read("openai"),
+    anthropic: read("anthropic"),
+    google: read("google"),
+    deepseek: read("deepseek"),
+    groq: read("groq"),
+    xai: read("xai"),
+    mistral: read("mistral"),
   };
 }
 
@@ -89,11 +97,19 @@ export async function streamAthlete(
   try {
     const key = keyForProvider(keys, athlete.provider);
     if (athlete.provider === "openai") {
-      await streamOpenAI(athlete.apiModel, messages, key, onEvent);
+      await streamOpenAI("https://api.openai.com/v1/chat/completions", athlete.apiModel, messages, key, onEvent);
     } else if (athlete.provider === "anthropic") {
       await streamAnthropic(athlete.apiModel, messages, key, onEvent);
-    } else {
+    } else if (athlete.provider === "google") {
       await streamGoogle(athlete.apiModel, messages, key, onEvent);
+    } else if (athlete.provider === "deepseek") {
+      await streamOpenAI("https://api.deepseek.com/v1/chat/completions", athlete.apiModel, messages, key, onEvent);
+    } else if (athlete.provider === "groq") {
+      await streamOpenAI("https://api.groq.com/openai/v1/chat/completions", athlete.apiModel, messages, key, onEvent);
+    } else if (athlete.provider === "xai") {
+      await streamOpenAI("https://api.x.ai/v1/chat/completions", athlete.apiModel, messages, key, onEvent);
+    } else {
+      await streamOpenAI("https://api.mistral.ai/v1/chat/completions", athlete.apiModel, messages, key, onEvent);
     }
   } catch (error) {
     const mapped =
@@ -122,12 +138,13 @@ export function providerStreamResponse(
 }
 
 async function streamOpenAI(
+  endpoint: string,
   model: string,
   messages: { role: string; content: string }[],
   apiKey: string,
   onEvent: (event: ChatStreamEvent) => void,
 ) {
-  const response = await fetchProvider("https://api.openai.com/v1/chat/completions", {
+  const response = await fetchProvider(endpoint, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,

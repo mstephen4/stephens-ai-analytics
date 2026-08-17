@@ -791,3 +791,246 @@ h2,
     display: none;
   }
 }
+
+/* —— Homepage (AI Olympiad landing) —— */
+.home-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px clamp(16px, 4vw, 48px) 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.home-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 48px;
+}
+
+.home-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-orbit {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px dotted var(--gold);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.35);
+}
+
+.logo-orbit.small {
+  width: 22px;
+  height: 22px;
+}
+
+.logo-text,
+.home-logo .brand-title {
+  margin: 0;
+  font-family: var(--font-outfit), sans-serif;
+  letter-spacing: 0.22em;
+  font-size: 14px;
+  color: var(--gold);
+}
+
+.home-links {
+  display: flex;
+  gap: 28px;
+}
+
+.home-links button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.home-links button:hover {
+  color: var(--ink);
+}
+
+.home-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.hero-copy h1 {
+  margin: 0 0 16px;
+  font-family: var(--font-outfit), sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+}
+
+.hero-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 480px;
+}
+
+.hero-arena-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-arena-svg {
+  width: min(380px, 100%);
+  height: auto;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.45));
+}
+
+.home-torch-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 215, 0, 0.45);
+  background: rgba(42, 46, 53, 0.85);
+  box-shadow: 0 0 24px rgba(255, 215, 0, 0.12);
+  margin-bottom: 48px;
+}
+
+.home-torch-bar input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--ink);
+}
+
+.home-torch-bar input::placeholder {
+  color: var(--muted);
+}
+
+.torch-icon {
+  color: var(--torch);
+  flex-shrink: 0;
+}
+
+.home-go {
+  border: 0;
+  background: linear-gradient(#ffe566, #d4af37);
+  color: #1a1d21;
+  font-weight: 650;
+  border-radius: 999px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+.home-podium-preview {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 16px;
+  align-items: end;
+  margin-top: auto;
+}
+
+.preview-card {
+  background: var(--slate);
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.preview-card.gold {
+  min-height: 160px;
+  transform: translateY(-12px);
+  border-color: var(--gold);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.35);
+  color: var(--ink);
+  align-items: flex-start;
+}
+
+.preview-card.silver {
+  border-color: var(--silver);
+}
+
+.preview-card.bronze {
+  border-color: var(--bronze);
+}
+
+.preview-card .citation-badge {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: #1a1d21;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.preview-card.gold p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.home-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.home-foot a {
+  color: var(--rings);
+  text-decoration: none;
+}
+
+.home-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.podium-grid.overflow-row {
+  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.lane-controls {
+  display: flex;
+  align-items: flex-end;
+}
+
+@media (max-width: 960px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-copy p {
+    margin-inline: auto;
+  }
+
+  .home-podium-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-card.gold {
+    transform: none;
+    order: -1;
+  }
+}

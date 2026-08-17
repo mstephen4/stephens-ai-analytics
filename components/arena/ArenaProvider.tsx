@@ -13,7 +13,8 @@ import {
 import { streamChat } from "@/lib/client-stream";
 import { recommendAthlete } from "@/lib/classifier";
 import { featureLocked, isPremiumActive } from "@/lib/gating";
-import { DEFAULT_PODIUM, DEFAULT_SINGLE, emptyKeys, hasAnyKey } from "@/lib/models";
+import { DEFAULT_PODIUM_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
+import { DEFAULT_COMPARE, DEFAULT_PODIUM, DEFAULT_SINGLE, emptyKeys, hasAnyKey } from "@/lib/models";
 import {
   deleteEvent,
   getOrCreateInstanceName,
@@ -51,9 +52,11 @@ interface ArenaContextValue {
   license: LicenseRecord | null;
   premium: boolean;
   coachEnabled: boolean;
-  mode: "single" | "podium";
+  mode: "single" | "compare" | "podium";
   selectedAthleteId: string;
-  podiumAthleteIds: [string, string, string];
+  compareAthleteIds: [string, string];
+  podiumAthleteIds: string[];
+  podiumLaneCount: number;
   recommendation: CoachRecommendation | null;
   paywall: Paywall;
   lockerOpen: boolean;
@@ -62,9 +65,11 @@ interface ArenaContextValue {
   sending: boolean;
   licenseMessage: string | null;
   setSelectedAthleteId: (id: string) => void;
-  setPodiumAthlete: (index: 0 | 1 | 2, id: string) => void;
+  setCompareAthlete: (index: 0 | 1, id: string) => void;
+  setPodiumAthlete: (index: number, id: string) => void;
+  setPodiumLaneCount: (count: number) => void;
   setCoachEnabled: (on: boolean) => void;
-  setMode: (mode: "single" | "podium") => void;
+  setMode: (mode: "single" | "compare" | "podium") => void;
   setPaywall: (paywall: Paywall) => void;
   setLockerOpen: (open: boolean, tab?: LockerTab) => void;
   setRailOpen: (open: boolean) => void;
@@ -82,7 +87,7 @@ interface ArenaContextValue {
 
 const ArenaContext = createContext<ArenaContextValue | null>(null);
 
-function createEvent(mode: "single" | "podium"): ArenaEvent {
+function createEvent(mode: "single" | "compare" | "podium"): ArenaEvent {
   const now = Date.now();
   return {
     id: uid(),
@@ -103,9 +108,11 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   const [vaultUnlocked, setVaultUnlocked] = useState(false);
   const [license, setLicense] = useState<LicenseRecord | null>(null);
   const [coachEnabled, setCoachEnabledState] = useState(false);
-  const [mode, setModeState] = useState<"single" | "podium">("single");
+  const [mode, setModeState] = useState<"single" | "compare" | "podium">("compare");
   const [selectedAthleteId, setSelectedAthleteId] = useState(DEFAULT_SINGLE);
-  const [podiumAthleteIds, setPodiumAthleteIds] = useState<[string, string, string]>(DEFAULT_PODIUM);
+  const [compareAthleteIds, setCompareAthleteIds] = useState<[string, string]>(DEFAULT_COMPARE);
+  const [podiumAthleteIds, setPodiumAthleteIds] = useState<string[]>(DEFAULT_PODIUM);
+  const [podiumLaneCount, setPodiumLaneCount] = useState(DEFAULT_PODIUM_LANES);
   const [recommendation, setRecommendation] = useState<CoachRecommendation | null>(null);
   const [paywall, setPaywall] = useState<Paywall>(null);
   const [lockerOpen, setLockerOpenState] = useState(false);
@@ -173,10 +180,26 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
       setLicense(storedLicense);
       if (settings.selectedAthleteId) setSelectedAthleteId(settings.selectedAthleteId);
-      if (settings.podiumAthleteIds) setPodiumAthleteIds(settings.podiumAthleteIds);
+      if (settings.compareAthleteIds) setCompareAthleteIds(settings.compareAthleteIds);
+      if (settings.podiumAthleteIds?.length) {
+        setPodiumAthleteIds(
+          [...settings.podiumAthleteIds, ...DEFAULT_PODIUM].slice(0, PRO_PODIUM_MAX_LANES),
+        );
+      }
       const premiumNow = isPremiumActive(storedLicense);
       setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow));
-      setModeState(settings.mode === "podium" && premiumNow ? "podium" : "single");
+      const savedMode = settings.mode ?? "compare";
+      if (savedMode === "podium" && !premiumNow) setModeState("compare");
+      else setModeState(savedMode);
+
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("q");
+      const launchMode = params.get("mode");
+      if (launchMode === "podium" && premiumNow) setModeState("podium");
+      else if (launchMode === "compare") setModeState("compare");
+      else if (launchMode === "single") setModeState("single");
+      if (params.get("coach") === "1" && premiumNow) setCoachEnabledState(true);
+      if (q) window.sessionStorage.setItem("olympiad.pendingPrompt", q);
 
       if (storedEvents.length > 0) {
         setEvents(storedEvents);
@@ -198,11 +221,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     if (!ready) return;
     saveSettings({
       selectedAthleteId,
+      compareAthleteIds,
       podiumAthleteIds,
       coachEnabled,
       mode,
     });
-  }, [ready, selectedAthleteId, podiumAthleteIds, coachEnabled, mode]);
+  }, [ready, selectedAthleteId, compareAthleteIds, podiumAthleteIds, coachEnabled, mode]);
 
   const revalidateLicense = useCallback(async (record: LicenseRecord) => {
     try {
@@ -234,7 +258,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       };
       if (!isPremiumActive(degraded)) {
         setCoachEnabledState(false);
-        setModeState("single");
+        setModeState("compare");
       }
       setLicense(degraded);
       saveLicense(degraded);
@@ -272,7 +296,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   );
 
   const setMode = useCallback(
-    (next: "single" | "podium") => {
+    (next: "single" | "compare" | "podium") => {
       if (next === "podium" && featureLocked("podium", license)) {
         setPaywall("podium");
         return;
@@ -361,6 +385,13 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         setPaywall("podium");
         return false;
       }
+
+      const lanes =
+        mode === "compare"
+          ? compareAthleteIds
+          : mode === "podium"
+            ? podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES)
+            : [];
 
       setSending(true);
       try {
@@ -458,8 +489,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
           onDelta: (text) => appendDelta(assistant.id, athleteId, text),
         });
         finishLane(assistant.id, athleteId, result);
-      } else {
-        const lanes = podiumAthleteIds;
+      } else if (mode === "compare" || mode === "podium") {
         const assistant: ArenaMessage = {
           id: uid(),
           role: "assistant",
@@ -474,7 +504,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         patchEvent(eventId, (event) => ({
           ...event,
           title: event.messages.length === 0 ? titleFromPrompt(trimmed) : event.title,
-          mode: "podium",
+          mode,
           messages: [...event.messages, userMessage, assistant],
         }));
 
@@ -509,7 +539,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         );
 
         const successful = collected.filter((c) => c.status === "done" && c.content.trim());
-        if (successful.length >= 2) {
+        if (mode === "podium" && successful.length >= 2) {
           try {
             const response = await fetch("/api/judge", {
               method: "POST",
@@ -549,7 +579,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         setSending(false);
       }
     },
-    [activeEvent, license, mode, patchEvent, podiumAthleteIds, selectedAthleteId, sending, setLockerOpen],
+    [activeEvent, compareAthleteIds, license, mode, patchEvent, podiumAthleteIds, podiumLaneCount, premium, selectedAthleteId, sending, setLockerOpen],
   );
 
   const saveKeys = useCallback(async (next: ProviderKeys, password?: string) => {
@@ -597,7 +627,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     setLicense(null);
     saveLicense(null);
     setCoachEnabledState(false);
-    setModeState("single");
+    setModeState("compare");
   }, []);
 
   const value = useMemo<ArenaContextValue>(
@@ -613,7 +643,9 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       coachEnabled,
       mode,
       selectedAthleteId,
+      compareAthleteIds,
       podiumAthleteIds,
+      podiumLaneCount,
       recommendation,
       paywall,
       lockerOpen,
@@ -624,10 +656,20 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       setSelectedAthleteId,
       setPodiumAthlete: (index, id) => {
         setPodiumAthleteIds((current) => {
-          const next = [...current] as [string, string, string];
+          const next = [...current];
+          next[index] = id;
+          return next.slice(0, PRO_PODIUM_MAX_LANES);
+        });
+      },
+      setCompareAthlete: (index, id) => {
+        setCompareAthleteIds((current) => {
+          const next = [...current] as [string, string];
           next[index] = id;
           return next;
         });
+      },
+      setPodiumLaneCount: (count) => {
+        setPodiumLaneCount(Math.min(PRO_PODIUM_MAX_LANES, Math.max(DEFAULT_PODIUM_LANES, count)));
       },
       setCoachEnabled,
       setMode,
@@ -660,7 +702,9 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       mode,
       newEvent,
       paywall,
+      compareAthleteIds,
       podiumAthleteIds,
+      podiumLaneCount,
       premium,
       railOpen,
       ready,

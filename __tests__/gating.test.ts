@@ -6,7 +6,7 @@ function record(overrides: Partial<LicenseRecord>): LicenseRecord {
   return {
     licenseKey: "KEY",
     instanceId: "inst",
-    instanceName: "Arena/test",
+    instanceName: "Olympiad/test",
     tier: "free",
     status: "inactive",
     lastValidatedAt: 0,

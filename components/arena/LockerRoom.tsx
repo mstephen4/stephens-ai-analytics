@@ -93,7 +93,8 @@ function VaultForm() {
             );
           }}
         >
-          {(["openai", "anthropic", "google"] as ProviderId[]).map((provider) => (
+          {(["openai", "anthropic", "google", "deepseek", "groq", "xai", "mistral"] as ProviderId[]).map(
+            (provider) => (
             <label key={provider}>
               {providerLabel(provider)} API key
               <input
@@ -175,7 +176,7 @@ function PassForm() {
           Pass active · {license?.tier} · product {license?.productId} / variant {license?.variantId}
         </p>
       ) : (
-        <p className="hint">Free Player — single-model chat remains available.</p>
+        <p className="hint">Free Player — single-model and 2-model compare stay available.</p>
       )}
       {error ? <p className="flag-copy">{error}</p> : null}
       {licenseMessage ? <p className="hint">{licenseMessage}</p> : null}
@@ -192,8 +193,8 @@ function AboutCopy() {
   return (
     <div className="locker-body">
       <p>
-        The Arena is a BYOK PWA. Chat history lives in IndexedDB on this device. If a Pro subscription expires, the
-        app degrades to Free Player without deleting your meet history.
+        AI Olympiad is a BYOK PWA. Chat history lives in IndexedDB on this device. If a Pro subscription expires, the
+        app degrades to Free Player without deleting your event history.
       </p>
       <p>
         Install it from the browser “Add to Home Screen” prompt for a stadium-style standalone app.

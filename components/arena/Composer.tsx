@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Flame, Send } from "lucide-react";
+import { DEFAULT_PODIUM_LANES, FREE_COMPARE_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
 import { ATHLETES, athletesForKeys, getAthlete } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
@@ -10,23 +11,45 @@ export function Composer() {
   const {
     keys,
     mode,
+    premium,
     selectedAthleteId,
     setSelectedAthleteId,
+    compareAthleteIds,
+    setCompareAthlete,
     podiumAthleteIds,
     setPodiumAthlete,
+    podiumLaneCount,
+    setPodiumLaneCount,
     coachEnabled,
     recommendation,
     requestCoach,
     sendPrompt,
     sending,
   } = useArena();
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return window.sessionStorage.getItem("olympiad.pendingPrompt") ?? "";
+  });
   const available = athletesForKeys(keys);
   const catalog = available.length > 0 ? available : ATHLETES;
 
   useEffect(() => {
     requestCoach(prompt);
   }, [prompt, requestCoach]);
+
+  useEffect(() => {
+    const pending = window.sessionStorage.getItem("olympiad.pendingPrompt");
+    if (!pending) return;
+    window.sessionStorage.removeItem("olympiad.pendingPrompt");
+    void sendPrompt(pending).then((ok) => {
+      if (ok) setPrompt("");
+    });
+  }, [sendPrompt]);
+
+  const laneIds =
+    mode === "compare"
+      ? compareAthleteIds
+      : podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES);
 
   return (
     <div className="composer">
@@ -38,13 +61,8 @@ export function Composer() {
             <p className="coach-pick">{getAthlete(recommendation.athleteId)?.name}</p>
             <p className="coach-why">{recommendation.justification}</p>
           </div>
-          <button
-            className="ghost-btn"
-            onClick={() => {
-              setSelectedAthleteId(recommendation.athleteId);
-            }}
-          >
-            Use athlete
+          <button className="ghost-btn" onClick={() => setSelectedAthleteId(recommendation.athleteId)}>
+            Use model
           </button>
         </div>
       ) : null}
@@ -52,7 +70,7 @@ export function Composer() {
       <div className="composer-card">
         {mode === "single" ? (
           <label className="athlete-select">
-            <span>Athlete</span>
+            <span>Model</span>
             <select value={selectedAthleteId} onChange={(e) => setSelectedAthleteId(e.target.value)}>
               {catalog.map((athlete) => (
                 <option key={athlete.id} value={athlete.id}>
@@ -63,12 +81,15 @@ export function Composer() {
           </label>
         ) : (
           <div className="podium-picks">
-            {podiumAthleteIds.map((id, index) => (
+            {laneIds.map((id, index) => (
               <label key={index} className="athlete-select">
                 <span>Lane {index + 1}</span>
                 <select
                   value={id}
-                  onChange={(e) => setPodiumAthlete(index as 0 | 1 | 2, e.target.value)}
+                  onChange={(e) => {
+                    if (mode === "compare") setCompareAthlete(index as 0 | 1, e.target.value);
+                    else setPodiumAthlete(index, e.target.value);
+                  }}
                 >
                   {catalog.map((athlete) => (
                     <option key={athlete.id} value={athlete.id}>
@@ -78,13 +99,25 @@ export function Composer() {
                 </select>
               </label>
             ))}
+            {mode === "podium" && premium ? (
+              <div className="lane-controls">
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  disabled={podiumLaneCount >= PRO_PODIUM_MAX_LANES}
+                  onClick={() => setPodiumLaneCount(podiumLaneCount + 1)}
+                >
+                  + Lane ({podiumLaneCount}/{PRO_PODIUM_MAX_LANES})
+                </button>
+              </div>
+            ) : null}
           </div>
         )}
 
         <textarea
           value={prompt}
           rows={3}
-          placeholder="Call the event — a prompt for the athletes…"
+          placeholder="Light the torch — ask anything"
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
@@ -97,7 +130,11 @@ export function Composer() {
         />
         <div className="composer-footer">
           <p className={cn("hint", coachEnabled && "gold")}>
-            {coachEnabled ? "Torch is lit — routing for cost and quality." : "⌘ / Ctrl + Enter to send"}
+            {mode === "compare"
+              ? `${FREE_COMPARE_LANES} models side-by-side (ChatHub-style).`
+              : coachEnabled
+                ? "Torch is lit — routing for cost and quality."
+                : "⌘ / Ctrl + Enter to send"}
           </p>
           <button
             className="gold-btn"
