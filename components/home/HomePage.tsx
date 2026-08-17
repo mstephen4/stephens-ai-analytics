@@ -40,6 +40,9 @@ export function HomePage() {
             <button type="button" onClick={() => launch("coach")}>
               Coach
             </button>
+            <Link href="/about" className="olympiad-nav-link">
+              About
+            </Link>
           </nav>
         </header>
 

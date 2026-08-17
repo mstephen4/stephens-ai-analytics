@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { Lock, Unlock, X } from "lucide-react";
-import { emptyKeys, providerLabel } from "@/lib/models";
-import type { ProviderId, ProviderKeys } from "@/lib/types";
+import { X } from "lucide-react";
+import { AboutContent } from "@/components/about/AboutContent";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
+import { VaultPanel } from "./VaultPanel";
 
 export function LockerRoom() {
   const { lockerOpen, lockerTab, setLockerOpen } = useArena();
@@ -35,107 +36,14 @@ export function LockerRoom() {
             </button>
           ))}
         </div>
-        {lockerTab === "vault" ? <VaultForm /> : null}
+        {lockerTab === "vault" ? <VaultPanel /> : null}
         {lockerTab === "pass" ? <PassForm /> : null}
-        {lockerTab === "about" ? <AboutCopy /> : null}
-      </aside>
-    </div>
-  );
-}
-
-function VaultForm() {
-  const { keys, vaultEncrypted, vaultUnlocked, saveKeys, unlock, lock } = useArena();
-  const [draft, setDraft] = useState<ProviderKeys>(keys);
-  const [password, setPassword] = useState("");
-  const [unlockPassword, setUnlockPassword] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
-
-  const setKey = (provider: ProviderId, value: string) => {
-    setDraft((current) => ({ ...current, [provider]: value }));
-  };
-
-  return (
-    <div className="locker-body">
-      <p>
-        Master keys stay in this browser. They are sent only as request headers to a zero-retention edge proxy that
-        talks to the provider — never written to a database.
-      </p>
-      {vaultEncrypted && !vaultUnlocked ? (
-        <form
-          className="stack"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void unlock(unlockPassword)
-              .then(() => setMessage("Vault unlocked."))
-              .catch(() => setMessage("Wrong master password."));
-          }}
-        >
-          <label>
-            Master password
-            <input
-              type="password"
-              value={unlockPassword}
-              onChange={(e) => setUnlockPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-          </label>
-          <button className="gold-btn" type="submit">
-            <Unlock size={16} /> Unlock vault
-          </button>
-        </form>
-      ) : (
-        <form
-          className="stack"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void saveKeys(draft, password || undefined).then(() =>
-              setMessage(password ? "Keys encrypted at rest." : "Keys saved locally."),
-            );
-          }}
-        >
-          {(["openai", "anthropic", "google", "deepseek", "groq", "xai", "mistral"] as ProviderId[]).map(
-            (provider) => (
-            <label key={provider}>
-              {providerLabel(provider)} API key
-              <input
-                type="password"
-                value={draft[provider]}
-                placeholder={`sk-…`}
-                autoComplete="off"
-                onChange={(e) => setKey(provider, e.target.value)}
-              />
-            </label>
-          ))}
-          <label>
-            Optional master password (AES-GCM)
-            <input
-              type="password"
-              value={password}
-              placeholder="Encrypt keys at rest"
-              autoComplete="new-password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-          <div className="row">
-            <button className="gold-btn" type="submit">
-              Save vault
-            </button>
-            {vaultEncrypted ? (
-              <button
-                className="ghost-btn"
-                type="button"
-                onClick={() => {
-                  lock();
-                  setDraft(emptyKeys());
-                }}
-              >
-                <Lock size={16} /> Lock
-              </button>
-            ) : null}
+        {lockerTab === "about" ? (
+          <div className="locker-body locker-about">
+            <AboutContent compact />
           </div>
-        </form>
-      )}
-      {message ? <p className="hint gold">{message}</p> : null}
+        ) : null}
+      </aside>
     </div>
   );
 }
@@ -185,19 +93,8 @@ function PassForm() {
           Remove pass from this device
         </button>
       ) : null}
-    </div>
-  );
-}
-
-function AboutCopy() {
-  return (
-    <div className="locker-body">
-      <p>
-        AI Olympiad is a BYOK PWA. Chat history lives in IndexedDB on this device. If a Pro subscription expires, the
-        app degrades to Free Player without deleting your event history.
-      </p>
-      <p>
-        Install it from the browser “Add to Home Screen” prompt for a stadium-style standalone app.
+      <p className="about-note">
+        <Link href="/about">Full About page →</Link>
       </p>
     </div>
   );
