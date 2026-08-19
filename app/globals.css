@@ -1169,6 +1169,44 @@ h2,
   color: var(--text-main);
 }
 
+.olympiad-nav-trial {
+  background: none;
+  border: 0;
+  color: var(--gold-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.02em;
+}
+
+.olympiad-nav-trial:hover {
+  color: var(--text-main);
+}
+
+.olympiad-trial-cta {
+  margin-top: 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-sub);
+  letter-spacing: 0.04em;
+}
+
+.olympiad-trial-cta button {
+  background: none;
+  border: 0;
+  color: var(--gold-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.olympiad-trial-cta button:hover {
+  text-decoration: underline;
+}
+
 /* —— About page —— */
 .about-page {
   min-height: 100vh;

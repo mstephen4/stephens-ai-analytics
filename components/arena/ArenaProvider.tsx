@@ -254,6 +254,17 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         window.history.replaceState({}, "", window.location.pathname);
       }
 
+      if (params.get("trial") === "1") {
+        setTrialModalOpen(true);
+        params.delete("trial");
+        const remaining = params.toString();
+        window.history.replaceState(
+          {},
+          "",
+          `${window.location.pathname}${remaining ? `?${remaining}` : ""}`,
+        );
+      }
+
       if (storedEvents.length > 0) {
         setEvents(storedEvents);
         setActiveEventId(storedEvents[0].id);

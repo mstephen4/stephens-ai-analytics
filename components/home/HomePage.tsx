@@ -20,6 +20,10 @@ export function HomePage() {
     router.push(`/events${query ? `?${query}` : ""}`);
   };
 
+  const startTrial = () => {
+    router.push("/events?trial=1");
+  };
+
   return (
     <div className="olympiad-home">
       <ColiseumBackdrop />
@@ -43,6 +47,9 @@ export function HomePage() {
             <Link href="/about" className="olympiad-nav-link">
               About
             </Link>
+            <button type="button" className="olympiad-nav-trial" onClick={startTrial}>
+              Free trial
+            </button>
           </nav>
         </header>
 
@@ -51,6 +58,12 @@ export function HomePage() {
             <h1>The games are always on.</h1>
             <p>
               EVERY METRIC. FOR PEAK. A PERPETUAL DATA STREAM, ATHLETES UNIFIED ON A GRAND PLATFORM.
+            </p>
+            <p className="olympiad-trial-cta">
+              <button type="button" onClick={startTrial}>
+                Start free Pro trial
+              </button>
+              <span> — Podium &amp; Coach · BYOK · no hosted model credits</span>
             </p>
           </section>
 
