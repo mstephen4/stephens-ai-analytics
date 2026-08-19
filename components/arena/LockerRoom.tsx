@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { AboutContent } from "@/components/about/AboutContent";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
+import { AccountPanel } from "./AccountPanel";
 import { VaultPanel } from "./VaultPanel";
 
 export function LockerRoom() {
@@ -19,25 +20,32 @@ export function LockerRoom() {
         <header className="locker-head">
           <div>
             <p className="brand-kicker">LOCKER ROOM</p>
-            <h2>Vault & Pass</h2>
+            <h2>Vault &amp; Pass</h2>
           </div>
           <button className="icon-btn" onClick={() => setLockerOpen(false)} aria-label="Close">
             <X size={16} />
           </button>
         </header>
         <div className="locker-tabs">
-          {(["vault", "pass", "about"] as const).map((item) => (
+          {(["vault", "pass", "account", "about"] as const).map((item) => (
             <button
               key={item}
               className={cn(lockerTab === item && "active")}
               onClick={() => setLockerOpen(true, item)}
             >
-              {item === "vault" ? "Vault" : item === "pass" ? "Pro Pass" : "About"}
+              {item === "vault"
+                ? "Vault"
+                : item === "pass"
+                  ? "Pro Pass"
+                  : item === "account"
+                    ? "Account"
+                    : "About"}
             </button>
           ))}
         </div>
         {lockerTab === "vault" ? <VaultPanel /> : null}
         {lockerTab === "pass" ? <PassForm /> : null}
+        {lockerTab === "account" ? <AccountPanel /> : null}
         {lockerTab === "about" ? (
           <div className="locker-body locker-about">
             <AboutContent compact />
@@ -57,8 +65,8 @@ function PassForm() {
   return (
     <div className="locker-body">
       <p>
-        Paste the alphanumeric license key emailed after Lemon Squeezy checkout. No username or password account is
-        required.
+        Paste the alphanumeric license key emailed after Lemon Squeezy checkout. Works on this device without signing
+        in — or link it to your account after sign-in.
       </p>
       <form
         className="stack"

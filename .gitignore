@@ -20,6 +20,9 @@
 # production
 /build
 
+# local sqlite auth store
+/data/
+
 # misc
 .DS_Store
 *.pem

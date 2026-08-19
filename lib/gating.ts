@@ -10,9 +10,10 @@ export function isPremiumActive(record: LicenseRecord | null): boolean {
 
 export function featureLocked(
   feature: PaywallFeature,
-  record: LicenseRecord | null,
+  premium: boolean,
 ): boolean {
-  return !isPremiumActive(record);
+  void feature;
+  return !premium;
 }
 
 export function degradeToFree(record: LicenseRecord): LicenseRecord {

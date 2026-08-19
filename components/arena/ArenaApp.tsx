@@ -7,6 +7,7 @@ import { EventRail } from "./EventRail";
 import { HeaderBar } from "./HeaderBar";
 import { LockerRoom } from "./LockerRoom";
 import { PaywallModal } from "./PaywallModal";
+import { TrialModal } from "./TrialModal";
 import { PwaRegister } from "./PwaRegister";
 import { SingleThread } from "./SingleThread";
 
@@ -48,6 +49,7 @@ function ArenaShell() {
       </div>
       <LockerRoom />
       <PaywallModal />
+      <TrialModal />
     </div>
   );
 }

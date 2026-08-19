@@ -16,6 +16,11 @@ import { featureLocked, isPremiumActive } from "@/lib/gating";
 import { DEFAULT_PODIUM_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
 import { DEFAULT_COMPARE, DEFAULT_PODIUM, DEFAULT_SINGLE, emptyKeys, hasAnyKey } from "@/lib/models";
 import {
+  resolvePremiumFromAccount,
+  type AccountInfo,
+  type PremiumStatus,
+} from "@/lib/premium";
+import {
   deleteEvent,
   getOrCreateInstanceName,
   listEvents,
@@ -40,7 +45,7 @@ import type {
 import { keyHeaders, titleFromPrompt, uid } from "@/lib/utils";
 
 type Paywall = "coach" | "podium" | null;
-type LockerTab = "vault" | "pass" | "about";
+type LockerTab = "vault" | "pass" | "account" | "about";
 
 interface ArenaContextValue {
   ready: boolean;
@@ -50,6 +55,8 @@ interface ArenaContextValue {
   vaultEncrypted: boolean;
   vaultUnlocked: boolean;
   license: LicenseRecord | null;
+  account: AccountInfo | null;
+  premiumStatus: PremiumStatus;
   premium: boolean;
   coachEnabled: boolean;
   mode: "single" | "compare" | "podium";
@@ -64,6 +71,8 @@ interface ArenaContextValue {
   railOpen: boolean;
   sending: boolean;
   licenseMessage: string | null;
+  authMessage: string | null;
+  trialModalOpen: boolean;
   setSelectedAthleteId: (id: string) => void;
   setCompareAthlete: (index: 0 | 1, id: string) => void;
   setPodiumAthlete: (index: number, id: string) => void;
@@ -73,6 +82,7 @@ interface ArenaContextValue {
   setPaywall: (paywall: Paywall) => void;
   setLockerOpen: (open: boolean, tab?: LockerTab) => void;
   setRailOpen: (open: boolean) => void;
+  setTrialModalOpen: (open: boolean) => void;
   newEvent: () => void;
   selectEvent: (id: string) => void;
   removeEvent: (id: string) => Promise<void>;
@@ -83,6 +93,10 @@ interface ArenaContextValue {
   lock: () => void;
   activate: (licenseKey: string) => Promise<void>;
   clearLicense: () => void;
+  requestSignIn: (email: string) => Promise<{ message?: string; devLink?: string }>;
+  signOut: () => Promise<void>;
+  linkLicenseToAccount: (licenseKey: string) => Promise<void>;
+  refreshAccount: () => Promise<void>;
 }
 
 const ArenaContext = createContext<ArenaContextValue | null>(null);
@@ -120,6 +134,9 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   const [railOpen, setRailOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [licenseMessage, setLicenseMessage] = useState<string | null>(null);
+  const [account, setAccount] = useState<AccountInfo | null>(null);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [trialModalOpen, setTrialModalOpen] = useState(false);
   const eventsRef = useRef(events);
   const keysRef = useRef(keys);
   const activeIdRef = useRef(activeEventId);
@@ -131,8 +148,23 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     keysRef.current = keys;
     activeIdRef.current = activeEventId;
   }, [events, keys, activeEventId]);
-  const premium = isPremiumActive(license);
+
+  const premiumStatus = useMemo(
+    () => resolvePremiumFromAccount(account, license),
+    [account, license],
+  );
+  const premium = premiumStatus.premium;
   const activeEvent = events.find((event) => event.id === activeEventId) ?? events[0] ?? null;
+
+  const refreshAccount = useCallback(async () => {
+    try {
+      const response = await fetch("/api/me", { cache: "no-store" });
+      const json = (await response.json()) as AccountInfo;
+      setAccount(json);
+    } catch {
+      // keep cached account state
+    }
+  }, []);
 
   const commitEvents = useCallback((next: ArenaEvent[], persistId?: string) => {
     eventsRef.current = next;
@@ -166,7 +198,16 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       const storedLicense = loadLicense();
       const settings = loadSettings();
       const storedEvents = await listEvents();
+      let accountInfo: AccountInfo | null = null;
+      try {
+        const response = await fetch("/api/me", { cache: "no-store" });
+        accountInfo = (await response.json()) as AccountInfo;
+      } catch {
+        accountInfo = null;
+      }
       if (cancelled) return;
+
+      if (accountInfo) setAccount(accountInfo);
 
       if (vault?.encrypted) {
         setVaultEncrypted(true);
@@ -186,7 +227,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
           [...settings.podiumAthleteIds, ...DEFAULT_PODIUM].slice(0, PRO_PODIUM_MAX_LANES),
         );
       }
-      const premiumNow = isPremiumActive(storedLicense);
+      const premiumNow = resolvePremiumFromAccount(accountInfo, storedLicense).premium;
       setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow));
       const savedMode = settings.mode ?? "compare";
       if (savedMode === "podium" && !premiumNow) setModeState("compare");
@@ -200,6 +241,18 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       else if (launchMode === "single") setModeState("single");
       if (params.get("coach") === "1" && premiumNow) setCoachEnabledState(true);
       if (q) window.sessionStorage.setItem("olympiad.pendingPrompt", q);
+
+      const auth = params.get("auth");
+      if (auth === "signed-in") {
+        setAuthMessage("Signed in — Pro trial active. BYOK vault unchanged.");
+        window.history.replaceState({}, "", window.location.pathname);
+      } else if (auth === "expired") {
+        setAuthMessage("Sign-in link expired. Request a new one from Account.");
+        window.history.replaceState({}, "", window.location.pathname);
+      } else if (auth === "missing") {
+        setAuthMessage("Invalid sign-in link.");
+        window.history.replaceState({}, "", window.location.pathname);
+      }
 
       if (storedEvents.length > 0) {
         setEvents(storedEvents);
@@ -216,6 +269,13 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!ready || premium || account?.signedIn) return;
+    if (sessionStorage.getItem("olympiad.trialDismissed")) return;
+    const timer = window.setTimeout(() => setTrialModalOpen(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, [ready, premium, account?.signedIn]);
 
   useEffect(() => {
     if (!ready) return;
@@ -256,17 +316,22 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         status: json.expired ? "expired" : "disabled",
         lastValidatedAt: Date.now(),
       };
-      if (!isPremiumActive(degraded)) {
+      setLicense(degraded);
+      saveLicense(degraded);
+      const stillPremium = resolvePremiumFromAccount(account, degraded).premium;
+      if (!stillPremium) {
         setCoachEnabledState(false);
         setModeState("compare");
       }
-      setLicense(degraded);
-      saveLicense(degraded);
-      setLicenseMessage(json.error || "Pass expired — back to Free Player. History is intact.");
+      if (!isPremiumActive(degraded)) {
+        setLicenseMessage(json.error || "Pass expired — back to Free Player. History is intact.");
+      } else {
+        setLicenseMessage(null);
+      }
     } catch {
       setLicenseMessage("Could not re-validate the pass right now. Premium stays cached until the next check.");
     }
-  }, []);
+  }, [account]);
 
   useEffect(() => {
     if (!ready) return undefined;
@@ -286,24 +351,24 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
   const setCoachEnabled = useCallback(
     (on: boolean) => {
-      if (on && featureLocked("coach", license)) {
+      if (on && featureLocked("coach", premium)) {
         setPaywall("coach");
         return;
       }
       setCoachEnabledState(on);
     },
-    [license],
+    [premium],
   );
 
   const setMode = useCallback(
     (next: "single" | "compare" | "podium") => {
-      if (next === "podium" && featureLocked("podium", license)) {
+      if (next === "podium" && featureLocked("podium", premium)) {
         setPaywall("podium");
         return;
       }
       setModeState(next);
     },
-    [license],
+    [premium],
   );
 
   const setLockerOpen = useCallback((open: boolean, tab?: LockerTab) => {
@@ -381,7 +446,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         setLockerOpen(true, "vault");
         return false;
       }
-      if (mode === "podium" && featureLocked("podium", license)) {
+      if (mode === "podium" && featureLocked("podium", premium)) {
         setPaywall("podium");
         return false;
       }
@@ -579,7 +644,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         setSending(false);
       }
     },
-    [activeEvent, compareAthleteIds, license, mode, patchEvent, podiumAthleteIds, podiumLaneCount, premium, selectedAthleteId, sending, setLockerOpen],
+    [activeEvent, compareAthleteIds, mode, patchEvent, podiumAthleteIds, podiumLaneCount, premium, selectedAthleteId, sending, setLockerOpen],
   );
 
   const saveKeys = useCallback(async (next: ProviderKeys, password?: string) => {
@@ -606,6 +671,59 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     setVaultUnlocked(false);
   }, []);
 
+  const requestSignIn = useCallback(async (email: string) => {
+    const response = await fetch("/api/auth/request-link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const json = (await response.json()) as {
+      ok: boolean;
+      error?: string;
+      message?: string;
+      devLink?: string;
+    };
+    if (!json.ok) throw new Error(json.error || "Could not send sign-in link.");
+    return { message: json.message, devLink: json.devLink };
+  }, []);
+
+  const signOut = useCallback(async () => {
+    await fetch("/api/auth/signout", { method: "POST" });
+    setAccount({ signedIn: false, email: null, premium: false, source: null, tier: "free", trialEndsAt: null });
+    setAuthMessage(null);
+    setTrialModalOpen(false);
+    const stillPremium = resolvePremiumFromAccount(
+      { signedIn: false, email: null, premium: false, source: null, tier: "free", trialEndsAt: null },
+      license,
+    ).premium;
+    if (!stillPremium) {
+      setCoachEnabledState(false);
+      setModeState("compare");
+    }
+  }, [license]);
+
+  const linkLicenseToAccount = useCallback(async (licenseKey: string) => {
+    const instanceName = getOrCreateInstanceName();
+    const response = await fetch("/api/me", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ licenseKey, instanceName }),
+    });
+    const json = (await response.json()) as {
+      ok: boolean;
+      error?: string;
+      record?: LicenseRecord;
+    };
+    if (!json.ok || !json.record) {
+      throw new Error(json.error || "Could not link license.");
+    }
+    setLicense(json.record);
+    saveLicense(json.record);
+    setLicenseMessage(null);
+    setPaywall(null);
+    await refreshAccount();
+  }, [refreshAccount]);
+
   const activate = useCallback(async (licenseKey: string) => {
     const instanceName = getOrCreateInstanceName();
     const response = await fetch("/api/license/activate", {
@@ -626,9 +744,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   const clearLicense = useCallback(() => {
     setLicense(null);
     saveLicense(null);
-    setCoachEnabledState(false);
-    setModeState("compare");
-  }, []);
+    const stillPremium = resolvePremiumFromAccount(account, null).premium;
+    if (!stillPremium) {
+      setCoachEnabledState(false);
+      setModeState("compare");
+    }
+  }, [account]);
 
   const value = useMemo<ArenaContextValue>(
     () => ({
@@ -639,6 +760,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       vaultEncrypted,
       vaultUnlocked,
       license,
+      account,
+      premiumStatus,
       premium,
       coachEnabled,
       mode,
@@ -653,6 +776,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       railOpen,
       sending,
       licenseMessage,
+      authMessage,
+      trialModalOpen,
       setSelectedAthleteId,
       setPodiumAthlete: (index, id) => {
         setPodiumAthleteIds((current) => {
@@ -676,6 +801,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       setPaywall,
       setLockerOpen,
       setRailOpen,
+      setTrialModalOpen,
       newEvent,
       selectEvent,
       removeEvent,
@@ -686,16 +812,23 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       lock,
       activate,
       clearLicense,
+      requestSignIn,
+      signOut,
+      linkLicenseToAccount,
+      refreshAccount,
     }),
     [
+      account,
       activate,
       activeEvent,
+      authMessage,
       clearLicense,
       coachEnabled,
       events,
       keys,
       license,
       licenseMessage,
+      linkLicenseToAccount,
       lock,
       lockerOpen,
       lockerTab,
@@ -706,11 +839,14 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       podiumAthleteIds,
       podiumLaneCount,
       premium,
+      premiumStatus,
       railOpen,
       ready,
       recommendation,
+      refreshAccount,
       removeEvent,
       requestCoach,
+      requestSignIn,
       saveKeys,
       selectedAthleteId,
       selectEvent,
@@ -719,6 +855,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       setCoachEnabled,
       setLockerOpen,
       setMode,
+      signOut,
+      trialModalOpen,
       unlock,
       vaultEncrypted,
       vaultUnlocked,

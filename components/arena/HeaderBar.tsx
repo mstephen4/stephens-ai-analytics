@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { Flame, KeyRound, Menu, Trophy } from "lucide-react";
 import { PRODUCT_NAME } from "@/lib/constants";
-import { displayTier } from "@/lib/gating";
+import { displayPremiumTier } from "@/lib/premium";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
 
 export function HeaderBar() {
   const {
     premium,
-    license,
+    premiumStatus,
     coachEnabled,
     setCoachEnabled,
     mode,
@@ -61,7 +61,7 @@ export function HeaderBar() {
       </div>
 
       <div className="header-actions">
-        <span className="tier-chip">{displayTier(license?.tier ?? "free", premium)}</span>
+        <span className="tier-chip">{displayPremiumTier(premiumStatus)}</span>
         <button
           className={cn("torch-btn", coachEnabled && "lit")}
           onClick={() => setCoachEnabled(!coachEnabled)}
