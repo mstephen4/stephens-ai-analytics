@@ -11,13 +11,17 @@ export function HeaderBar() {
   const {
     premium,
     premiumStatus,
+    account,
     coachEnabled,
     setCoachEnabled,
     mode,
     setMode,
     setLockerOpen,
     setRailOpen,
+    setTrialModalOpen,
   } = useArena();
+
+  const showTrial = !premium && !account?.signedIn;
 
   return (
     <header className="arena-header">
@@ -56,11 +60,20 @@ export function HeaderBar() {
         >
           <Trophy size={14} />
           Podium
-          {!premium ? <span className="lock-dot" /> : null}
+          {!premium ? <span className="pro-badge compact">Pro</span> : null}
         </button>
       </div>
 
       <div className="header-actions">
+        {showTrial ? (
+          <button
+            type="button"
+            className="gold-btn header-trial-btn"
+            onClick={() => setTrialModalOpen(true)}
+          >
+            Free trial
+          </button>
+        ) : null}
         <span className="tier-chip">{displayPremiumTier(premiumStatus)}</span>
         <button
           className={cn("torch-btn", coachEnabled && "lit")}
@@ -70,7 +83,7 @@ export function HeaderBar() {
         >
           <Flame size={18} />
           <span>Coach</span>
-          {!premium ? <span className="lock-dot" /> : null}
+          {!premium ? <span className="pro-badge compact">Pro</span> : null}
         </button>
         <button className="icon-btn" onClick={() => setLockerOpen(true)} aria-label="Vault">
           <KeyRound size={18} />

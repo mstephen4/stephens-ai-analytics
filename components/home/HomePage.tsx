@@ -16,6 +16,7 @@ export function HomePage() {
     if (prompt.trim()) params.set("q", prompt.trim());
     if (mode) params.set("mode", mode);
     if (mode === "coach") params.set("coach", "1");
+    if (mode === "podium" || mode === "coach") params.set("trial", "1");
     const query = params.toString();
     router.push(`/events${query ? `?${query}` : ""}`);
   };
@@ -29,6 +30,15 @@ export function HomePage() {
       <ColiseumBackdrop />
 
       <div className="olympiad-overlay">
+        <div className="olympiad-trial-banner">
+          <p>
+            <strong>Free Pro trial</strong> — unlock Podium &amp; Coach for 7 days. BYOK · no hosted model credits.
+          </p>
+          <button type="button" className="gold-btn olympiad-trial-banner-btn" onClick={startTrial}>
+            Start free trial
+          </button>
+        </div>
+
         <header className="olympiad-header">
           <Link href="/" className="logo-container">
             <LogoMark />
@@ -38,16 +48,18 @@ export function HomePage() {
             <button type="button" onClick={() => launch()}>
               Events
             </button>
-            <button type="button" onClick={() => launch("podium")}>
+            <button type="button" className="olympiad-nav-pro" onClick={() => launch("podium")}>
               Podium
+              <span className="pro-badge">Pro</span>
             </button>
-            <button type="button" onClick={() => launch("coach")}>
+            <button type="button" className="olympiad-nav-pro" onClick={() => launch("coach")}>
               Coach
+              <span className="pro-badge">Pro</span>
             </button>
             <Link href="/about" className="olympiad-nav-link">
               About
             </Link>
-            <button type="button" className="olympiad-nav-trial" onClick={startTrial}>
+            <button type="button" className="gold-btn olympiad-nav-trial-btn" onClick={startTrial}>
               Free trial
             </button>
           </nav>
@@ -56,15 +68,15 @@ export function HomePage() {
         <main className="olympiad-main">
           <section className="olympiad-hero-copy">
             <h1>The games are always on.</h1>
-            <p>
+            <p className="olympiad-tagline">
               EVERY METRIC. FOR PEAK. A PERPETUAL DATA STREAM, ATHLETES UNIFIED ON A GRAND PLATFORM.
             </p>
-            <p className="olympiad-trial-cta">
-              <button type="button" onClick={startTrial}>
+            <div className="olympiad-trial-hero">
+              <button type="button" className="gold-btn olympiad-trial-hero-btn" onClick={startTrial}>
                 Start free Pro trial
               </button>
-              <span> — Podium &amp; Coach · BYOK · no hosted model credits</span>
-            </p>
+              <p className="olympiad-trial-note">Podium + Coach · sign in with email · keys stay local</p>
+            </div>
           </section>
 
           <form

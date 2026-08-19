@@ -800,6 +800,11 @@ h2,
   .header-actions .tier-chip {
     display: none;
   }
+
+  .header-trial-btn {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
+  }
 }
 
 /* —— Homepage (Olympiad landscape landing) —— */
@@ -891,7 +896,11 @@ h2,
 
 .olympiad-nav {
   display: flex;
-  gap: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem 1.5rem;
+  max-width: min(100%, 640px);
 }
 
 .olympiad-nav button {
@@ -906,6 +915,72 @@ h2,
 
 .olympiad-nav button:hover {
   color: var(--text-main);
+}
+
+.olympiad-nav-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.olympiad-nav-trial-btn {
+  font-size: 0.85rem !important;
+  padding: 0.45rem 0.9rem !important;
+  white-space: nowrap;
+}
+
+.olympiad-trial-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(90deg, rgba(245, 183, 46, 0.18), rgba(245, 183, 46, 0.08));
+  border-bottom: 1px solid rgba(245, 183, 46, 0.35);
+  text-align: center;
+}
+
+.olympiad-trial-banner p {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+}
+
+.olympiad-trial-banner strong {
+  color: var(--gold-primary);
+}
+
+.olympiad-trial-banner-btn {
+  font-size: 0.82rem;
+  padding: 0.45rem 1rem;
+  white-space: nowrap;
+}
+
+.pro-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(245, 183, 46, 0.2);
+  color: var(--gold-primary);
+  border: 1px solid rgba(245, 183, 46, 0.45);
+}
+
+.pro-badge.compact {
+  font-size: 0.58rem;
+  padding: 0.1rem 0.35rem;
+}
+
+.header-trial-btn {
+  font-size: 0.78rem;
+  padding: 0.4rem 0.85rem;
+  white-space: nowrap;
 }
 
 .olympiad-main {
@@ -948,6 +1023,34 @@ h2,
   max-width: 720px;
   margin: 0 auto;
   line-height: 1.65;
+}
+
+.olympiad-tagline {
+  margin-bottom: 0 !important;
+}
+
+.olympiad-trial-hero {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.olympiad-trial-hero-btn {
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 0 24px rgba(245, 183, 46, 0.35);
+}
+
+.olympiad-trial-note {
+  margin: 0 !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: none !important;
+  color: var(--gold-primary) !important;
 }
 
 /* Torch input */
@@ -1169,42 +1272,24 @@ h2,
   color: var(--text-main);
 }
 
-.olympiad-nav-trial {
-  background: none;
-  border: 0;
-  color: var(--gold-primary);
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  letter-spacing: 0.02em;
-}
+@media (max-width: 900px) {
+  .olympiad-trial-banner {
+    padding: 0.55rem 1rem;
+  }
 
-.olympiad-nav-trial:hover {
-  color: var(--text-main);
-}
+  .olympiad-trial-banner p {
+    font-size: 0.75rem;
+  }
 
-.olympiad-trial-cta {
-  margin-top: 1.25rem;
-  font-size: 0.88rem;
-  color: var(--text-sub);
-  letter-spacing: 0.04em;
-}
+  .olympiad-nav {
+    gap: 0.65rem 1rem;
+  }
 
-.olympiad-trial-cta button {
-  background: none;
-  border: 0;
-  color: var(--gold-primary);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.olympiad-trial-cta button:hover {
-  text-decoration: underline;
+  .olympiad-nav-trial-btn {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* —— About page —— */
