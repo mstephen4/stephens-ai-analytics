@@ -8,7 +8,7 @@ export default function PodiumGrid() {
   const { activeEvent, retryAllFailedLanes, sending } = useArena();
   const last = [...(activeEvent?.messages ?? [])]
     .reverse()
-    .find((message) => (message.contenders?.length ?? 0) >= 2);
+    .find((message) => (message.contenders?.length ?? 0) >= 1);
   const contenders = last?.contenders ?? [];
   const failedCount = contenders.filter((c) => c.status === "false_start" || c.status === "dq").length;
   const ranked = contenders.some((c) => c.place);

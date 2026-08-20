@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PODIUM, emptyKeys, getAthlete, mergeKeys, reconcilePodiumLanes } from "@/lib/models";
+import { activeLaneIds, DEFAULT_PODIUM, emptyKeys, getAthlete, mergeKeys, reconcilePodiumLanes } from "@/lib/models";
+
+describe("activeLaneIds", () => {
+  it("drops empty lane slots", () => {
+    expect(activeLaneIds(["openai:gpt-4o-mini", "", "google:gemini-3.6-flash"])).toEqual([
+      "openai:gpt-4o-mini",
+      "google:gemini-3.6-flash",
+    ]);
+  });
+});
 
 describe("reconcilePodiumLanes", () => {
   it("replaces lanes for providers without vault keys", () => {
@@ -35,6 +44,19 @@ describe("reconcilePodiumLanes", () => {
   it("leaves lanes unchanged when no keys are saved", () => {
     const lanes = reconcilePodiumLanes(DEFAULT_PODIUM, emptyKeys(), 6);
     expect(lanes).toEqual(DEFAULT_PODIUM);
+  });
+
+  it("preserves intentionally empty lane slots", () => {
+    const keys = mergeKeys({
+      openai: "sk-openai",
+      google: "sk-google",
+    });
+    const lanes = reconcilePodiumLanes(
+      ["openai:gpt-4o-mini", "", "google:gemini-3.6-flash", ""],
+      keys,
+      6,
+    );
+    expect(lanes).toEqual(["openai:gpt-4o-mini", "", "google:gemini-3.6-flash", ""]);
   });
 
   it("resolves retired Google Pro id to Gemini 3.1 Pro", () => {

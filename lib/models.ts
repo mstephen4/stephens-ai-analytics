@@ -302,27 +302,45 @@ export function hasKeyForAthlete(keys: ProviderKeys, athleteId: string): boolean
   return Boolean(keys[athlete.provider]?.trim());
 }
 
-/** Replace lanes whose provider has no vault key with models the user can actually call. */
+export function activeLaneIds(laneIds: string[]): string[] {
+  return laneIds.filter((id) => id.trim().length > 0);
+}
+
+/** Replace lanes whose provider has no vault key; preserve intentionally empty slots. */
 export function reconcilePodiumLanes(
   laneIds: string[],
   keys: ProviderKeys,
   maxLanes = 6,
 ): string[] {
   const available = athletesForKeys(keys);
-  if (available.length === 0) return laneIds.slice(0, maxLanes);
+  const trimmed = laneIds.slice(0, maxLanes);
+  if (available.length === 0) return trimmed;
 
-  const kept = laneIds.filter((id) => hasKeyForAthlete(keys, id));
-  const used = new Set(kept);
+  const used = new Set(
+    trimmed.filter((id) => id && hasKeyForAthlete(keys, id)),
+  );
+  const result: string[] = [];
 
-  for (const athlete of available) {
-    if (kept.length >= maxLanes) break;
-    if (!used.has(athlete.id)) {
-      kept.push(athlete.id);
-      used.add(athlete.id);
+  for (const id of trimmed) {
+    if (!id) {
+      result.push("");
+      continue;
+    }
+    if (hasKeyForAthlete(keys, id)) {
+      result.push(id);
+      used.add(id);
+      continue;
+    }
+    const replacement = available.find((athlete) => !used.has(athlete.id));
+    if (replacement) {
+      result.push(replacement.id);
+      used.add(replacement.id);
+    } else {
+      result.push("");
     }
   }
 
-  return kept.slice(0, maxLanes);
+  return result;
 }
 
 export function athletesForKeys(keys: ProviderKeys): Athlete[] {

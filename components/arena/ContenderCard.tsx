@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Flag, Medal, RotateCcw } from "lucide-react";
+import { Flag, Medal, RotateCcw, X } from "lucide-react";
 import { formatDuration, formatUsd } from "@/lib/cost";
 import { getAthlete, providerLabel } from "@/lib/models";
 import type { ContenderResult } from "@/lib/types";
@@ -21,7 +21,7 @@ export function ContenderCard({
   elevated?: boolean;
   defaultCollapsed?: boolean;
 }) {
-  const { retryLane, sending } = useArena();
+  const { retryLane, closeLane, sending } = useArena();
   const athlete = getAthlete(contender.athleteId);
   const [collapsed, setCollapsed] = useState(defaultCollapsed && contender.content.length > 900);
   const flagged = contender.status === "false_start" || contender.status === "dq";
@@ -43,6 +43,7 @@ export function ContenderCard({
           <p className="card-kicker">{athlete ? providerLabel(athlete.provider) : "Athlete"}</p>
           <h3 className="card-title">{athlete?.name ?? contender.athleteId}</h3>
         </div>
+        <div className="card-header-actions">
         {medal ? (
           <span className={cn("medal-badge", medal)}>
             <Medal size={14} />
@@ -55,6 +56,18 @@ export function ContenderCard({
             {contender.status === "dq" ? "DQ" : "FALSE START"}
           </span>
         ) : null}
+        {assistantMessageId ? (
+          <button
+            type="button"
+            className="lane-close-btn"
+            aria-label="Close lane"
+            title="Close lane"
+            onClick={() => void closeLane(assistantMessageId, contender.athleteId)}
+          >
+            <X size={14} />
+          </button>
+        ) : null}
+        </div>
       </header>
 
       {contender.stats ? (

@@ -14,7 +14,15 @@ import { streamChat } from "@/lib/client-stream";
 import { recommendAthlete } from "@/lib/classifier";
 import { featureLocked, isPremiumActive } from "@/lib/gating";
 import { DEFAULT_PODIUM_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
-import { DEFAULT_COMPARE, DEFAULT_PODIUM, DEFAULT_SINGLE, emptyKeys, hasAnyKey, reconcilePodiumLanes } from "@/lib/models";
+import {
+  activeLaneIds,
+  DEFAULT_COMPARE,
+  DEFAULT_PODIUM,
+  DEFAULT_SINGLE,
+  emptyKeys,
+  hasAnyKey,
+  reconcilePodiumLanes,
+} from "@/lib/models";
 import {
   resolvePremiumFromAccount,
   type AccountInfo,
@@ -112,6 +120,7 @@ interface ArenaContextValue {
   sendPrompt: (prompt: string) => Promise<boolean>;
   retryLane: (assistantMessageId: string, athleteId: string) => Promise<boolean>;
   retryAllFailedLanes: (assistantMessageId: string) => Promise<boolean>;
+  closeLane: (assistantMessageId: string, athleteId: string) => Promise<boolean>;
   saveKeys: (keys: ProviderKeys, password?: string) => Promise<void>;
   unlock: (password: string) => Promise<void>;
   lock: () => void;
@@ -487,12 +496,16 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
-      const lanes =
+      const lanes = activeLaneIds(
         mode === "compare"
           ? compareAthleteIds
           : mode === "podium"
             ? podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES)
-            : [];
+            : [],
+      );
+      if ((mode === "compare" || mode === "podium") && lanes.length === 0) {
+        return false;
+      }
 
       setSending(true);
       try {
@@ -846,6 +859,45 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     [retryLane],
   );
 
+  const closeLane = useCallback(
+    async (assistantMessageId: string, athleteId: string) => {
+      const eventId = activeIdRef.current;
+      if (!eventId) return false;
+      const event = eventsRef.current.find((entry) => entry.id === eventId);
+      if (!event) return false;
+
+      const assistantIndex = event.messages.findIndex((message) => message.id === assistantMessageId);
+      if (assistantIndex < 0) return false;
+      const assistant = event.messages[assistantIndex];
+      if (!assistant.contenders?.some((c) => c.athleteId === athleteId)) return false;
+
+      const prompt = userPromptBeforeAssistant(event.messages, assistantIndex);
+
+      patchEvent(eventId, (current) => ({
+        ...current,
+        messages: current.messages.map((message) =>
+          message.id === assistantMessageId
+            ? {
+                ...message,
+                contenders: message.contenders
+                  ?.filter((c) => c.athleteId !== athleteId)
+                  .map((c) => ({ ...c, place: undefined, citation: undefined })),
+              }
+            : message,
+        ),
+      }));
+
+      if (event.mode === "podium" && prompt) {
+        await runJudgeForMessage(eventId, assistantMessageId, prompt);
+      }
+
+      const finalEvent = eventsRef.current.find((entry) => entry.id === eventId);
+      if (finalEvent) await putEvent(finalEvent);
+      return true;
+    },
+    [patchEvent, runJudgeForMessage],
+  );
+
   const saveKeys = useCallback(async (next: ProviderKeys, password?: string) => {
     setKeys(next);
     setPodiumAthleteIds((current) => reconcilePodiumLanes(current, next, PRO_PODIUM_MAX_LANES));
@@ -1010,6 +1062,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       sendPrompt,
       retryLane,
       retryAllFailedLanes,
+      closeLane,
       saveKeys,
       unlock,
       lock,
@@ -1057,6 +1110,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       sendPrompt,
       retryAllFailedLanes,
       retryLane,
+      closeLane,
       setCoachEnabled,
       setLockerOpen,
       setMode,

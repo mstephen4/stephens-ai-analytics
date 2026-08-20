@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Flame, Send } from "lucide-react";
-import { DEFAULT_PODIUM_LANES, FREE_COMPARE_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
-import { ATHLETES, athletesForKeys, getAthlete } from "@/lib/models";
+import { DEFAULT_PODIUM_LANES, EMPTY_LANE_ID, FREE_COMPARE_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
+import { activeLaneIds, ATHLETES, athletesForKeys, getAthlete } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
 
@@ -50,6 +50,8 @@ export function Composer() {
     mode === "compare"
       ? compareAthleteIds
       : podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES);
+  const activeLanes = activeLaneIds(laneIds);
+  const canDeploy = mode === "single" || activeLanes.length > 0;
 
   return (
     <div className="composer">
@@ -91,6 +93,7 @@ export function Composer() {
                     else setPodiumAthlete(index, e.target.value);
                   }}
                 >
+                  <option value={EMPTY_LANE_ID}>— Empty —</option>
                   {catalog.map((athlete) => (
                     <option key={athlete.id} value={athlete.id}>
                       {athlete.shortName}
@@ -130,15 +133,17 @@ export function Composer() {
         />
         <div className="composer-footer">
           <p className={cn("hint", coachEnabled && "gold")}>
-            {mode === "compare"
-              ? `${FREE_COMPARE_LANES} models side-by-side (ChatHub-style).`
-              : coachEnabled
-                ? "Torch is lit — routing for cost and quality."
-                : "⌘ / Ctrl + Enter to send"}
+            {!canDeploy
+              ? "Pick at least one lane to deploy."
+              : mode === "compare"
+                ? `${FREE_COMPARE_LANES} models side-by-side (ChatHub-style). Empty lanes are skipped.`
+                : coachEnabled
+                  ? "Torch is lit — routing for cost and quality."
+                  : "⌘ / Ctrl + Enter to send"}
           </p>
           <button
             className="gold-btn"
-            disabled={sending || !prompt.trim()}
+            disabled={sending || !prompt.trim() || !canDeploy}
             onClick={() => {
               void sendPrompt(prompt).then((ok) => {
                 if (ok) setPrompt("");

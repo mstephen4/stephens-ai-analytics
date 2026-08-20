@@ -57,10 +57,12 @@ function ArenaShell() {
 function FloorSwitch() {
   const { mode, activeEvent } = useArena();
   const last = activeEvent?.messages.at(-1);
-  const multi = (last?.contenders?.length ?? 0) >= 2;
-  const gridMode = mode === "compare" || mode === "podium" || multi;
+  const contenderCount = last?.contenders?.length ?? 0;
+  const showGrid =
+    contenderCount >= 1 &&
+    (mode === "compare" || mode === "podium" || contenderCount >= 2);
 
-  if (gridMode && multi) {
+  if (showGrid) {
     return (
       <Suspense fallback={<PodiumSkeleton />}>
         <PodiumGrid />
