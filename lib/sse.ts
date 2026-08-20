@@ -15,6 +15,15 @@ export function createSseResponse(stream: ReadableStream<Uint8Array>): Response 
   });
 }
 
+export function eachSseDataPayload(eventBlock: string): string[] {
+  return eventBlock
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .filter((line) => line.startsWith("data:"))
+    .map((line) => line.slice(5).trim())
+    .filter((data) => data.length > 0 && data !== "[DONE]");
+}
+
 export async function readSseStream(
   stream: ReadableStream<Uint8Array>,
   onEvent: (event: ChatStreamEvent) => void,
@@ -29,16 +38,12 @@ export async function readSseStream(
     const chunks = buffer.split("\n\n");
     buffer = chunks.pop() ?? "";
     for (const chunk of chunks) {
-      const line = chunk
-        .split("\n")
-        .filter((entry) => entry.startsWith("data:"))
-        .map((entry) => entry.slice(5).trim())
-        .join("");
-      if (!line || line === "[DONE]") continue;
-      try {
-        onEvent(JSON.parse(line) as ChatStreamEvent);
-      } catch {
-        // ignore malformed keep-alives
+      for (const line of eachSseDataPayload(chunk)) {
+        try {
+          onEvent(JSON.parse(line) as ChatStreamEvent);
+        } catch {
+          // ignore malformed keep-alives
+        }
       }
     }
   }

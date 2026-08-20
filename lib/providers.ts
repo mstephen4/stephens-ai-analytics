@@ -1,5 +1,5 @@
 import { getAthlete } from "./models";
-import { encodeSse } from "./sse";
+import { eachSseDataPayload, encodeSse } from "./sse";
 import type { ChatStreamEvent, ProviderId, ProviderKeys } from "./types";
 
 const REQUEST_TIMEOUT_MS = 120_000;
@@ -282,14 +282,27 @@ async function streamGoogle(
   let outputTokens = 0;
   let safety = false;
   await iterateSse(response.body, (payload) => {
-    const json = JSON.parse(payload) as {
+    let json: {
+      error?: { message?: string };
       candidates?: {
-        content?: { parts?: { text?: string }[] };
+        content?: { parts?: { text?: string; thought?: boolean }[] };
         finishReason?: string;
       }[];
       usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number };
     };
-    const text = json.candidates?.[0]?.content?.parts?.map((part) => part.text ?? "").join("");
+    try {
+      json = JSON.parse(payload);
+    } catch {
+      return;
+    }
+    if (json.error) {
+      throw new ProviderError("FALSE_START", json.error.message || "Google stream error.");
+    }
+    const parts = json.candidates?.[0]?.content?.parts ?? [];
+    const text = parts
+      .filter((part) => !part.thought)
+      .map((part) => part.text ?? "")
+      .join("");
     if (text) onEvent({ type: "delta", text });
     if (json.candidates?.[0]?.finishReason === "SAFETY") safety = true;
     if (json.usageMetadata) {
@@ -318,21 +331,14 @@ async function iterateSse(
     const parts = buffer.split("\n\n");
     buffer = parts.pop() ?? "";
     for (const part of parts) {
-      const data = part
-        .split("\n")
-        .filter((line) => line.startsWith("data:"))
-        .map((line) => line.slice(5).trim())
-        .join("");
-      if (!data) continue;
-      onPayload(data);
+      for (const data of eachSseDataPayload(part)) {
+        onPayload(data);
+      }
     }
   }
   if (buffer.trim()) {
-    const data = buffer
-      .split("\n")
-      .filter((line) => line.startsWith("data:"))
-      .map((line) => line.slice(5).trim())
-      .join("");
-    if (data) onPayload(data);
+    for (const data of eachSseDataPayload(buffer)) {
+      onPayload(data);
+    }
   }
 }
