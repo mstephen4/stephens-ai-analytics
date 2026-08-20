@@ -38,7 +38,13 @@ export function SingleThread() {
         }
         const contender = message.contenders?.[0];
         if (!contender) return null;
-        return <ContenderCard key={message.id} contender={contender} />;
+        return (
+          <ContenderCard
+            key={message.id}
+            assistantMessageId={message.id}
+            contender={contender}
+          />
+        );
       })}
     </div>
   );
