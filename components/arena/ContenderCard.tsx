@@ -3,21 +3,25 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Flag, Medal } from "lucide-react";
+import { Flag, Medal, RotateCcw } from "lucide-react";
 import { formatDuration, formatUsd } from "@/lib/cost";
 import { getAthlete, providerLabel } from "@/lib/models";
 import type { ContenderResult } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useArena } from "./ArenaProvider";
 
 export function ContenderCard({
   contender,
+  assistantMessageId,
   elevated = false,
   defaultCollapsed = false,
 }: {
   contender: ContenderResult;
+  assistantMessageId?: string;
   elevated?: boolean;
   defaultCollapsed?: boolean;
 }) {
+  const { retryLane, sending } = useArena();
   const athlete = getAthlete(contender.athleteId);
   const [collapsed, setCollapsed] = useState(defaultCollapsed && contender.content.length > 900);
   const flagged = contender.status === "false_start" || contender.status === "dq";
@@ -83,7 +87,20 @@ export function ContenderCard({
 
       <div className={cn("card-body", collapsed && "collapsed")}>
         {flagged ? (
-          <p className="flag-copy">{contender.error}</p>
+          <>
+            <p className="flag-copy">{contender.error}</p>
+            {assistantMessageId ? (
+              <button
+                type="button"
+                className="ghost-btn lane-retry-btn"
+                disabled={sending}
+                onClick={() => void retryLane(assistantMessageId, contender.athleteId)}
+              >
+                <RotateCcw size={14} />
+                Retry this lane
+              </button>
+            ) : null}
+          </>
         ) : (
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{contender.content || " "}</ReactMarkdown>
         )}

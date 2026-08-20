@@ -44,6 +44,28 @@ import type {
 } from "@/lib/types";
 import { keyHeaders, titleFromPrompt, uid } from "@/lib/utils";
 
+const LANE_STAGGER_MS = 450;
+
+function userPromptBeforeAssistant(messages: ArenaMessage[], assistantIndex: number): string | null {
+  for (let i = assistantIndex - 1; i >= 0; i -= 1) {
+    if (messages[i].role === "user") return messages[i].content;
+  }
+  return null;
+}
+
+function chatHistoryBefore(messages: ArenaMessage[], beforeIndex: number) {
+  return messages
+    .slice(0, beforeIndex)
+    .filter((message) => message.role === "user" || (message.role === "assistant" && message.content))
+    .map((message) => ({
+      role: message.role as "user" | "assistant" | "system",
+      content:
+        message.role === "assistant" && message.contenders
+          ? message.contenders.find((c) => c.place === 1)?.content || message.content
+          : message.content,
+    }));
+}
+
 type Paywall = "coach" | "podium" | null;
 type LockerTab = "vault" | "pass" | "account" | "about";
 
@@ -88,6 +110,8 @@ interface ArenaContextValue {
   removeEvent: (id: string) => Promise<void>;
   requestCoach: (prompt: string) => void;
   sendPrompt: (prompt: string) => Promise<boolean>;
+  retryLane: (assistantMessageId: string, athleteId: string) => Promise<boolean>;
+  retryAllFailedLanes: (assistantMessageId: string) => Promise<boolean>;
   saveKeys: (keys: ProviderKeys, password?: string) => Promise<void>;
   unlock: (password: string) => Promise<void>;
   lock: () => void;
@@ -484,15 +508,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         createdAt: Date.now(),
       };
 
-      const history = (activeEvent?.messages ?? [])
-        .filter((message) => message.role === "user" || (message.role === "assistant" && message.content))
-        .map((message) => ({
-          role: message.role,
-          content:
-            message.role === "assistant" && message.contenders
-              ? message.contenders.find((c) => c.place === 1)?.content || message.content
-              : message.content,
-        }));
+      const history = chatHistoryBefore(activeEvent?.messages ?? [], activeEvent?.messages.length ?? 0);
 
       const appendDelta = (assistantId: string, athleteId: string, text: string) => {
         patchEvent(
@@ -593,6 +609,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
         await Promise.all(
           lanes.map(async (athleteId, index) => {
+            if (index > 0) await new Promise((resolve) => setTimeout(resolve, LANE_STAGGER_MS * index));
             const result = await streamChat({
               athleteId,
               keys: keysRef.current,
@@ -657,6 +674,176 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       }
     },
     [activeEvent, compareAthleteIds, mode, patchEvent, podiumAthleteIds, podiumLaneCount, premium, selectedAthleteId, sending, setLockerOpen],
+  );
+
+  const runJudgeForMessage = useCallback(
+    async (eventId: string, assistantMessageId: string, prompt: string) => {
+      const event = eventsRef.current.find((entry) => entry.id === eventId);
+      const assistant = event?.messages.find((message) => message.id === assistantMessageId);
+      const successful =
+        assistant?.contenders?.filter((c) => c.status === "done" && c.content.trim()) ?? [];
+      if (successful.length < 2) return;
+
+      try {
+        const response = await fetch("/api/judge", {
+          method: "POST",
+          headers: keyHeaders(keysRef.current),
+          body: JSON.stringify({
+            prompt,
+            contenders: successful.map((c) => ({ athleteId: c.athleteId, content: c.content })),
+          }),
+        });
+        const json = (await response.json()) as {
+          ranking?: { athleteId: string; place: 1 | 2 | 3; reason?: string }[];
+          citation?: string;
+        };
+        if (json.ranking?.length) {
+          patchEvent(eventId, (current) => ({
+            ...current,
+            messages: current.messages.map((message) =>
+              message.id === assistantMessageId
+                ? {
+                    ...message,
+                    contenders: applyRanking(message.contenders ?? [], json.ranking ?? [], json.citation),
+                  }
+                : message,
+            ),
+          }));
+        }
+      } catch {
+        // leave unranked
+      }
+    },
+    [patchEvent],
+  );
+
+  const retryLane = useCallback(
+    async (assistantMessageId: string, athleteId: string) => {
+      if (sending) return false;
+      if (!hasAnyKey(keysRef.current)) {
+        setLockerOpen(true, "vault");
+        return false;
+      }
+
+      const eventId = activeIdRef.current;
+      if (!eventId) return false;
+      const event = eventsRef.current.find((entry) => entry.id === eventId);
+      if (!event) return false;
+
+      const assistantIndex = event.messages.findIndex((message) => message.id === assistantMessageId);
+      if (assistantIndex < 0) return false;
+      const assistant = event.messages[assistantIndex];
+      if (!assistant.contenders?.some((c) => c.athleteId === athleteId)) return false;
+
+      const prompt = userPromptBeforeAssistant(event.messages, assistantIndex);
+      if (!prompt) return false;
+
+      const history = chatHistoryBefore(event.messages, assistantIndex);
+
+      setSending(true);
+      try {
+        patchEvent(eventId, (current) => ({
+          ...current,
+          messages: current.messages.map((message) =>
+            message.id === assistantMessageId
+              ? {
+                  ...message,
+                  contenders: message.contenders?.map((c) =>
+                    c.athleteId === athleteId
+                      ? {
+                          ...c,
+                          content: "",
+                          status: "streaming" as const,
+                          error: undefined,
+                          stats: undefined,
+                          place: undefined,
+                          citation: undefined,
+                        }
+                      : c,
+                  ),
+                }
+              : message,
+          ),
+        }));
+
+        let output = "";
+        const result = await streamChat({
+          athleteId,
+          keys: keysRef.current,
+          messages: [...history, { role: "user", content: prompt }],
+          onDelta: (text) => {
+            output += text;
+            patchEvent(
+              eventId,
+              (current) => ({
+                ...current,
+                messages: current.messages.map((message) =>
+                  message.id === assistantMessageId
+                    ? {
+                        ...message,
+                        contenders: message.contenders?.map((c) =>
+                          c.athleteId === athleteId ? { ...c, content: c.content + text } : c,
+                        ),
+                      }
+                    : message,
+                ),
+              }),
+              false,
+            );
+          },
+        });
+
+        patchEvent(eventId, (current) => ({
+          ...current,
+          messages: current.messages.map((message) =>
+            message.id === assistantMessageId
+              ? {
+                  ...message,
+                  contenders: message.contenders?.map((c) =>
+                    c.athleteId === athleteId
+                      ? {
+                          ...c,
+                          content: output,
+                          status: result.error ? (result.error.code === "DQ" ? "dq" : "false_start") : "done",
+                          error: result.error?.message,
+                          stats: result.stats,
+                        }
+                      : c,
+                  ),
+                }
+              : message,
+          ),
+        }));
+
+        if (event.mode === "podium") {
+          await runJudgeForMessage(eventId, assistantMessageId, prompt);
+        }
+
+        const finalEvent = eventsRef.current.find((entry) => entry.id === eventId);
+        if (finalEvent) await putEvent(finalEvent);
+        return !result.error;
+      } finally {
+        setSending(false);
+      }
+    },
+    [patchEvent, runJudgeForMessage, sending, setLockerOpen],
+  );
+
+  const retryAllFailedLanes = useCallback(
+    async (assistantMessageId: string) => {
+      const event = eventsRef.current.find((entry) => entry.id === activeIdRef.current);
+      const assistant = event?.messages.find((message) => message.id === assistantMessageId);
+      const failed =
+        assistant?.contenders?.filter((c) => c.status === "false_start" || c.status === "dq") ?? [];
+      if (failed.length === 0) return true;
+
+      for (const [index, contender] of failed.entries()) {
+        if (index > 0) await new Promise((resolve) => setTimeout(resolve, LANE_STAGGER_MS * index));
+        await retryLane(assistantMessageId, contender.athleteId);
+      }
+      return true;
+    },
+    [retryLane],
   );
 
   const saveKeys = useCallback(async (next: ProviderKeys, password?: string) => {
@@ -821,6 +1008,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       removeEvent,
       requestCoach,
       sendPrompt,
+      retryLane,
+      retryAllFailedLanes,
       saveKeys,
       unlock,
       lock,
@@ -866,6 +1055,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       selectEvent,
       sending,
       sendPrompt,
+      retryAllFailedLanes,
+      retryLane,
       setCoachEnabled,
       setLockerOpen,
       setMode,

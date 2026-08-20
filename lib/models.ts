@@ -110,13 +110,13 @@ export const ATHLETES: Athlete[] = [
   // Google
   {
     id: "google:gemini-2.0-flash",
-    name: "Gemini 2.0 Flash",
-    shortName: "Flash 2.0",
+    name: "Gemini 2.5 Flash",
+    shortName: "Flash",
     provider: "google",
-    apiModel: "gemini-2.0-flash",
+    apiModel: "gemini-2.5-flash",
     role: "sprinter",
-    inputCostPer1M: 0.1,
-    outputCostPer1M: 0.4,
+    inputCostPer1M: 0.3,
+    outputCostPer1M: 2.5,
     strengths: ["lowest cost", "snappy Q&A", "routing"],
     judgeEligible: true,
     classifierEligible: true,
@@ -286,15 +286,15 @@ export const ATHLETES: Athlete[] = [
 export const DEFAULT_SINGLE = "openai:gpt-4o-mini";
 export const DEFAULT_COMPARE: [string, string] = [
   "openai:gpt-4o-mini",
-  "google:gemini-2.0-flash",
+  "google:gemini-2.5-flash",
 ];
 export const DEFAULT_PODIUM: string[] = [
   "openai:gpt-4o-mini",
   "openai:gpt-4o",
   "anthropic:claude-haiku-3.5",
   "anthropic:claude-sonnet-4",
-  "google:gemini-2.0-flash",
   "google:gemini-2.5-flash",
+  "google:gemini-3.1-pro-preview",
 ];
 
 export function getAthlete(id: string): Athlete | undefined {
