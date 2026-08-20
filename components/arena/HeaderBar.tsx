@@ -76,13 +76,15 @@ export function HeaderBar() {
         ) : null}
         <span className="tier-chip">{displayPremiumTier(premiumStatus)}</span>
         <button
-          className={cn("torch-btn", coachEnabled && "lit")}
+          className={cn("torch-btn", coachEnabled ? "lit" : "off")}
           onClick={() => setCoachEnabled(!coachEnabled)}
           aria-pressed={coachEnabled}
-          title="Coach"
+          aria-label={coachEnabled ? "Coach enabled — click to turn off" : "Coach disabled — click to turn on"}
+          title={coachEnabled ? "Coach ON" : "Coach OFF"}
         >
-          <Flame size={18} />
-          <span>Coach</span>
+          <Flame size={18} aria-hidden />
+          <span className="torch-label">Coach</span>
+          <span className="torch-status">{coachEnabled ? "ON" : "OFF"}</span>
           {!premium ? <span className="pro-badge compact">Pro</span> : null}
         </button>
         <button className="icon-btn" onClick={() => setLockerOpen(true)} aria-label="Vault">

@@ -56,15 +56,27 @@ export function Composer() {
 
   return (
     <div className="composer">
+      {coachEnabled && !recommendation ? (
+        <div className="coach-active-bar" role="status">
+          <Flame size={14} aria-hidden />
+          <span>Coach is lit — keep typing for a model recommendation</span>
+        </div>
+      ) : null}
       {coachEnabled && recommendation ? (
-        <div className="coach-panel">
-          <Flame size={16} className="text-torch" />
-          <div>
+        <div className="coach-panel coach-panel-highlight">
+          <div className="coach-panel-icon" aria-hidden>
+            <Flame size={20} />
+          </div>
+          <div className="coach-panel-body">
             <p className="coach-kicker">Coach recommends</p>
             <p className="coach-pick">{getAthlete(recommendation.athleteId)?.name}</p>
             <p className="coach-why">{recommendation.justification}</p>
           </div>
-          <button className="ghost-btn" onClick={() => applyCoachRecommendation(recommendation.athleteId)}>
+          <button
+            type="button"
+            className="gold-btn coach-use-btn"
+            onClick={() => applyCoachRecommendation(recommendation.athleteId)}
+          >
             Use model
           </button>
         </div>
