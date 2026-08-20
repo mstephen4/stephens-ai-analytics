@@ -71,19 +71,19 @@ export function heuristicClassify(prompt: string): HeuristicResult {
 
 const INTENT_PREFERENCES: Record<Intent, string[]> = {
   simple_qa: [
-    "google:gemini-2.0-flash",
+    "google:gemini-3.6-flash",
     "openai:gpt-4o-mini",
-    "google:gemini-2.5-flash",
+    "google:gemini-3.6-flash",
     "anthropic:claude-haiku-3.5",
   ],
   summarize: [
-    "google:gemini-2.0-flash",
+    "google:gemini-3.6-flash",
     "openai:gpt-4o-mini",
     "anthropic:claude-haiku-3.5",
-    "google:gemini-2.5-flash",
+    "google:gemini-3.6-flash",
   ],
   translation: [
-    "google:gemini-2.5-flash",
+    "google:gemini-3.6-flash",
     "openai:gpt-4o-mini",
     "anthropic:claude-haiku-3.5",
   ],
@@ -185,9 +185,9 @@ export function pickClassifierAthlete(keys: ProviderKeys): Athlete | undefined {
   );
   return cheapestAvailable(
     [
-      "google:gemini-2.0-flash",
+      "google:gemini-3.6-flash",
       "openai:gpt-4o-mini",
-      "google:gemini-2.5-flash",
+      "google:gemini-3.6-flash",
       "anthropic:claude-haiku-3.5",
     ],
     available,
@@ -205,10 +205,10 @@ export function pickJudgeAthlete(keys: ProviderKeys, contestantIds: string[]): A
   return (
     cheapestAvailable(
       [
-        "google:gemini-2.0-flash",
+        "google:gemini-3.6-flash",
         "openai:gpt-4o-mini",
         "anthropic:claude-haiku-3.5",
-        "google:gemini-2.5-flash",
+        "google:gemini-3.6-flash",
       ],
       available,
     ) ??

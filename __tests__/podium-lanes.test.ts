@@ -48,7 +48,8 @@ describe("reconcilePodiumLanes", () => {
     expect(getAthlete("anthropic:claude-haiku-3.5")?.apiModel).toBe("claude-haiku-4-5");
   });
 
-  it("routes legacy Gemini 2.0 Flash lane to gemini-2.5-flash", () => {
-    expect(getAthlete("google:gemini-2.0-flash")?.apiModel).toBe("gemini-2.5-flash");
+  it("routes legacy Gemini Flash lane ids to gemini-3.6-flash", () => {
+    expect(getAthlete("google:gemini-2.0-flash")?.apiModel).toBe("gemini-3.6-flash");
+    expect(getAthlete("google:gemini-2.5-flash")?.apiModel).toBe("gemini-3.6-flash");
   });
 });

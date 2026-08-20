@@ -20,7 +20,7 @@ export const STARTER_PROVIDERS: ProviderGuide[] = [
     tagline: "Best first key — generous free tier, one key covers Flash and Pro lanes.",
     keyUrl: "https://aistudio.google.com/apikey",
     docsUrl: "https://ai.google.dev/gemini-api/docs/api-key",
-    testAthleteId: "google:gemini-2.0-flash",
+    testAthleteId: "google:gemini-3.6-flash",
     steps: [
       "Open Google AI Studio and sign in with your Google account.",
       "Click Create API key and copy the key (starts with AI…).",
@@ -59,7 +59,7 @@ export const STARTER_PROVIDERS: ProviderGuide[] = [
 ];
 
 export const TEST_ATHLETE_BY_PROVIDER: Partial<Record<ProviderId, string>> = {
-  google: "google:gemini-2.0-flash",
+  google: "google:gemini-3.6-flash",
   groq: "groq:llama-3.1-8b-instant",
   openai: "openai:gpt-4o-mini",
   anthropic: "anthropic:claude-haiku-3.5",

@@ -109,28 +109,15 @@ export const ATHLETES: Athlete[] = [
   },
   // Google
   {
-    id: "google:gemini-2.0-flash",
-    name: "Gemini 2.5 Flash",
+    id: "google:gemini-3.6-flash",
+    name: "Gemini 3.6 Flash",
     shortName: "Flash",
     provider: "google",
-    apiModel: "gemini-2.5-flash",
+    apiModel: "gemini-3.6-flash",
     role: "sprinter",
-    inputCostPer1M: 0.3,
-    outputCostPer1M: 2.5,
-    strengths: ["lowest cost", "snappy Q&A", "routing"],
-    judgeEligible: true,
-    classifierEligible: true,
-  },
-  {
-    id: "google:gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
-    shortName: "Flash 2.5",
-    provider: "google",
-    apiModel: "gemini-2.5-flash",
-    role: "allrounder",
-    inputCostPer1M: 0.3,
-    outputCostPer1M: 2.5,
-    strengths: ["balanced quality", "long context"],
+    inputCostPer1M: 1.5,
+    outputCostPer1M: 7.5,
+    strengths: ["fast agentic loops", "coding", "multimodal"],
     judgeEligible: true,
     classifierEligible: true,
   },
@@ -286,14 +273,14 @@ export const ATHLETES: Athlete[] = [
 export const DEFAULT_SINGLE = "openai:gpt-4o-mini";
 export const DEFAULT_COMPARE: [string, string] = [
   "openai:gpt-4o-mini",
-  "google:gemini-2.5-flash",
+  "google:gemini-3.6-flash",
 ];
 export const DEFAULT_PODIUM: string[] = [
   "openai:gpt-4o-mini",
   "openai:gpt-4o",
   "anthropic:claude-haiku-3.5",
   "anthropic:claude-sonnet-4",
-  "google:gemini-2.5-flash",
+  "google:gemini-3.6-flash",
   "google:gemini-3.1-pro-preview",
 ];
 
@@ -304,6 +291,8 @@ export function getAthlete(id: string): Athlete | undefined {
 
 /** Map retired athlete ids saved in local settings to current catalog entries. */
 const LEGACY_ATHLETE_IDS: Record<string, string> = {
+  "google:gemini-2.0-flash": "google:gemini-3.6-flash",
+  "google:gemini-2.5-flash": "google:gemini-3.6-flash",
   "google:gemini-2.5-pro": "google:gemini-3.1-pro-preview",
 };
 

@@ -9,7 +9,7 @@ describe("scoreboard cost", () => {
   });
 
   it("computes tokens/sec from generation time", () => {
-    const stats = buildStats("google:gemini-2.0-flash", 2000, 100, 200);
+    const stats = buildStats("google:gemini-3.6-flash", 2000, 100, 200);
     expect(stats.tokensPerSec).toBe(100);
     expect(stats.generationMs).toBe(2000);
   });

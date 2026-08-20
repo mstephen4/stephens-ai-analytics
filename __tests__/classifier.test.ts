@@ -34,7 +34,7 @@ describe("heuristicClassify", () => {
 describe("recommendAthlete", () => {
   it("picks a sprinter for simple Q&A when Flash is available", () => {
     const rec = recommendAthlete("What is 2+2 as a trivia fact?", allKeys);
-    expect(rec?.athleteId).toBe("google:gemini-2.0-flash");
+    expect(rec?.athleteId).toBe("google:gemini-3.6-flash");
   });
 
   it("stays inside the providers the user actually vaulted", () => {
