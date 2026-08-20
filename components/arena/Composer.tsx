@@ -14,6 +14,7 @@ export function Composer() {
     premium,
     selectedAthleteId,
     setSelectedAthleteId,
+    applyCoachRecommendation,
     compareAthleteIds,
     setCompareAthlete,
     podiumAthleteIds,
@@ -63,7 +64,7 @@ export function Composer() {
             <p className="coach-pick">{getAthlete(recommendation.athleteId)?.name}</p>
             <p className="coach-why">{recommendation.justification}</p>
           </div>
-          <button className="ghost-btn" onClick={() => setSelectedAthleteId(recommendation.athleteId)}>
+          <button className="ghost-btn" onClick={() => applyCoachRecommendation(recommendation.athleteId)}>
             Use model
           </button>
         </div>

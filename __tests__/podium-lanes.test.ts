@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeLaneIds, DEFAULT_PODIUM, emptyKeys, getAthlete, mergeKeys, reconcilePodiumLanes } from "@/lib/models";
+import { activeLaneIds, DEFAULT_PODIUM, emptyKeys, getAthlete, laneIndexForCoachPick, mergeKeys, reconcilePodiumLanes } from "@/lib/models";
 
 describe("activeLaneIds", () => {
   it("drops empty lane slots", () => {
@@ -7,6 +7,24 @@ describe("activeLaneIds", () => {
       "openai:gpt-4o-mini",
       "google:gemini-3.6-flash",
     ]);
+  });
+});
+
+describe("laneIndexForCoachPick", () => {
+  it("targets the first empty lane", () => {
+    expect(laneIndexForCoachPick(["openai:gpt-4o-mini", ""], "google:gemini-3.6-flash")).toBe(1);
+  });
+
+  it("keeps an existing lane when the model is already selected", () => {
+    expect(laneIndexForCoachPick(["openai:gpt-4o-mini", "google:gemini-3.6-flash"], "google:gemini-3.6-flash")).toBe(
+      1,
+    );
+  });
+
+  it("falls back to lane 1 when every lane is filled", () => {
+    expect(
+      laneIndexForCoachPick(["openai:gpt-4o-mini", "anthropic:claude-haiku-3.5"], "google:gemini-3.6-flash"),
+    ).toBe(0);
   });
 });
 

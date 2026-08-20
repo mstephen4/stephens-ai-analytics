@@ -306,6 +306,15 @@ export function activeLaneIds(laneIds: string[]): string[] {
   return laneIds.filter((id) => id.trim().length > 0);
 }
 
+/** Pick which lane slot should receive a Coach recommendation. */
+export function laneIndexForCoachPick(laneIds: string[], athleteId: string): number {
+  const existing = laneIds.findIndex((id) => id === athleteId);
+  if (existing >= 0) return existing;
+  const empty = laneIds.findIndex((id) => !id.trim());
+  if (empty >= 0) return empty;
+  return 0;
+}
+
 /** Replace lanes whose provider has no vault key; preserve intentionally empty slots. */
 export function reconcilePodiumLanes(
   laneIds: string[],

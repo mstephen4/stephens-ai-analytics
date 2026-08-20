@@ -21,6 +21,7 @@ import {
   DEFAULT_SINGLE,
   emptyKeys,
   hasAnyKey,
+  laneIndexForCoachPick,
   reconcilePodiumLanes,
 } from "@/lib/models";
 import {
@@ -117,6 +118,7 @@ interface ArenaContextValue {
   selectEvent: (id: string) => void;
   removeEvent: (id: string) => Promise<void>;
   requestCoach: (prompt: string) => void;
+  applyCoachRecommendation: (athleteId: string) => void;
   sendPrompt: (prompt: string) => Promise<boolean>;
   retryLane: (assistantMessageId: string, athleteId: string) => Promise<boolean>;
   retryAllFailedLanes: (assistantMessageId: string) => Promise<boolean>;
@@ -481,6 +483,34 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       }, 450);
     },
     [coachEnabled, premium],
+  );
+
+  const applyCoachRecommendation = useCallback(
+    (athleteId: string) => {
+      if (mode === "single") {
+        setSelectedAthleteId(athleteId);
+        return;
+      }
+      const visibleLanes =
+        mode === "compare"
+          ? [...compareAthleteIds]
+          : podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES);
+      const index = laneIndexForCoachPick(visibleLanes, athleteId);
+      if (mode === "compare") {
+        setCompareAthleteIds((current) => {
+          const next = [...current] as [string, string];
+          next[index as 0 | 1] = athleteId;
+          return next;
+        });
+      } else {
+        setPodiumAthleteIds((current) => {
+          const next = [...current];
+          next[index] = athleteId;
+          return next.slice(0, PRO_PODIUM_MAX_LANES);
+        });
+      }
+    },
+    [compareAthleteIds, mode, podiumAthleteIds, podiumLaneCount, premium],
   );
 
   const sendPrompt = useCallback(
@@ -1059,6 +1089,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       selectEvent,
       removeEvent,
       requestCoach,
+      applyCoachRecommendation,
       sendPrompt,
       retryLane,
       retryAllFailedLanes,
@@ -1102,8 +1133,10 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       refreshAccount,
       removeEvent,
       requestCoach,
-      requestSignIn,
+      applyCoachRecommendation,
       saveKeys,
+      requestSignIn,
+      linkLicenseToAccount,
       selectedAthleteId,
       selectEvent,
       sending,
