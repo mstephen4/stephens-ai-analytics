@@ -14,7 +14,7 @@ import { streamChat } from "@/lib/client-stream";
 import { recommendAthlete } from "@/lib/classifier";
 import { featureLocked, isPremiumActive } from "@/lib/gating";
 import { DEFAULT_PODIUM_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
-import { DEFAULT_COMPARE, DEFAULT_PODIUM, DEFAULT_SINGLE, emptyKeys, hasAnyKey } from "@/lib/models";
+import { DEFAULT_COMPARE, DEFAULT_PODIUM, DEFAULT_SINGLE, emptyKeys, hasAnyKey, reconcilePodiumLanes } from "@/lib/models";
 import {
   resolvePremiumFromAccount,
   type AccountInfo,
@@ -209,12 +209,14 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
       if (accountInfo) setAccount(accountInfo);
 
+      let loadedKeys = emptyKeys();
       if (vault?.encrypted) {
         setVaultEncrypted(true);
         setVaultUnlocked(false);
         setLockerOpenState(true);
         setLockerTab("vault");
       } else if (vault && !vault.encrypted) {
+        loadedKeys = vault.keys;
         setKeys(vault.keys);
         setVaultUnlocked(true);
       }
@@ -222,11 +224,10 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       setLicense(storedLicense);
       if (settings.selectedAthleteId) setSelectedAthleteId(settings.selectedAthleteId);
       if (settings.compareAthleteIds) setCompareAthleteIds(settings.compareAthleteIds);
-      if (settings.podiumAthleteIds?.length) {
-        setPodiumAthleteIds(
-          [...settings.podiumAthleteIds, ...DEFAULT_PODIUM].slice(0, PRO_PODIUM_MAX_LANES),
-        );
-      }
+      const initialPodium = settings.podiumAthleteIds?.length
+        ? [...settings.podiumAthleteIds, ...DEFAULT_PODIUM].slice(0, PRO_PODIUM_MAX_LANES)
+        : DEFAULT_PODIUM;
+      setPodiumAthleteIds(reconcilePodiumLanes(initialPodium, loadedKeys, PRO_PODIUM_MAX_LANES));
       const premiumNow = resolvePremiumFromAccount(accountInfo, storedLicense).premium;
       setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow));
       const savedMode = settings.mode ?? "compare";
@@ -660,6 +661,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
   const saveKeys = useCallback(async (next: ProviderKeys, password?: string) => {
     setKeys(next);
+    setPodiumAthleteIds((current) => reconcilePodiumLanes(current, next, PRO_PODIUM_MAX_LANES));
     if (password) {
       await saveEncryptedKeys(next, password);
       setVaultEncrypted(true);
@@ -674,6 +676,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   const unlock = useCallback(async (password: string) => {
     const next = await unlockVault(password);
     setKeys(next);
+    setPodiumAthleteIds((current) => reconcilePodiumLanes(current, next, PRO_PODIUM_MAX_LANES));
     setVaultUnlocked(true);
   }, []);
 

@@ -289,16 +289,45 @@ export const DEFAULT_COMPARE: [string, string] = [
   "google:gemini-2.0-flash",
 ];
 export const DEFAULT_PODIUM: string[] = [
+  "openai:gpt-4o-mini",
   "openai:gpt-4o",
+  "anthropic:claude-haiku-3.5",
   "anthropic:claude-sonnet-4",
-  "google:gemini-2.5-pro",
-  "deepseek:deepseek-chat",
-  "xai:grok-2-1212",
-  "mistral:mistral-large-latest",
+  "google:gemini-2.0-flash",
+  "google:gemini-2.5-flash",
 ];
 
 export function getAthlete(id: string): Athlete | undefined {
   return ATHLETES.find((athlete) => athlete.id === id);
+}
+
+export function hasKeyForAthlete(keys: ProviderKeys, athleteId: string): boolean {
+  const athlete = getAthlete(athleteId);
+  if (!athlete) return false;
+  return Boolean(keys[athlete.provider]?.trim());
+}
+
+/** Replace lanes whose provider has no vault key with models the user can actually call. */
+export function reconcilePodiumLanes(
+  laneIds: string[],
+  keys: ProviderKeys,
+  maxLanes = 6,
+): string[] {
+  const available = athletesForKeys(keys);
+  if (available.length === 0) return laneIds.slice(0, maxLanes);
+
+  const kept = laneIds.filter((id) => hasKeyForAthlete(keys, id));
+  const used = new Set(kept);
+
+  for (const athlete of available) {
+    if (kept.length >= maxLanes) break;
+    if (!used.has(athlete.id)) {
+      kept.push(athlete.id);
+      used.add(athlete.id);
+    }
+  }
+
+  return kept.slice(0, maxLanes);
 }
 
 export function athletesForKeys(keys: ProviderKeys): Athlete[] {
