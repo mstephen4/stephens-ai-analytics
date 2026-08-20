@@ -75,7 +75,9 @@ export function HomePage() {
               <button type="button" className="gold-btn olympiad-trial-hero-btn" onClick={startTrial}>
                 Start free Pro trial
               </button>
-              <p className="olympiad-trial-note">Podium + Coach · sign in with email · keys stay local</p>
+              <p className="olympiad-trial-note">
+                <strong>Podium + Coach · sign in with email · keys stay local</strong>
+              </p>
             </div>
           </section>
 

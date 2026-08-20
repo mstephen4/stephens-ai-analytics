@@ -1215,6 +1215,13 @@ h2,
 
 .olympiad-tagline {
   margin-bottom: 0 !important;
+  color: #ffe566 !important;
+  font-weight: 650;
+  font-size: clamp(0.72rem, 1.25vw, 0.88rem) !important;
+  letter-spacing: 0.16em !important;
+  text-shadow:
+    0 0 24px rgba(245, 183, 46, 0.45),
+    0 0 8px rgba(255, 215, 0, 0.25);
 }
 
 .olympiad-trial-hero {
@@ -1239,6 +1246,7 @@ h2,
   letter-spacing: 0.08em !important;
   text-transform: none !important;
   color: var(--gold-primary) !important;
+  font-weight: 700 !important;
 }
 
 /* Torch input */
