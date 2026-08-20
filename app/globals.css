@@ -962,6 +962,21 @@ h2,
     display: inline-flex;
   }
 
+  .coach-panel,
+  .coach-panel-highlight {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .coach-use-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .torch-label {
+    display: none;
+  }
+
   .podium-grid {
     grid-template-columns: 1fr;
   }
