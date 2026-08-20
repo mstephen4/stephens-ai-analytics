@@ -41,4 +41,10 @@ describe("reconcilePodiumLanes", () => {
     const athlete = getAthlete("google:gemini-2.5-pro");
     expect(athlete?.apiModel).toBe("gemini-3.1-pro-preview");
   });
+
+  it("uses current Anthropic API model ids", () => {
+    expect(getAthlete("anthropic:claude-sonnet-4")?.apiModel).toBe("claude-sonnet-4-6");
+    expect(getAthlete("anthropic:claude-opus-4")?.apiModel).toBe("claude-opus-4-8");
+    expect(getAthlete("anthropic:claude-haiku-3.5")?.apiModel).toBe("claude-haiku-4-5");
+  });
 });
