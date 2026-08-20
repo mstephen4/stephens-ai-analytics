@@ -135,14 +135,14 @@ export const ATHLETES: Athlete[] = [
     classifierEligible: true,
   },
   {
-    id: "google:gemini-2.5-pro",
-    name: "Gemini 2.5 Pro",
+    id: "google:gemini-3.1-pro-preview",
+    name: "Gemini 3.1 Pro",
     shortName: "Gemini Pro",
     provider: "google",
-    apiModel: "gemini-2.5-pro",
+    apiModel: "gemini-3.1-pro-preview",
     role: "heavy",
-    inputCostPer1M: 1.25,
-    outputCostPer1M: 10,
+    inputCostPer1M: 2,
+    outputCostPer1M: 12,
     strengths: ["analysis", "research", "reasoning"],
     judgeEligible: false,
     classifierEligible: false,
@@ -298,8 +298,14 @@ export const DEFAULT_PODIUM: string[] = [
 ];
 
 export function getAthlete(id: string): Athlete | undefined {
-  return ATHLETES.find((athlete) => athlete.id === id);
+  const resolved = LEGACY_ATHLETE_IDS[id] ?? id;
+  return ATHLETES.find((athlete) => athlete.id === resolved);
 }
+
+/** Map retired athlete ids saved in local settings to current catalog entries. */
+const LEGACY_ATHLETE_IDS: Record<string, string> = {
+  "google:gemini-2.5-pro": "google:gemini-3.1-pro-preview",
+};
 
 export function hasKeyForAthlete(keys: ProviderKeys, athleteId: string): boolean {
   const athlete = getAthlete(athleteId);

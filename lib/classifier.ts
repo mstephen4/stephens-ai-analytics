@@ -90,24 +90,24 @@ const INTENT_PREFERENCES: Record<Intent, string[]> = {
   creative: [
     "anthropic:claude-sonnet-4",
     "openai:gpt-4o",
-    "google:gemini-2.5-pro",
+    "google:gemini-3.1-pro-preview",
     "anthropic:claude-opus-4",
   ],
   code: [
     "anthropic:claude-sonnet-4",
     "openai:gpt-4.1",
     "openai:gpt-4o",
-    "google:gemini-2.5-pro",
+    "google:gemini-3.1-pro-preview",
     "anthropic:claude-opus-4",
   ],
   math: [
     "openai:o4-mini",
-    "google:gemini-2.5-pro",
+    "google:gemini-3.1-pro-preview",
     "anthropic:claude-opus-4",
     "openai:gpt-4.1",
   ],
   analysis: [
-    "google:gemini-2.5-pro",
+    "google:gemini-3.1-pro-preview",
     "anthropic:claude-sonnet-4",
     "openai:gpt-4.1",
     "anthropic:claude-opus-4",
@@ -117,7 +117,7 @@ const INTENT_PREFERENCES: Record<Intent, string[]> = {
 const HIGH_COMPLEXITY_UPGRADE: Partial<Record<Intent, string[]>> = {
   code: ["anthropic:claude-opus-4", "openai:gpt-4.1"],
   math: ["anthropic:claude-opus-4", "openai:o4-mini"],
-  analysis: ["anthropic:claude-opus-4", "google:gemini-2.5-pro"],
+  analysis: ["anthropic:claude-opus-4", "google:gemini-3.1-pro-preview"],
 };
 
 export function cheapestAvailable(

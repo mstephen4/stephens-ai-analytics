@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PODIUM, emptyKeys, mergeKeys, reconcilePodiumLanes } from "@/lib/models";
+import { DEFAULT_PODIUM, emptyKeys, getAthlete, mergeKeys, reconcilePodiumLanes } from "@/lib/models";
 
 describe("reconcilePodiumLanes", () => {
   it("replaces lanes for providers without vault keys", () => {
@@ -11,7 +11,7 @@ describe("reconcilePodiumLanes", () => {
     const legacy = [
       "openai:gpt-4o",
       "anthropic:claude-sonnet-4",
-      "google:gemini-2.5-pro",
+      "google:gemini-3.1-pro-preview",
       "deepseek:deepseek-chat",
       "xai:grok-2-1212",
       "mistral:mistral-large-latest",
@@ -35,5 +35,10 @@ describe("reconcilePodiumLanes", () => {
   it("leaves lanes unchanged when no keys are saved", () => {
     const lanes = reconcilePodiumLanes(DEFAULT_PODIUM, emptyKeys(), 6);
     expect(lanes).toEqual(DEFAULT_PODIUM);
+  });
+
+  it("resolves retired Google Pro id to Gemini 3.1 Pro", () => {
+    const athlete = getAthlete("google:gemini-2.5-pro");
+    expect(athlete?.apiModel).toBe("gemini-3.1-pro-preview");
   });
 });
