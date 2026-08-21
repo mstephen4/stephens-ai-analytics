@@ -903,6 +903,22 @@ h2,
   line-height: 1.6;
 }
 
+.subscription-offer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 16px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.28);
+  background: rgba(255, 215, 0, 0.06);
+}
+
+.subscription-offer .gold-btn {
+  align-self: flex-start;
+  text-decoration: none;
+}
+
 .locker label {
   display: flex;
   flex-direction: column;
