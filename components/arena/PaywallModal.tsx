@@ -9,19 +9,12 @@ export function PaywallModal() {
   const { paywall, setPaywall, setLockerOpen, setTrialModalOpen, account } = useArena();
   if (!paywall) return null;
 
-  const title =
-    paywall === "podium"
-      ? "Unlock the Podium"
-      : paywall === "coach"
-        ? "Light the Coach’s torch"
-        : paywall === "compare"
-          ? "Unlock Compare mode"
-          : "Choose your plan";
+  const title = paywall === "coach" ? "Light the Coach’s torch" : "Subscribe to use the arena";
 
   const detail =
-    paywall === "compare"
-      ? "Free Player includes Single-mode chat. Subscribe to Olympiad Single for 2-lane Compare, or Pro for Podium + Coach."
-      : "Free Player includes Single-mode chat and local history. Podium (up to 6 models + judge) and Coach require Olympiad Pro.";
+    paywall === "coach"
+      ? "Single, Compare, and Podium are included with Olympiad Single or a Pro trial. Coach routing is an Olympiad Pro feature."
+      : "One UI, one vault for all your API keys — then Single, Compare, and Podium on this device. Start with a free Pro trial or choose Single or Pro below.";
 
   return (
     <div className="modal-root">

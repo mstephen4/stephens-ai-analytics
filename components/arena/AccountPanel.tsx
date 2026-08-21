@@ -17,14 +17,16 @@ export function AccountPanel() {
 
   if (account?.signedIn) {
     const onTrial = premiumStatus.source === "trial";
-    const subscribed = premiumStatus.premium || premiumStatus.single;
+    const { subscribed, premium } = premiumStatus;
 
     return (
       <div className="locker-body">
         <p className="hint gold">Signed in as {account.email}</p>
         <p>
           Tier:{" "}
-          <strong>{onTrial ? "Pro Trial" : premiumStatus.premium ? "Pro" : premiumStatus.single ? "Single" : "Free"}</strong>
+          <strong>
+            {onTrial ? "Pro Trial" : premium ? "Pro" : subscribed ? "Single" : "Free"}
+          </strong>
         </p>
         {premiumStatus.trialEndsAt ? (
           <p className="hint">
@@ -38,8 +40,8 @@ export function AccountPanel() {
             <PricingPlans email={account.email} compact />
           </div>
         ) : null}
-        {!premiumStatus.premium && premiumStatus.single ? (
-          <p className="hint">Single plan active — upgrade to Pro for Podium &amp; Coach.</p>
+        {subscribed && !premium ? (
+          <p className="hint">Single plan active — upgrade to Pro for Coach and 6-lane Podium.</p>
         ) : null}
         <form
           className="stack"
@@ -75,8 +77,8 @@ export function AccountPanel() {
   return (
     <div className="locker-body">
       <p>
-        Sign in with email to start a <strong>free Pro trial</strong> (Podium + Coach). Model access stays{" "}
-        <strong>BYOK</strong> — add keys in the Vault separately.
+        Sign in with email to start a <strong>free Pro trial</strong> (Single, Compare, Podium + Coach). Model access
+        stays <strong>BYOK</strong> — add keys in the Vault separately.
       </p>
       <PricingPlans compact />
       <form

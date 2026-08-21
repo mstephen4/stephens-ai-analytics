@@ -6,7 +6,7 @@ export type PremiumSource = "trial" | "account_license" | "local_license" | null
 
 export interface PremiumStatus {
   premium: boolean;
-  single: boolean;
+  subscribed: boolean;
   source: PremiumSource;
   tier: LicenseTier;
   trialEndsAt: number | null;
@@ -17,7 +17,7 @@ export interface AccountInfo {
   signedIn: boolean;
   email: string | null;
   premium: boolean;
-  single: boolean;
+  subscribed: boolean;
   source: PremiumSource;
   tier: LicenseTier;
   trialEndsAt: number | null;
@@ -34,7 +34,7 @@ export function resolvePremiumFromAccount(
   if (account?.signedIn && account.premium) {
     return {
       premium: true,
-      single: true,
+      subscribed: true,
       source: account.source,
       tier: account.tier,
       trialEndsAt,
@@ -45,7 +45,7 @@ export function resolvePremiumFromAccount(
   if (account?.signedIn && account.trialEndsAt && account.trialEndsAt > Date.now()) {
     return {
       premium: true,
-      single: true,
+      subscribed: true,
       source: "trial",
       tier: "pro",
       trialEndsAt,
@@ -53,10 +53,10 @@ export function resolvePremiumFromAccount(
     };
   }
 
-  if (account?.signedIn && account.single) {
+  if (account?.signedIn && account.subscribed) {
     return {
       premium: false,
-      single: true,
+      subscribed: true,
       source: account.source,
       tier: account.tier,
       trialEndsAt,
@@ -67,7 +67,7 @@ export function resolvePremiumFromAccount(
   if (localLicense && isPremiumActive(localLicense)) {
     return {
       premium: true,
-      single: true,
+      subscribed: true,
       source: "local_license",
       tier: localLicense.tier,
       trialEndsAt,
@@ -78,7 +78,7 @@ export function resolvePremiumFromAccount(
   if (localLicense && licenseUnlocksSingle(localLicense.tier, localLicense.status)) {
     return {
       premium: false,
-      single: true,
+      subscribed: true,
       source: "local_license",
       tier: localLicense.tier,
       trialEndsAt,
@@ -86,7 +86,7 @@ export function resolvePremiumFromAccount(
     };
   }
 
-  return { premium: false, single: false, source: null, tier: "free", trialEndsAt, email };
+  return { premium: false, subscribed: false, source: null, tier: "free", trialEndsAt, email };
 }
 
 export function displayPremiumTier(status: PremiumStatus): string {
@@ -95,6 +95,6 @@ export function displayPremiumTier(status: PremiumStatus): string {
     if (status.tier === "lifetime") return "Lifetime Pass";
     return "Olympiad Pro";
   }
-  if (status.single) return "Olympiad Single";
+  if (status.subscribed) return "Olympiad Single";
   return "Free Player";
 }

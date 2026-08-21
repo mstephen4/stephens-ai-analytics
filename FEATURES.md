@@ -6,16 +6,16 @@ This document lists ChatHub capabilities and what **AI Olympiad** adopts. Olympi
 
 | Feature | ChatHub | AI Olympiad | Tier |
 | --- | --- | --- | --- |
-| **Multi-model compare** | 2 models free, up to 6 paid | **Compare mode**: 2 models side-by-side, one prompt | Free |
-| **Simultaneous streaming** | All lanes stream in parallel | Web Streams / SSE fan-out per lane | Free / Pro |
-| **Side-by-side grid** | Responsive grid of answers | Contender cards with live stats | Free / Pro |
-| **Many providers** | OpenAI, Anthropic, Google, Grok, Llama, DeepSeek, Mistral, … | **21 models** across 7 BYOK providers | Free (with your keys) |
-| **Single-model chat** | Supported | **Single mode** | Free |
-| **Podium + judge** | Implicit via comparison | Up to **6 lanes** + impartial judge ranks top 3 | Pro / Lifetime |
-| **Smart routing** | Model picker | **Coach** (heuristic + optional classifier) | Pro / Lifetime |
-| **Local history** | Cloud account | **IndexedDB** events on device | Free |
-| **PWA / install** | Apps + extension | Installable PWA (`manifest` + service worker) | Free |
-| **License gating** | Subscription | Lemon Squeezy license keys | Pro / Lifetime |
+| **Multi-model compare** | 2 models free, up to 6 paid | **Compare mode**: 2 models side-by-side, one prompt | Single / Pro / Trial |
+| **Simultaneous streaming** | All lanes stream in parallel | Web Streams / SSE fan-out per lane | Single / Pro |
+| **Side-by-side grid** | Responsive grid of answers | Contender cards with live stats | Single / Pro |
+| **Many providers** | OpenAI, Anthropic, Google, Grok, Llama, DeepSeek, Mistral, … | **21 models** across 7 BYOK providers | With subscription + your keys |
+| **Single-model chat** | Supported | **Single mode** | Single / Pro / Trial |
+| **Podium + judge** | Implicit via comparison | Up to **6 lanes** + impartial judge ranks top 3 | Single (3 lanes) / Pro (6 lanes) |
+| **Smart routing** | Model picker | **Coach** (heuristic + optional classifier) | Pro / Lifetime / Trial |
+| **Local history** | Cloud account | **IndexedDB** events on device | With subscription |
+| **PWA / install** | Installable PWA (`manifest` + service worker) | Free to install; chat requires pass |
+| **License gating** | Subscription | Lemon Squeezy license keys | Single / Pro / Lifetime |
 
 ## Not adopted (out of scope for now)
 

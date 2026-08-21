@@ -1,11 +1,16 @@
 import { licenseUnlocksPremium } from "./license";
 import type { LicenseRecord, LicenseTier } from "./types";
 
-export type PaywallFeature = "coach" | "podium" | "compare";
+/** App modes that require a paid plan or active trial (Single, Compare, Podium). */
+export type AppModeFeature = "single" | "compare" | "podium";
+
+export type PaywallFeature = AppModeFeature | "coach";
 
 export interface FeatureAccess {
+  /** Paid Single/Pro/Lifetime or active trial — unlocks all three chat modes + vault UI. */
+  subscribed: boolean;
+  /** Pro, Lifetime, or trial — unlocks Coach. */
   pro: boolean;
-  single: boolean;
 }
 
 export function isPremiumActive(record: LicenseRecord | null): boolean {
@@ -14,9 +19,8 @@ export function isPremiumActive(record: LicenseRecord | null): boolean {
 }
 
 export function featureLocked(feature: PaywallFeature, access: FeatureAccess): boolean {
-  if (feature === "podium" || feature === "coach") return !access.pro;
-  if (feature === "compare") return !access.single;
-  return true;
+  if (feature === "coach") return !access.pro;
+  return !access.subscribed;
 }
 
 export function degradeToFree(record: LicenseRecord): LicenseRecord {
@@ -37,6 +41,6 @@ export function displayTier(tier: LicenseTier, access: FeatureAccess): string {
     if (tier === "lifetime") return "Lifetime Pass";
     return "Olympiad Pro";
   }
-  if (access.single) return "Olympiad Single";
+  if (access.subscribed) return "Olympiad Single";
   return "Free Player";
 }

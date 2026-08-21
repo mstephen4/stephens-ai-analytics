@@ -21,7 +21,8 @@ export function HeaderBar() {
     setTrialModalOpen,
   } = useArena();
 
-  const showTrial = !premium && !account?.signedIn;
+  const subscribed = premiumStatus.subscribed;
+  const showTrial = !subscribed && !account?.signedIn;
 
   return (
     <header className="arena-header">
@@ -43,6 +44,7 @@ export function HeaderBar() {
           onClick={() => setMode("single")}
         >
           Single
+          {!subscribed ? <span className="pro-badge compact">Pass</span> : null}
         </button>
         <button
           role="tab"
@@ -51,7 +53,7 @@ export function HeaderBar() {
           onClick={() => setMode("compare")}
         >
           Compare
-          {!premiumStatus.single ? <span className="pro-badge compact">Single+</span> : null}
+          {!subscribed ? <span className="pro-badge compact">Pass</span> : null}
         </button>
         <button
           role="tab"
@@ -61,7 +63,7 @@ export function HeaderBar() {
         >
           <Trophy size={14} />
           Podium
-          {!premium ? <span className="pro-badge compact">Pro</span> : null}
+          {!subscribed ? <span className="pro-badge compact">Pass</span> : null}
         </button>
       </div>
 

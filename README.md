@@ -3,7 +3,7 @@
 A Bring-Your-Own-Key (BYOK) Progressive Web App to **compare multiple AI models side by side** (ChatHub-style), with optional **Coach** routing and **Podium** judging. See [FEATURES.md](./FEATURES.md) for what we adopt from ChatHub vs what is out of scope.
 
 - **Homepage** [`/`] — landing with torch search bar (aligned to product mockup)
-- **Events app** [`/events`] — single, compare (2 models, free), podium (up to 6 + judge, pro)
+- **Events app** [`/events`] — Single, Compare, and Podium (subscription or trial); Coach on Pro
 
 ## Quick start
 
@@ -35,16 +35,15 @@ GitHub never receives your keys or conversations. Clearing site data in the brow
 
 | Plan | Price | Unlocks |
 | --- | --- | --- |
-| **Free** | $0 | Single-mode chat, local vault |
-| **Single** | $5/mo · $49/yr | + 2-lane Compare |
-| **Pro** | $9/mo · $99/yr | + Podium (6 lanes + Judge) + Coach |
 | **Trial** | 3 days | Full Pro via email sign-in |
+| **Single** | $5/mo · $49/yr | Single, Compare, Podium (3 lanes) + vault UI |
+| **Pro** | $9/mo · $99/yr | + Coach + 6-lane Podium |
 
 Configure Lemon Squeezy checkout URLs in `.env` (see `.env.example`). Prices are displayed from `lib/subscription.ts` and must match your store.
 
 ## Pro subscription (single user)
 
-Olympiad Pro is a **personal** subscription (one email, one browser vault) via [Lemon Squeezy](https://www.lemonsqueezy.com). It unlocks **Podium + Coach** only — model usage stays **BYOK**.
+Olympiad Pro is a **personal** subscription (one email, one browser vault) via [Lemon Squeezy](https://www.lemonsqueezy.com). **Single** unlocks all three chat modes; **Pro** adds Coach and 6-lane Podium — model usage stays **BYOK**.
 
 **Price is not hard-coded in this repo.** Set it in your Lemon Squeezy product, then configure:
 

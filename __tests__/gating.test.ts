@@ -3,19 +3,21 @@ import { featureLocked, isPremiumActive } from "@/lib/gating";
 import { degradeToFree } from "@/lib/gating";
 
 describe("featureLocked", () => {
-  it("locks Podium and Coach for Free Player", () => {
-    const free = { pro: false, single: false };
+  it("locks all modes and Coach for Free Player", () => {
+    const free = { pro: false, subscribed: false };
+    expect(featureLocked("single", free)).toBe(true);
+    expect(featureLocked("compare", free)).toBe(true);
     expect(featureLocked("podium", free)).toBe(true);
     expect(featureLocked("coach", free)).toBe(true);
-    expect(featureLocked("compare", free)).toBe(true);
   });
 
-  it("unlocks compare for Single and everything for Pro", () => {
-    const single = { pro: false, single: true };
-    const pro = { pro: true, single: true };
+  it("unlocks all modes for Single and Coach only for Pro", () => {
+    const single = { pro: false, subscribed: true };
+    const pro = { pro: true, subscribed: true };
+    expect(featureLocked("single", single)).toBe(false);
     expect(featureLocked("compare", single)).toBe(false);
-    expect(featureLocked("podium", single)).toBe(true);
-    expect(featureLocked("podium", pro)).toBe(false);
+    expect(featureLocked("podium", single)).toBe(false);
+    expect(featureLocked("coach", single)).toBe(true);
     expect(featureLocked("coach", pro)).toBe(false);
   });
 });

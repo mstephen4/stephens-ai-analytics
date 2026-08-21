@@ -44,14 +44,14 @@ export function resolvePremium(options: {
   const trialEndsAt = options.user?.trialEndsAt ?? null;
 
   if (isTrialActive(options.user)) {
-    return { premium: true, single: true, source: "trial", tier: "pro", trialEndsAt, email };
+    return { premium: true, subscribed: true, source: "trial", tier: "pro", trialEndsAt, email };
   }
 
   const accountLicense = email ? accountLicenseForEmail(email) : null;
   if (accountLicense && licenseUnlocksPremium(accountLicense.tier, accountLicense.status)) {
     return {
       premium: true,
-      single: true,
+      subscribed: true,
       source: "account_license",
       tier: accountLicense.tier,
       trialEndsAt,
@@ -61,7 +61,7 @@ export function resolvePremium(options: {
   if (accountLicense && licenseUnlocksSingle(accountLicense.tier, accountLicense.status)) {
     return {
       premium: false,
-      single: true,
+      subscribed: true,
       source: "account_license",
       tier: accountLicense.tier,
       trialEndsAt,
@@ -72,7 +72,7 @@ export function resolvePremium(options: {
   if (options.localLicense && licenseUnlocksPremium(options.localLicense.tier, options.localLicense.status)) {
     return {
       premium: true,
-      single: true,
+      subscribed: true,
       source: "local_license",
       tier: options.localLicense.tier,
       trialEndsAt,
@@ -82,7 +82,7 @@ export function resolvePremium(options: {
   if (options.localLicense && licenseUnlocksSingle(options.localLicense.tier, options.localLicense.status)) {
     return {
       premium: false,
-      single: true,
+      subscribed: true,
       source: "local_license",
       tier: options.localLicense.tier,
       trialEndsAt,
@@ -90,7 +90,7 @@ export function resolvePremium(options: {
     };
   }
 
-  return { premium: false, single: false, source: null, tier: "free", trialEndsAt, email };
+  return { premium: false, subscribed: false, source: null, tier: "free", trialEndsAt, email };
 }
 
 export async function resolvePremiumForUser(

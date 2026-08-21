@@ -17,7 +17,7 @@ export function PricingPlans({
       <article className="pricing-card">
         <p className="pricing-kicker">Single</p>
         <h3 className="pricing-title">Olympiad Single</h3>
-        <p className="pricing-blurb">Single-model chat + 2-lane Compare. BYOK vault on this device.</p>
+        <p className="pricing-blurb">Single, Compare, and Podium (3 lanes). One UI + BYOK vault on this device.</p>
         <div className="pricing-options">
           {getCheckoutUrl("single", "monthly", email) ? (
             <a className="gold-btn" href={getCheckoutUrl("single", "monthly", email)}>
@@ -38,7 +38,7 @@ export function PricingPlans({
       <article className="pricing-card featured">
         <p className="pricing-kicker">Pro</p>
         <h3 className="pricing-title">Olympiad Pro</h3>
-        <p className="pricing-blurb">Everything in Single, plus Podium (6 lanes + Judge) and Coach routing.</p>
+        <p className="pricing-blurb">Everything in Single, plus 6-lane Podium + Judge and Coach routing.</p>
         <div className="pricing-options">
           {getCheckoutUrl("pro", "monthly", email) ? (
             <a className="gold-btn" href={getCheckoutUrl("pro", "monthly", email)}>
