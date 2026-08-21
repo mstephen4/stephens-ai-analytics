@@ -1,15 +1,23 @@
 "use client";
 
 import { Crown, X } from "lucide-react";
+import {
+  getLifetimeCheckoutUrl,
+  getLifetimePriceLabel,
+  getProCheckoutUrl,
+  getProPriceLabel,
+  PRO_SUBSCRIPTION_TAGLINE,
+} from "@/lib/subscription";
 import { useArena } from "./ArenaProvider";
 
-const PRO_URL = process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_PRO ?? "";
-const LIFETIME_URL = process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_LIFETIME ?? "";
-
 export function PaywallModal() {
-  const { paywall, setPaywall, setLockerOpen, setTrialModalOpen } = useArena();
+  const { paywall, setPaywall, setLockerOpen, setTrialModalOpen, account } = useArena();
   if (!paywall) return null;
   const title = paywall === "podium" ? "Unlock the Podium" : "Light the Coach’s torch";
+  const proUrl = getProCheckoutUrl(account?.email);
+  const lifetimeUrl = getLifetimeCheckoutUrl(account?.email);
+  const proPrice = getProPriceLabel();
+  const lifetimePrice = getLifetimePriceLabel();
 
   return (
     <div className="modal-root">
@@ -21,11 +29,13 @@ export function PaywallModal() {
         <Crown className="text-torch" />
         <p className="brand-kicker">OLYMPIC PASS</p>
         <h2>{title}</h2>
+        <p>{PRO_SUBSCRIPTION_TAGLINE}</p>
         <p>
           Free Player keeps single-model chat, 2-model compare, BYOK, and local history. Podium (up to 6 models +
-          judge) and Coach routing require Pro — via <strong>free trial</strong>, subscription, or lifetime pass.
+          judge) and Coach routing require <strong>Olympiad Pro</strong> — subscription or lifetime pass for a{" "}
+          <strong>single user</strong> (this browser vault).
         </p>
-        <p className="hint">Pro unlocks features only. You still bring your own API keys for model access.</p>
+        <p className="hint">Pro unlocks features only. You still bring your own API keys and pay providers directly.</p>
         <div className="paywall-actions">
           <button
             className="gold-btn"
@@ -36,14 +46,14 @@ export function PaywallModal() {
           >
             Start free Pro trial
           </button>
-          {PRO_URL ? (
-            <a className="ghost-btn" href={PRO_URL} target="_blank" rel="noreferrer">
-              Buy Olympiad Pro
+          {proUrl ? (
+            <a className="ghost-btn" href={proUrl} target="_blank" rel="noreferrer">
+              {proPrice ? `Subscribe — ${proPrice}` : "Subscribe to Olympiad Pro"}
             </a>
           ) : null}
-          {LIFETIME_URL ? (
-            <a className="ghost-btn" href={LIFETIME_URL} target="_blank" rel="noreferrer">
-              Lifetime
+          {lifetimeUrl ? (
+            <a className="ghost-btn" href={lifetimeUrl} target="_blank" rel="noreferrer">
+              {lifetimePrice ? `Lifetime — ${lifetimePrice}` : "Lifetime pass"}
             </a>
           ) : null}
           <button

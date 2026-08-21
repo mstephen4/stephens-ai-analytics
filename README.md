@@ -31,6 +31,20 @@ OpenAI · Anthropic · Google · DeepSeek · Groq (Llama/Mixtral) · xAI (Grok) 
 
 GitHub never receives your keys or conversations. Clearing site data in the browser removes local history.
 
+## Pro subscription (single user)
+
+Olympiad Pro is a **personal** subscription (one email, one browser vault) via [Lemon Squeezy](https://www.lemonsqueezy.com). It unlocks **Podium + Coach** only — model usage stays **BYOK**.
+
+**Price is not hard-coded in this repo.** Set it in your Lemon Squeezy product, then configure:
+
+```env
+NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_PRO=https://…
+NEXT_PUBLIC_PRO_PRICE_LABEL=$X/mo   # display only — match your store
+NEXT_PUBLIC_LEMONSQUEEZY_CUSTOMER_PORTAL=https://…  # optional
+```
+
+After checkout, the webhook links the license to the buyer’s email; sign in with that email on **Account** to activate Pro.
+
 ## Docs
 
 - [FEATURES.md](./FEATURES.md) — ChatHub alignment & tier matrix

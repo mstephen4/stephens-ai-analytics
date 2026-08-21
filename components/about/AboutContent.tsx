@@ -134,6 +134,35 @@ export function AboutContent({ compact = false }: AboutContentProps) {
       </section>
 
       <section className="about-section">
+        <h2>Olympiad Pro — single-user subscription</h2>
+        <p>
+          AI Olympiad is a <strong>personal API vault</strong> with the convenience of <strong>one UI at a time</strong>{" "}
+          on your device. You store your provider keys locally, run compare events, and optionally upgrade to{" "}
+          <strong>Olympiad Pro</strong> for Podium judging and Coach routing.
+        </p>
+        <ul className="about-list">
+          <li>
+            <strong>One person</strong> — subscription is tied to your email; vault and history stay on this browser.
+          </li>
+          <li>
+            <strong>BYOK</strong> — Olympiad does not sell model credits. You pay OpenAI, Anthropic, Google, etc.
+            directly.
+          </li>
+          <li>
+            <strong>Pro</strong> — monthly subscription or lifetime pass via Lemon Squeezy; license links to your account
+            after checkout.
+          </li>
+          <li>
+            <strong>Free trial</strong> — sign in with email for a short Pro trial before you subscribe.
+          </li>
+        </ul>
+        <p className="about-note">
+          Pricing is set in your Lemon Squeezy store (configure checkout URLs and price labels in{" "}
+          <code>.env</code>). There is no hosted multi-seat team plan — this is built for individual power users.
+        </p>
+      </section>
+
+      <section className="about-section">
         <h2>Your keys, your data</h2>
         <ul className="about-list">
           <li>API keys live in the <strong>Vault</strong> on this device (optional AES-GCM encryption).</li>

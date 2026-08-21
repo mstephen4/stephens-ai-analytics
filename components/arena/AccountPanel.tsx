@@ -3,6 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LogOut, Mail } from "lucide-react";
+import {
+  getProCheckoutUrl,
+  getProPriceLabel,
+  getSubscriptionPortalUrl,
+  PRO_SUBSCRIPTION_TAGLINE,
+} from "@/lib/subscription";
 import { useArena } from "./ArenaProvider";
 
 export function AccountPanel() {
@@ -14,17 +20,40 @@ export function AccountPanel() {
   const [devLink, setDevLink] = useState<string | null>(null);
 
   if (account?.signedIn) {
+    const proUrl = getProCheckoutUrl(account.email);
+    const proPrice = getProPriceLabel();
+    const portalUrl = getSubscriptionPortalUrl();
+    const onTrial = premiumStatus.source === "trial";
+
     return (
       <div className="locker-body">
         <p className="hint gold">Signed in as {account.email}</p>
         <p>
-          Tier: <strong>{premiumStatus.source === "trial" ? "Pro Trial" : premiumStatus.premium ? "Pro" : "Free"}</strong>
+          Tier:{" "}
+          <strong>{onTrial ? "Pro Trial" : premiumStatus.premium ? "Pro" : "Free"}</strong>
         </p>
         {premiumStatus.trialEndsAt ? (
           <p className="hint">
             Trial ends {new Date(premiumStatus.trialEndsAt).toLocaleDateString()}. BYOK vault unchanged — your API keys
             stay local.
           </p>
+        ) : null}
+        {!premiumStatus.premium ? (
+          <div className="subscription-offer">
+            <p className="hint">{PRO_SUBSCRIPTION_TAGLINE}</p>
+            {proUrl ? (
+              <a className="gold-btn" href={proUrl} target="_blank" rel="noreferrer">
+                {proPrice ? `Subscribe to Pro — ${proPrice}` : "Subscribe to Olympiad Pro"}
+              </a>
+            ) : (
+              <p className="hint">Set NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_PRO in your deploy env to enable checkout.</p>
+            )}
+          </div>
+        ) : null}
+        {premiumStatus.premium && portalUrl ? (
+          <a className="ghost-btn" href={portalUrl} target="_blank" rel="noreferrer">
+            Manage subscription
+          </a>
         ) : null}
         <form
           className="stack"
