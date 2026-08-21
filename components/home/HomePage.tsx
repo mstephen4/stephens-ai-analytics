@@ -1,5 +1,6 @@
 "use client";
 
+import { getPublicTrialDays } from "@/lib/trial";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +11,8 @@ import { TorchIcon } from "./TorchIcon";
 export function HomePage() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
+
+  const trialDays = getPublicTrialDays();
 
   const launch = (mode?: "compare" | "podium" | "coach") => {
     const params = new URLSearchParams();
@@ -32,7 +35,8 @@ export function HomePage() {
       <div className="olympiad-overlay">
         <div className="olympiad-trial-banner">
           <p>
-            <strong>Free Pro trial</strong> — unlock Podium &amp; Coach for 7 days. BYOK · no hosted model credits.
+            <strong>Free Pro trial</strong> — unlock Podium &amp; Coach for {trialDays} days. BYOK · no hosted model
+            credits.
           </p>
           <button type="button" className="gold-btn olympiad-trial-banner-btn" onClick={startTrial}>
             Start free trial

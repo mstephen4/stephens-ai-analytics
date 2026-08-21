@@ -1,10 +1,9 @@
+import { getTrialDays } from "@/lib/trial";
 import { NextResponse } from "next/server";
 import { buildSessionCookie, sessionCookieOptions } from "@/lib/auth/session";
 import { consumeMagicLink, upsertUserWithTrial } from "@/lib/auth/users";
 
 export const runtime = "nodejs";
-
-const TRIAL_DAYS = Number(process.env.TRIAL_DAYS ?? "7") || 7;
 
 function appOrigin(request: Request): string {
   return (
@@ -25,7 +24,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${appOrigin(request)}/events?auth=expired`);
   }
 
-  const user = upsertUserWithTrial(email, TRIAL_DAYS);
+  const user = upsertUserWithTrial(email, getTrialDays());
   const cookieValue = buildSessionCookie(user.id, user.email);
   const response = NextResponse.redirect(`${appOrigin(request)}/events?auth=signed-in`);
   response.cookies.set("olympiad_session", cookieValue, sessionCookieOptions(30 * 24 * 60 * 60));
