@@ -31,6 +31,17 @@ OpenAI · Anthropic · Google · DeepSeek · Groq (Llama/Mixtral) · xAI (Grok) 
 
 GitHub never receives your keys or conversations. Clearing site data in the browser removes local history.
 
+## Plans (single user, BYOK)
+
+| Plan | Price | Unlocks |
+| --- | --- | --- |
+| **Free** | $0 | Single-mode chat, local vault |
+| **Single** | $5/mo · $49/yr | + 2-lane Compare |
+| **Pro** | $9/mo · $99/yr | + Podium (6 lanes + Judge) + Coach |
+| **Trial** | 3 days | Full Pro via email sign-in |
+
+Configure Lemon Squeezy checkout URLs in `.env` (see `.env.example`). Prices are displayed from `lib/subscription.ts` and must match your store.
+
 ## Pro subscription (single user)
 
 Olympiad Pro is a **personal** subscription (one email, one browser vault) via [Lemon Squeezy](https://www.lemonsqueezy.com). It unlocks **Podium + Coach** only — model usage stays **BYOK**.

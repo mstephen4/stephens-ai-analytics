@@ -12,7 +12,7 @@ export function lemonErrorMessage(reason?: string): string {
     case "wrong_product":
       return "This license is not an AI Olympiad product key.";
     case "wrong_variant":
-      return "This license variant is not Olympiad Pro or Lifetime.";
+      return "This license variant is not Olympiad Single, Pro, or Lifetime.";
     default:
       return "License could not be verified.";
   }

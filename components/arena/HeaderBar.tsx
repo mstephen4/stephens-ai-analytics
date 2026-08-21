@@ -51,6 +51,7 @@ export function HeaderBar() {
           onClick={() => setMode("compare")}
         >
           Compare
+          {!premiumStatus.single ? <span className="pro-badge compact">Single+</span> : null}
         </button>
         <button
           role="tab"

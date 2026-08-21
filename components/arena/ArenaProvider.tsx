@@ -75,7 +75,7 @@ function chatHistoryBefore(messages: ArenaMessage[], beforeIndex: number) {
     }));
 }
 
-type Paywall = "coach" | "podium" | null;
+type Paywall = "coach" | "podium" | "compare" | null;
 type LockerTab = "vault" | "pass" | "account" | "about";
 
 interface ArenaContextValue {
@@ -189,6 +189,10 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     [account, license],
   );
   const premium = premiumStatus.premium;
+  const featureAccess = useMemo(
+    () => ({ pro: premiumStatus.premium, single: premiumStatus.single }),
+    [premiumStatus.premium, premiumStatus.single],
+  );
   const activeEvent = events.find((event) => event.id === activeEventId) ?? events[0] ?? null;
 
   const refreshAccount = useCallback(async () => {
@@ -263,19 +267,20 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         ? [...settings.podiumAthleteIds, ...DEFAULT_PODIUM].slice(0, PRO_PODIUM_MAX_LANES)
         : DEFAULT_PODIUM;
       setPodiumAthleteIds(reconcilePodiumLanes(initialPodium, loadedKeys, PRO_PODIUM_MAX_LANES));
-      const premiumNow = resolvePremiumFromAccount(accountInfo, storedLicense).premium;
-      setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow));
+      const premiumNow = resolvePremiumFromAccount(accountInfo, storedLicense);
+      setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow.premium));
       const savedMode = settings.mode ?? "compare";
-      if (savedMode === "podium" && !premiumNow) setModeState("compare");
+      if (savedMode === "podium" && !premiumNow.premium) setModeState("compare");
+      else if (savedMode === "compare" && !premiumNow.single) setModeState("single");
       else setModeState(savedMode);
 
       const params = new URLSearchParams(window.location.search);
       const q = params.get("q");
       const launchMode = params.get("mode");
-      if (launchMode === "podium" && premiumNow) setModeState("podium");
-      else if (launchMode === "compare") setModeState("compare");
+      if (launchMode === "podium" && premiumNow.premium) setModeState("podium");
+      else if (launchMode === "compare" && premiumNow.single) setModeState("compare");
       else if (launchMode === "single") setModeState("single");
-      if (params.get("coach") === "1" && premiumNow) setCoachEnabledState(true);
+      if (params.get("coach") === "1" && premiumNow.premium) setCoachEnabledState(true);
       if (q) window.sessionStorage.setItem("olympiad.pendingPrompt", q);
 
       const auth = params.get("auth");
@@ -365,9 +370,13 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       };
       setLicense(degraded);
       saveLicense(degraded);
-      const stillPremium = resolvePremiumFromAccount(account, degraded).premium;
-      if (!stillPremium) {
+      const access = resolvePremiumFromAccount(account, degraded);
+      if (!access.premium) {
         setCoachEnabledState(false);
+      }
+      if (!access.single) {
+        setModeState("single");
+      } else if (!access.premium) {
         setModeState("compare");
       }
       if (!isPremiumActive(degraded)) {
@@ -398,24 +407,28 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
   const setCoachEnabled = useCallback(
     (on: boolean) => {
-      if (on && featureLocked("coach", premium)) {
+      if (on && featureLocked("coach", featureAccess)) {
         setPaywall("coach");
         return;
       }
       setCoachEnabledState(on);
     },
-    [premium],
+    [featureAccess],
   );
 
   const setMode = useCallback(
     (next: "single" | "compare" | "podium") => {
-      if (next === "podium" && featureLocked("podium", premium)) {
+      if (next === "podium" && featureLocked("podium", featureAccess)) {
         setPaywall("podium");
+        return;
+      }
+      if (next === "compare" && featureLocked("compare", featureAccess)) {
+        setPaywall("compare");
         return;
       }
       setModeState(next);
     },
-    [premium],
+    [featureAccess],
   );
 
   const setLockerOpen = useCallback((open: boolean, tab?: LockerTab) => {
@@ -521,8 +534,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         setLockerOpen(true, "vault");
         return false;
       }
-      if (mode === "podium" && featureLocked("podium", premium)) {
+      if (mode === "podium" && featureLocked("podium", featureAccess)) {
         setPaywall("podium");
+        return false;
+      }
+      if (mode === "compare" && featureLocked("compare", featureAccess)) {
+        setPaywall("compare");
         return false;
       }
 
@@ -972,17 +989,16 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await fetch("/api/auth/signout", { method: "POST" });
-    setAccount({ signedIn: false, email: null, premium: false, source: null, tier: "free", trialEndsAt: null });
+    setAccount({ signedIn: false, email: null, premium: false, single: false, source: null, tier: "free", trialEndsAt: null });
     setAuthMessage(null);
     setTrialModalOpen(false);
-    const stillPremium = resolvePremiumFromAccount(
-      { signedIn: false, email: null, premium: false, source: null, tier: "free", trialEndsAt: null },
+    const access = resolvePremiumFromAccount(
+      { signedIn: false, email: null, premium: false, single: false, source: null, tier: "free", trialEndsAt: null },
       license,
-    ).premium;
-    if (!stillPremium) {
-      setCoachEnabledState(false);
-      setModeState("compare");
-    }
+    );
+    if (!access.premium) setCoachEnabledState(false);
+    if (!access.single) setModeState("single");
+    else if (!access.premium) setModeState("compare");
   }, [license]);
 
   const linkLicenseToAccount = useCallback(async (licenseKey: string) => {
@@ -1027,11 +1043,10 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   const clearLicense = useCallback(() => {
     setLicense(null);
     saveLicense(null);
-    const stillPremium = resolvePremiumFromAccount(account, null).premium;
-    if (!stillPremium) {
-      setCoachEnabledState(false);
-      setModeState("compare");
-    }
+    const access = resolvePremiumFromAccount(account, null);
+    if (!access.premium) setCoachEnabledState(false);
+    if (!access.single) setModeState("single");
+    else if (!access.premium) setModeState("compare");
   }, [account]);
 
   const value = useMemo<ArenaContextValue>(

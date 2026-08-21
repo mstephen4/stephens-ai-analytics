@@ -919,6 +919,67 @@ h2,
   text-decoration: none;
 }
 
+.pricing-plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.pricing-plans.compact {
+  grid-template-columns: 1fr;
+}
+
+.pricing-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pricing-card.featured {
+  border-color: rgba(255, 215, 0, 0.45);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.12);
+}
+
+.pricing-kicker {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.pricing-title {
+  margin: 4px 0 8px;
+  font-size: 18px;
+}
+
+.pricing-blurb {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.pricing-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pricing-unconfigured {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 8px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+.paywall-card-wide {
+  max-width: 720px;
+}
+
 .locker label {
   display: flex;
   flex-direction: column;

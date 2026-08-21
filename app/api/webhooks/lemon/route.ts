@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { upsertLicenseByEmail } from "@/lib/auth/users";
 import { readLicenseEnv } from "@/lib/license";
+import type { LicenseTier } from "@/lib/types";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,14 @@ function verifySignature(rawBody: string, signature: string | null): boolean {
   } catch {
     return false;
   }
+}
+
+function tierFromVariantId(variantId: string, env: ReturnType<typeof readLicenseEnv>): LicenseTier {
+  if (!env) return "pro";
+  if (variantId === env.lifetimeVariantId) return "lifetime";
+  if (variantId === env.proMonthlyVariantId || variantId === env.proYearlyVariantId) return "pro";
+  if (variantId === env.singleMonthlyVariantId || variantId === env.singleYearlyVariantId) return "single";
+  return "pro";
 }
 
 export async function POST(request: Request) {
@@ -31,6 +40,7 @@ export async function POST(request: Request) {
         customer_email?: string;
         key?: string;
         status?: string;
+        variant_id?: number;
       };
       relationships?: Record<string, unknown>;
     };
@@ -48,11 +58,8 @@ export async function POST(request: Request) {
   const licenseKey = attrs.key?.trim() ?? "";
 
   const env = readLicenseEnv();
-  const variantId = String(
-    (payload.data as { attributes?: { variant_id?: number } })?.attributes?.variant_id ?? "",
-  );
-  let tier: "pro" | "lifetime" = "pro";
-  if (env?.lifetimeVariantId && variantId === env.lifetimeVariantId) tier = "lifetime";
+  const variantId = String(attrs.variant_id ?? "");
+  const tier = tierFromVariantId(variantId, env);
 
   if (email && licenseKey && (event.includes("license") || event.includes("order") || event.includes("subscription"))) {
     upsertLicenseByEmail(email, licenseKey, tier, attrs.status ?? "active");

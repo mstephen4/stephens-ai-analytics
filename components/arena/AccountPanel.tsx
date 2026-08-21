@@ -3,12 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LogOut, Mail } from "lucide-react";
-import {
-  getProCheckoutUrl,
-  getProPriceLabel,
-  getSubscriptionPortalUrl,
-  PRO_SUBSCRIPTION_TAGLINE,
-} from "@/lib/subscription";
+import { PRO_SUBSCRIPTION_TAGLINE } from "@/lib/subscription";
+import { PricingPlans } from "./PricingPlans";
 import { useArena } from "./ArenaProvider";
 
 export function AccountPanel() {
@@ -20,17 +16,15 @@ export function AccountPanel() {
   const [devLink, setDevLink] = useState<string | null>(null);
 
   if (account?.signedIn) {
-    const proUrl = getProCheckoutUrl(account.email);
-    const proPrice = getProPriceLabel();
-    const portalUrl = getSubscriptionPortalUrl();
     const onTrial = premiumStatus.source === "trial";
+    const subscribed = premiumStatus.premium || premiumStatus.single;
 
     return (
       <div className="locker-body">
         <p className="hint gold">Signed in as {account.email}</p>
         <p>
           Tier:{" "}
-          <strong>{onTrial ? "Pro Trial" : premiumStatus.premium ? "Pro" : "Free"}</strong>
+          <strong>{onTrial ? "Pro Trial" : premiumStatus.premium ? "Pro" : premiumStatus.single ? "Single" : "Free"}</strong>
         </p>
         {premiumStatus.trialEndsAt ? (
           <p className="hint">
@@ -38,22 +32,14 @@ export function AccountPanel() {
             stay local.
           </p>
         ) : null}
-        {!premiumStatus.premium ? (
+        {!subscribed ? (
           <div className="subscription-offer">
             <p className="hint">{PRO_SUBSCRIPTION_TAGLINE}</p>
-            {proUrl ? (
-              <a className="gold-btn" href={proUrl} target="_blank" rel="noreferrer">
-                {proPrice ? `Subscribe to Pro — ${proPrice}` : "Subscribe to Olympiad Pro"}
-              </a>
-            ) : (
-              <p className="hint">Set NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_PRO in your deploy env to enable checkout.</p>
-            )}
+            <PricingPlans email={account.email} compact />
           </div>
         ) : null}
-        {premiumStatus.premium && portalUrl ? (
-          <a className="ghost-btn" href={portalUrl} target="_blank" rel="noreferrer">
-            Manage subscription
-          </a>
+        {!premiumStatus.premium && premiumStatus.single ? (
+          <p className="hint">Single plan active — upgrade to Pro for Podium &amp; Coach.</p>
         ) : null}
         <form
           className="stack"
@@ -92,6 +78,7 @@ export function AccountPanel() {
         Sign in with email to start a <strong>free Pro trial</strong> (Podium + Coach). Model access stays{" "}
         <strong>BYOK</strong> — add keys in the Vault separately.
       </p>
+      <PricingPlans compact />
       <form
         className="stack"
         onSubmit={(e) => {

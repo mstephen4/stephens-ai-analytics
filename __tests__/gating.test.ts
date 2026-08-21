@@ -1,36 +1,53 @@
 import { describe, expect, it } from "vitest";
 import { featureLocked, isPremiumActive } from "@/lib/gating";
-import type { LicenseRecord } from "@/lib/types";
+import { degradeToFree } from "@/lib/gating";
 
-function record(overrides: Partial<LicenseRecord>): LicenseRecord {
-  return {
-    licenseKey: "KEY",
-    instanceId: "inst",
-    instanceName: "Olympiad/test",
-    tier: "free",
-    status: "inactive",
-    lastValidatedAt: 0,
-    expiresAt: null,
-    ...overrides,
-  };
-}
-
-describe("feature gating", () => {
-  it("locks The Podium and The Coach for Free Player", () => {
-    expect(featureLocked("podium", false)).toBe(true);
-    expect(featureLocked("coach", false)).toBe(true);
+describe("featureLocked", () => {
+  it("locks Podium and Coach for Free Player", () => {
+    const free = { pro: false, single: false };
+    expect(featureLocked("podium", free)).toBe(true);
+    expect(featureLocked("coach", free)).toBe(true);
+    expect(featureLocked("compare", free)).toBe(true);
   });
 
-  it("unlocks premium while Pro is active", () => {
-    const pro = record({ tier: "pro", status: "active" });
-    expect(isPremiumActive(pro)).toBe(true);
-    expect(featureLocked("podium", true)).toBe(false);
-    expect(featureLocked("coach", true)).toBe(false);
+  it("unlocks compare for Single and everything for Pro", () => {
+    const single = { pro: false, single: true };
+    const pro = { pro: true, single: true };
+    expect(featureLocked("compare", single)).toBe(false);
+    expect(featureLocked("podium", single)).toBe(true);
+    expect(featureLocked("podium", pro)).toBe(false);
+    expect(featureLocked("coach", pro)).toBe(false);
   });
+});
 
+describe("isPremiumActive", () => {
+  it("treats active Pro as premium", () => {
+    expect(
+      isPremiumActive({
+        licenseKey: "x",
+        instanceId: "i",
+        instanceName: "n",
+        tier: "pro",
+        status: "active",
+        lastValidatedAt: 0,
+        expiresAt: null,
+      }),
+    ).toBe(true);
+  });
+});
+
+describe("degradeToFree", () => {
   it("degrades expired Pro without treating it as premium", () => {
-    const expired = record({ tier: "pro", status: "expired" });
+    const expired = degradeToFree({
+      licenseKey: "x",
+      instanceId: "i",
+      instanceName: "n",
+      tier: "pro",
+      status: "expired",
+      lastValidatedAt: 0,
+      expiresAt: null,
+    });
+    expect(expired.tier).toBe("free");
     expect(isPremiumActive(expired)).toBe(false);
-    expect(featureLocked("podium", isPremiumActive(expired))).toBe(true);
   });
 });

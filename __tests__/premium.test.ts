@@ -22,6 +22,7 @@ describe("resolvePremiumFromAccount", () => {
         signedIn: true,
         email: "a@b.com",
         premium: true,
+        single: true,
         source: "trial",
         tier: "pro",
         trialEndsAt: Date.now() + 86400000,
@@ -29,6 +30,7 @@ describe("resolvePremiumFromAccount", () => {
       null,
     );
     expect(status.premium).toBe(true);
+    expect(status.single).toBe(true);
     expect(status.source).toBe("trial");
   });
 
@@ -38,6 +40,7 @@ describe("resolvePremiumFromAccount", () => {
         signedIn: false,
         email: null,
         premium: false,
+        single: false,
         source: null,
         tier: "free",
         trialEndsAt: null,
@@ -45,7 +48,26 @@ describe("resolvePremiumFromAccount", () => {
       record({ tier: "pro", status: "active" }),
     );
     expect(status.premium).toBe(true);
+    expect(status.single).toBe(true);
     expect(status.source).toBe("local_license");
+  });
+
+  it("grants single access from a single-tier local license", () => {
+    const status = resolvePremiumFromAccount(
+      {
+        signedIn: false,
+        email: null,
+        premium: false,
+        single: false,
+        source: null,
+        tier: "free",
+        trialEndsAt: null,
+      },
+      record({ tier: "single", status: "active" }),
+    );
+    expect(status.premium).toBe(false);
+    expect(status.single).toBe(true);
+    expect(status.tier).toBe("single");
   });
 
   it("uses account license when signed in with premium", () => {
@@ -54,6 +76,7 @@ describe("resolvePremiumFromAccount", () => {
         signedIn: true,
         email: "buyer@example.com",
         premium: true,
+        single: true,
         source: "account_license",
         tier: "lifetime",
         trialEndsAt: null,

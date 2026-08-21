@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { licenseUnlocksPremium, verifyArenaLicense, type LicenseEnv } from "@/lib/license";
+import {
+  licenseUnlocksPremium,
+  licenseUnlocksSingle,
+  verifyArenaLicense,
+  type LicenseEnv,
+} from "@/lib/license";
 
 const env: LicenseEnv = {
   storeId: "10",
   productId: "20",
-  proVariantId: "30",
+  singleMonthlyVariantId: "25",
+  singleYearlyVariantId: "26",
+  proMonthlyVariantId: "30",
+  proYearlyVariantId: "31",
   lifetimeVariantId: "40",
 };
 
@@ -21,8 +29,12 @@ describe("verifyArenaLicense", () => {
     ).toBe("wrong_variant");
   });
 
-  it("accepts only Olympiad Pro and Lifetime variants", () => {
-    expect(verifyArenaLicense({ store_id: 10, product_id: 20, variant_id: 30 }, env)).toEqual({
+  it("accepts Single, Pro, and Lifetime variants", () => {
+    expect(verifyArenaLicense({ store_id: 10, product_id: 20, variant_id: 25 }, env)).toEqual({
+      ok: true,
+      tier: "single",
+    });
+    expect(verifyArenaLicense({ store_id: 10, product_id: 20, variant_id: 31 }, env)).toEqual({
       ok: true,
       tier: "pro",
     });
@@ -43,8 +55,19 @@ describe("licenseUnlocksPremium", () => {
   it("locks an expired subscription but keeps a lifetime key unless disabled", () => {
     expect(licenseUnlocksPremium("pro", "expired")).toBe(false);
     expect(licenseUnlocksPremium("pro", "active")).toBe(true);
+    expect(licenseUnlocksPremium("single", "active")).toBe(false);
     expect(licenseUnlocksPremium("lifetime", "active")).toBe(true);
     expect(licenseUnlocksPremium("lifetime", "disabled")).toBe(false);
     expect(licenseUnlocksPremium("free", "active")).toBe(false);
+  });
+});
+
+describe("licenseUnlocksSingle", () => {
+  it("allows single and pro tiers but not bare free", () => {
+    expect(licenseUnlocksSingle("single", "active")).toBe(true);
+    expect(licenseUnlocksSingle("pro", "active")).toBe(true);
+    expect(licenseUnlocksSingle("lifetime", "active")).toBe(true);
+    expect(licenseUnlocksSingle("free", "active")).toBe(false);
+    expect(licenseUnlocksSingle("single", "expired")).toBe(false);
   });
 });

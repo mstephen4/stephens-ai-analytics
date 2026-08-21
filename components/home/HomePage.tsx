@@ -1,6 +1,7 @@
 "use client";
 
 import { getPublicTrialDays } from "@/lib/trial";
+import { PLAN_PRICING } from "@/lib/subscription";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,8 +36,9 @@ export function HomePage() {
       <div className="olympiad-overlay">
         <div className="olympiad-trial-banner">
           <p>
-            <strong>Free Pro trial</strong> — unlock Podium &amp; Coach for {trialDays} days. BYOK · no hosted model
-            credits.
+            <strong>Free Pro trial</strong> — then Single {PLAN_PRICING.single.monthly.label} /{" "}
+            {PLAN_PRICING.single.yearly.label} · Pro {PLAN_PRICING.pro.monthly.label} / {PLAN_PRICING.pro.yearly.label}.
+            BYOK · no hosted model credits.
           </p>
           <button type="button" className="gold-btn olympiad-trial-banner-btn" onClick={startTrial}>
             Start free trial

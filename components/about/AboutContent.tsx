@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PLAN_PRICING } from "@/lib/subscription";
 
 type AboutContentProps = {
   compact?: boolean;
@@ -149,16 +150,20 @@ export function AboutContent({ compact = false }: AboutContentProps) {
             directly.
           </li>
           <li>
-            <strong>Pro</strong> — monthly subscription or lifetime pass via Lemon Squeezy; license links to your account
-            after checkout.
+            <strong>Single</strong> — {PLAN_PRICING.single.monthly.label} or {PLAN_PRICING.single.yearly.label}: Single
+            chat + 2-lane Compare.
+          </li>
+          <li>
+            <strong>Pro</strong> — {PLAN_PRICING.pro.monthly.label} or {PLAN_PRICING.pro.yearly.label}: Podium (6 lanes +
+            Judge) + Coach.
           </li>
           <li>
             <strong>Free trial</strong> — sign in with email for a short Pro trial before you subscribe.
           </li>
         </ul>
         <p className="about-note">
-          Pricing is set in your Lemon Squeezy store (configure checkout URLs and price labels in{" "}
-          <code>.env</code>). There is no hosted multi-seat team plan — this is built for individual power users.
+          Create matching monthly/yearly products in Lemon Squeezy and paste checkout URLs into <code>.env</code>. One
+          email, one browser vault — no team seats.
         </p>
       </section>
 

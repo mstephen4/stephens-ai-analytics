@@ -1,6 +1,6 @@
 import "server-only";
 import { isPremiumActive } from "./gating";
-import { licenseUnlocksPremium } from "./license";
+import { licenseUnlocksPremium, licenseUnlocksSingle } from "./license";
 import type { LicenseRecord, LicenseTier } from "./types";
 import { getLicenseByEmail, getUserById, type DbUser } from "./auth/users";
 import type { PremiumStatus } from "./premium";
@@ -13,8 +13,18 @@ export function isTrialActive(user: DbUser | null): boolean {
 export function accountLicenseForEmail(email: string): LicenseRecord | null {
   const linked = getLicenseByEmail(email);
   if (!linked) return null;
-  const tier = (linked.tier === "lifetime" ? "lifetime" : linked.tier === "pro" ? "pro" : "free") as LicenseTier;
-  if (!licenseUnlocksPremium(tier, linked.status as LicenseRecord["status"])) return null;
+  const tier = (
+    linked.tier === "lifetime"
+      ? "lifetime"
+      : linked.tier === "pro"
+        ? "pro"
+        : linked.tier === "single"
+          ? "single"
+          : "free"
+  ) as LicenseTier;
+  if (!licenseUnlocksSingle(tier, linked.status) && !licenseUnlocksPremium(tier, linked.status)) {
+    return null;
+  }
   return {
     licenseKey: linked.license_key,
     instanceId: "",
@@ -34,13 +44,24 @@ export function resolvePremium(options: {
   const trialEndsAt = options.user?.trialEndsAt ?? null;
 
   if (isTrialActive(options.user)) {
-    return { premium: true, source: "trial", tier: "pro", trialEndsAt, email };
+    return { premium: true, single: true, source: "trial", tier: "pro", trialEndsAt, email };
   }
 
   const accountLicense = email ? accountLicenseForEmail(email) : null;
-  if (accountLicense && isPremiumActive(accountLicense)) {
+  if (accountLicense && licenseUnlocksPremium(accountLicense.tier, accountLicense.status)) {
     return {
       premium: true,
+      single: true,
+      source: "account_license",
+      tier: accountLicense.tier,
+      trialEndsAt,
+      email,
+    };
+  }
+  if (accountLicense && licenseUnlocksSingle(accountLicense.tier, accountLicense.status)) {
+    return {
+      premium: false,
+      single: true,
       source: "account_license",
       tier: accountLicense.tier,
       trialEndsAt,
@@ -48,9 +69,20 @@ export function resolvePremium(options: {
     };
   }
 
-  if (options.localLicense && isPremiumActive(options.localLicense)) {
+  if (options.localLicense && licenseUnlocksPremium(options.localLicense.tier, options.localLicense.status)) {
     return {
       premium: true,
+      single: true,
+      source: "local_license",
+      tier: options.localLicense.tier,
+      trialEndsAt,
+      email,
+    };
+  }
+  if (options.localLicense && licenseUnlocksSingle(options.localLicense.tier, options.localLicense.status)) {
+    return {
+      premium: false,
+      single: true,
       source: "local_license",
       tier: options.localLicense.tier,
       trialEndsAt,
@@ -58,7 +90,7 @@ export function resolvePremium(options: {
     };
   }
 
-  return { premium: false, source: null, tier: "free", trialEndsAt, email };
+  return { premium: false, single: false, source: null, tier: "free", trialEndsAt, email };
 }
 
 export async function resolvePremiumForUser(
