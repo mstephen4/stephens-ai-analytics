@@ -12,7 +12,7 @@ import {
 } from "react";
 import { streamChat } from "@/lib/client-stream";
 import { recommendAthlete } from "@/lib/classifier";
-import { featureLocked, isPremiumActive } from "@/lib/gating";
+import { featureLocked, isPremiumActive, visiblePodiumLanes } from "@/lib/gating";
 import { DEFAULT_PODIUM_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
 import {
   activeLaneIds,
@@ -190,8 +190,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   );
   const premium = premiumStatus.premium;
   const featureAccess = useMemo(
-    () => ({ pro: premiumStatus.premium, subscribed: premiumStatus.subscribed }),
-    [premiumStatus.premium, premiumStatus.subscribed],
+    () => ({ tier: premiumStatus.tier, pro: premiumStatus.premium }),
+    [premiumStatus.tier, premiumStatus.premium],
+  );
+  const podiumLaneLimit = useMemo(
+    () => visiblePodiumLanes(featureAccess, podiumLaneCount),
+    [featureAccess, podiumLaneCount],
   );
   const activeEvent = events.find((event) => event.id === activeEventId) ?? events[0] ?? null;
 
@@ -500,7 +504,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       const visibleLanes =
         mode === "compare"
           ? [...compareAthleteIds]
-          : podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES);
+          : podiumAthleteIds.slice(0, podiumLaneLimit);
       const index = laneIndexForCoachPick(visibleLanes, athleteId);
       if (mode === "compare") {
         setCompareAthleteIds((current) => {
@@ -516,7 +520,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         });
       }
     },
-    [compareAthleteIds, mode, podiumAthleteIds, podiumLaneCount, premium],
+    [compareAthleteIds, mode, podiumAthleteIds, podiumLaneLimit],
   );
 
   const sendPrompt = useCallback(
@@ -536,7 +540,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         mode === "compare"
           ? compareAthleteIds
           : mode === "podium"
-            ? podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES)
+            ? podiumAthleteIds.slice(0, podiumLaneLimit)
             : [],
       );
       if ((mode === "compare" || mode === "podium") && lanes.length === 0) {
@@ -722,7 +726,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         setSending(false);
       }
     },
-    [activeEvent, compareAthleteIds, mode, patchEvent, podiumAthleteIds, podiumLaneCount, premium, selectedAthleteId, sending, setLockerOpen],
+    [activeEvent, compareAthleteIds, featureAccess, mode, patchEvent, podiumAthleteIds, podiumLaneLimit, selectedAthleteId, sending, setLockerOpen],
   );
 
   const runJudgeForMessage = useCallback(

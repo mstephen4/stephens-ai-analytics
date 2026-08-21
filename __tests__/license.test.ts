@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  licenseUnlocksComparePlan,
   licenseUnlocksPremium,
-  licenseUnlocksSingle,
+  licenseUnlocksSinglePlan,
   verifyArenaLicense,
   type LicenseEnv,
 } from "@/lib/license";
@@ -11,6 +12,8 @@ const env: LicenseEnv = {
   productId: "20",
   singleMonthlyVariantId: "25",
   singleYearlyVariantId: "26",
+  compareMonthlyVariantId: "27",
+  compareYearlyVariantId: "28",
   proMonthlyVariantId: "30",
   proYearlyVariantId: "31",
   lifetimeVariantId: "40",
@@ -29,10 +32,14 @@ describe("verifyArenaLicense", () => {
     ).toBe("wrong_variant");
   });
 
-  it("accepts Single, Pro, and Lifetime variants", () => {
+  it("accepts Single, Compare, Pro, and Lifetime variants", () => {
     expect(verifyArenaLicense({ store_id: 10, product_id: 20, variant_id: 25 }, env)).toEqual({
       ok: true,
       tier: "single",
+    });
+    expect(verifyArenaLicense({ store_id: 10, product_id: 20, variant_id: 27 }, env)).toEqual({
+      ok: true,
+      tier: "compare",
     });
     expect(verifyArenaLicense({ store_id: 10, product_id: 20, variant_id: 31 }, env)).toEqual({
       ok: true,
@@ -56,18 +63,27 @@ describe("licenseUnlocksPremium", () => {
     expect(licenseUnlocksPremium("pro", "expired")).toBe(false);
     expect(licenseUnlocksPremium("pro", "active")).toBe(true);
     expect(licenseUnlocksPremium("single", "active")).toBe(false);
+    expect(licenseUnlocksPremium("compare", "active")).toBe(false);
     expect(licenseUnlocksPremium("lifetime", "active")).toBe(true);
     expect(licenseUnlocksPremium("lifetime", "disabled")).toBe(false);
     expect(licenseUnlocksPremium("free", "active")).toBe(false);
   });
 });
 
-describe("licenseUnlocksSingle", () => {
-  it("allows single and pro tiers but not bare free", () => {
-    expect(licenseUnlocksSingle("single", "active")).toBe(true);
-    expect(licenseUnlocksSingle("pro", "active")).toBe(true);
-    expect(licenseUnlocksSingle("lifetime", "active")).toBe(true);
-    expect(licenseUnlocksSingle("free", "active")).toBe(false);
-    expect(licenseUnlocksSingle("single", "expired")).toBe(false);
+describe("licenseUnlocksSinglePlan", () => {
+  it("allows only the Single tier", () => {
+    expect(licenseUnlocksSinglePlan("single", "active")).toBe(true);
+    expect(licenseUnlocksSinglePlan("compare", "active")).toBe(false);
+    expect(licenseUnlocksSinglePlan("pro", "active")).toBe(false);
+    expect(licenseUnlocksSinglePlan("single", "expired")).toBe(false);
+  });
+});
+
+describe("licenseUnlocksComparePlan", () => {
+  it("allows Compare and Pro tiers", () => {
+    expect(licenseUnlocksComparePlan("compare", "active")).toBe(true);
+    expect(licenseUnlocksComparePlan("pro", "active")).toBe(true);
+    expect(licenseUnlocksComparePlan("lifetime", "active")).toBe(true);
+    expect(licenseUnlocksComparePlan("single", "active")).toBe(false);
   });
 });

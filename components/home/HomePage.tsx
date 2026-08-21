@@ -33,9 +33,9 @@ export function HomePage() {
       <div className="olympiad-overlay">
         <div className="olympiad-trial-banner">
           <p>
-            <strong>Free Pro trial</strong> — then subscribe for Single, Compare &amp; Podium ({PLAN_PRICING.single.monthly.label} /{" "}
-            {PLAN_PRICING.single.yearly.label}) or Pro + Coach ({PLAN_PRICING.pro.monthly.label} / {PLAN_PRICING.pro.yearly.label}).
-            BYOK · no hosted model credits.
+            <strong>Free Pro trial</strong> — Single {PLAN_PRICING.single.monthly.label} / {PLAN_PRICING.single.yearly.label} · Compare{" "}
+            {PLAN_PRICING.compare.monthly.label} / {PLAN_PRICING.compare.yearly.label} · Pro {PLAN_PRICING.pro.monthly.label} /{" "}
+            {PLAN_PRICING.pro.yearly.label}. BYOK · no hosted model credits.
           </p>
           <button type="button" className="gold-btn olympiad-trial-banner-btn" onClick={startTrial}>
             Start free trial

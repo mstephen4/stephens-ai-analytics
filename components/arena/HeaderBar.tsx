@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Flame, KeyRound, Menu, Trophy } from "lucide-react";
 import { PRODUCT_NAME } from "@/lib/constants";
+import { featureLocked } from "@/lib/gating";
 import { displayPremiumTier } from "@/lib/premium";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
@@ -21,8 +22,8 @@ export function HeaderBar() {
     setTrialModalOpen,
   } = useArena();
 
-  const subscribed = premiumStatus.subscribed;
-  const showTrial = !subscribed && !account?.signedIn;
+  const access = { tier: premiumStatus.tier, pro: premiumStatus.premium };
+  const showTrial = !premiumStatus.subscribed && !account?.signedIn;
 
   return (
     <header className="arena-header">
@@ -44,7 +45,7 @@ export function HeaderBar() {
           onClick={() => setMode("single")}
         >
           Single
-          {!subscribed ? <span className="pro-badge compact">Pass</span> : null}
+          {featureLocked("single", access) ? <span className="pro-badge compact">Pass</span> : null}
         </button>
         <button
           role="tab"
@@ -53,7 +54,7 @@ export function HeaderBar() {
           onClick={() => setMode("compare")}
         >
           Compare
-          {!subscribed ? <span className="pro-badge compact">Pass</span> : null}
+          {featureLocked("compare", access) ? <span className="pro-badge compact">Compare</span> : null}
         </button>
         <button
           role="tab"
@@ -63,7 +64,7 @@ export function HeaderBar() {
         >
           <Trophy size={14} />
           Podium
-          {!subscribed ? <span className="pro-badge compact">Pass</span> : null}
+          {featureLocked("podium", access) ? <span className="pro-badge compact">Compare</span> : null}
         </button>
       </div>
 

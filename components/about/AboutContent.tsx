@@ -138,8 +138,7 @@ export function AboutContent({ compact = false }: AboutContentProps) {
         <h2>Olympiad Pro — single-user subscription</h2>
         <p>
           AI Olympiad is a <strong>personal API vault</strong> with the convenience of <strong>one UI at a time</strong>{" "}
-          on your device. You store your provider keys locally, then subscribe to run Single, Compare, and Podium events.
-          Upgrade to <strong>Olympiad Pro</strong> for Coach routing and 6-lane Podium.
+          on your device. You store provider keys locally, then pick a plan: Single for chat, Compare for side-by-side + 2-lane Podium, or Pro for Coach and 6-lane Podium.
         </p>
         <ul className="about-list">
           <li>
@@ -150,12 +149,13 @@ export function AboutContent({ compact = false }: AboutContentProps) {
             directly.
           </li>
           <li>
-            <strong>Single</strong> — {PLAN_PRICING.single.monthly.label} or {PLAN_PRICING.single.yearly.label}: Single,
-            Compare, and Podium (3 lanes). One UI + local vault.
+            <strong>Single</strong> — {PLAN_PRICING.single.monthly.label} or {PLAN_PRICING.single.yearly.label}: Single-mode chat + vault UI.
           </li>
           <li>
-            <strong>Pro</strong> — {PLAN_PRICING.pro.monthly.label} or {PLAN_PRICING.pro.yearly.label}: 6-lane Podium +
-            Judge + Coach.
+            <strong>Compare</strong> — {PLAN_PRICING.compare.monthly.label} or {PLAN_PRICING.compare.yearly.label}: Compare mode + Podium (2 lanes + Judge).
+          </li>
+          <li>
+            <strong>Pro</strong> — {PLAN_PRICING.pro.monthly.label} or {PLAN_PRICING.pro.yearly.label}: All modes + Coach + 6-lane Podium.
           </li>
           <li>
             <strong>Free trial</strong> — sign in with email for a short full Pro trial before you subscribe.
@@ -173,7 +173,7 @@ export function AboutContent({ compact = false }: AboutContentProps) {
           <li>API keys live in the <strong>Vault</strong> on this device (optional AES-GCM encryption).</li>
           <li>Chat history lives in <strong>IndexedDB</strong> — never synced to GitHub or a cloud account.</li>
           <li>
-            Subscription unlocks Single, Compare, and Podium. Pro adds Coach and 6-lane Podium. Vault setup is always local.
+            Single unlocks chat; Compare adds side-by-side + 2-lane Podium; Pro adds Coach and 6 lanes. Vault setup stays local.
           </li>
           <li>Install as a PWA from your browser&apos;s Add to Home Screen prompt.</li>
         </ul>

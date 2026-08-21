@@ -9,7 +9,7 @@ export type ProviderId =
 
 export type ArenaMode = "single" | "compare" | "podium";
 
-export type LicenseTier = "free" | "single" | "pro" | "lifetime";
+export type LicenseTier = "free" | "single" | "compare" | "pro" | "lifetime";
 
 export type LicenseStatus = "inactive" | "active" | "expired" | "disabled" | "unknown";
 

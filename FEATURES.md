@@ -6,16 +6,16 @@ This document lists ChatHub capabilities and what **AI Olympiad** adopts. Olympi
 
 | Feature | ChatHub | AI Olympiad | Tier |
 | --- | --- | --- | --- |
-| **Multi-model compare** | 2 models free, up to 6 paid | **Compare mode**: 2 models side-by-side, one prompt | Single / Pro / Trial |
-| **Simultaneous streaming** | All lanes stream in parallel | Web Streams / SSE fan-out per lane | Single / Pro |
-| **Side-by-side grid** | Responsive grid of answers | Contender cards with live stats | Single / Pro |
+| **Multi-model compare** | 2 models free, up to 6 paid | **Compare mode**: 2 models side-by-side, one prompt | Compare / Pro / Trial |
+| **Simultaneous streaming** | All lanes stream in parallel | Web Streams / SSE fan-out per lane | Compare / Pro |
+| **Side-by-side grid** | Responsive grid of answers | Contender cards with live stats | Compare / Pro |
 | **Many providers** | OpenAI, Anthropic, Google, Grok, Llama, DeepSeek, Mistral, … | **21 models** across 7 BYOK providers | With subscription + your keys |
 | **Single-model chat** | Supported | **Single mode** | Single / Pro / Trial |
-| **Podium + judge** | Implicit via comparison | Up to **6 lanes** + impartial judge ranks top 3 | Single (3 lanes) / Pro (6 lanes) |
+| **Podium + judge** | Implicit via comparison | Up to **6 lanes** + impartial judge ranks top 3 | Compare (2 lanes) / Pro (6 lanes) |
 | **Smart routing** | Model picker | **Coach** (heuristic + optional classifier) | Pro / Lifetime / Trial |
 | **Local history** | Cloud account | **IndexedDB** events on device | With subscription |
 | **PWA / install** | Installable PWA (`manifest` + service worker) | Free to install; chat requires pass |
-| **License gating** | Subscription | Lemon Squeezy license keys | Single / Pro / Lifetime |
+| **License gating** | Subscription | Lemon Squeezy license keys | Single / Compare / Pro / Lifetime |
 
 ## Not adopted (out of scope for now)
 

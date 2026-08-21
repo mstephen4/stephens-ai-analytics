@@ -1,4 +1,4 @@
-/** Marketing + checkout helpers for Olympiad Single & Pro (Lemon Squeezy). */
+/** Marketing + checkout helpers for Olympiad Single, Compare & Pro (Lemon Squeezy). */
 
 export const PRO_SUBSCRIPTION_TAGLINE =
   "One person · one vault · one UI — your API keys stay local on this device.";
@@ -7,6 +7,10 @@ export const PLAN_PRICING = {
   single: {
     monthly: { label: "$5/mo", cadence: "monthly" as const },
     yearly: { label: "$49/yr", cadence: "yearly" as const },
+  },
+  compare: {
+    monthly: { label: "$7/mo", cadence: "monthly" as const },
+    yearly: { label: "$75/yr", cadence: "yearly" as const },
   },
   pro: {
     monthly: { label: "$9/mo", cadence: "monthly" as const },
@@ -23,6 +27,12 @@ function rawCheckoutUrl(plan: PlanId, cadence: BillingCadence): string {
   }
   if (plan === "single" && cadence === "yearly") {
     return process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_SINGLE_YEARLY?.trim() ?? "";
+  }
+  if (plan === "compare" && cadence === "monthly") {
+    return process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_COMPARE_MONTHLY?.trim() ?? "";
+  }
+  if (plan === "compare" && cadence === "yearly") {
+    return process.env.NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_COMPARE_YEARLY?.trim() ?? "";
   }
   if (plan === "pro" && cadence === "monthly") {
     return (

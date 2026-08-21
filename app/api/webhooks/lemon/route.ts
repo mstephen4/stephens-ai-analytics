@@ -21,6 +21,7 @@ function tierFromVariantId(variantId: string, env: ReturnType<typeof readLicense
   if (!env) return "pro";
   if (variantId === env.lifetimeVariantId) return "lifetime";
   if (variantId === env.proMonthlyVariantId || variantId === env.proYearlyVariantId) return "pro";
+  if (variantId === env.compareMonthlyVariantId || variantId === env.compareYearlyVariantId) return "compare";
   if (variantId === env.singleMonthlyVariantId || variantId === env.singleYearlyVariantId) return "single";
   return "pro";
 }

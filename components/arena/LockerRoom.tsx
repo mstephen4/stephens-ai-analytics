@@ -92,7 +92,7 @@ function PassForm() {
           Pass active · {license?.tier} · product {license?.productId} / variant {license?.variantId}
         </p>
       ) : (
-        <p className="hint">No pass on this device — subscribe or start a trial to use Single, Compare, and Podium.</p>
+        <p className="hint">No pass on this device — subscribe or start a trial. Single for chat; Compare for 2-lane Podium.</p>
       )}
       {error ? <p className="flag-copy">{error}</p> : null}
       {licenseMessage ? <p className="hint">{licenseMessage}</p> : null}

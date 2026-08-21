@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Flame, Send } from "lucide-react";
-import { DEFAULT_PODIUM_LANES, EMPTY_LANE_ID, FREE_COMPARE_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
+import { COMPARE_PODIUM_MAX_LANES, EMPTY_LANE_ID, FREE_COMPARE_LANES, PRO_PODIUM_MAX_LANES } from "@/lib/constants";
+import { visiblePodiumLanes } from "@/lib/gating";
 import { activeLaneIds, ATHLETES, athletesForKeys, getAthlete } from "@/lib/models";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
@@ -11,7 +12,7 @@ export function Composer() {
   const {
     keys,
     mode,
-    premium,
+    premiumStatus,
     selectedAthleteId,
     setSelectedAthleteId,
     applyCoachRecommendation,
@@ -47,10 +48,13 @@ export function Composer() {
     });
   }, [sendPrompt]);
 
+  const access = { tier: premiumStatus.tier, pro: premiumStatus.premium };
+  const podiumLaneLimit = visiblePodiumLanes(access, podiumLaneCount);
+
   const laneIds =
     mode === "compare"
       ? compareAthleteIds
-      : podiumAthleteIds.slice(0, premium ? podiumLaneCount : DEFAULT_PODIUM_LANES);
+      : podiumAthleteIds.slice(0, podiumLaneLimit);
   const activeLanes = activeLaneIds(laneIds);
   const canDeploy = mode === "single" || activeLanes.length > 0;
 
@@ -115,7 +119,7 @@ export function Composer() {
                 </select>
               </label>
             ))}
-            {mode === "podium" && premium ? (
+            {mode === "podium" && access.pro ? (
               <div className="lane-controls">
                 <button
                   type="button"
@@ -126,6 +130,8 @@ export function Composer() {
                   + Lane ({podiumLaneCount}/{PRO_PODIUM_MAX_LANES})
                 </button>
               </div>
+            ) : mode === "podium" && access.tier === "compare" ? (
+              <p className="hint">Compare plan — {COMPARE_PODIUM_MAX_LANES} Podium lanes. Upgrade to Pro for 6.</p>
             ) : null}
           </div>
         )}

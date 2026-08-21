@@ -13,8 +13,8 @@ export function PaywallModal() {
 
   const detail =
     paywall === "coach"
-      ? "Single, Compare, and Podium are included with Olympiad Single or a Pro trial. Coach routing is an Olympiad Pro feature."
-      : "One UI, one vault for all your API keys — then Single, Compare, and Podium on this device. Start with a free Pro trial or choose Single or Pro below.";
+      ? "Coach routing is an Olympiad Pro feature. Single unlocks one-on-one chat; Compare adds 2-lane Podium; Pro adds Coach and 6-lane Podium."
+      : "One UI, one vault for all your API keys. Single ($5) for chat, Compare ($7) for side-by-side + 2-lane Podium, or Pro ($9) for Coach and 6 lanes. Start with a free 3-day Pro trial.";
 
   return (
     <div className="modal-root">

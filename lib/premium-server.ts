@@ -1,6 +1,11 @@
 import "server-only";
 import { isPremiumActive } from "./gating";
-import { licenseUnlocksPremium, licenseUnlocksSingle } from "./license";
+import {
+  licenseUnlocksAnyPaid,
+  licenseUnlocksComparePlan,
+  licenseUnlocksPremium,
+  licenseUnlocksSinglePlan,
+} from "./license";
 import type { LicenseRecord, LicenseTier } from "./types";
 import { getLicenseByEmail, getUserById, type DbUser } from "./auth/users";
 import type { PremiumStatus } from "./premium";
@@ -10,19 +15,19 @@ export function isTrialActive(user: DbUser | null): boolean {
   return user.trialEndsAt > Date.now();
 }
 
+function tierFromDb(raw: string): LicenseTier {
+  if (raw === "lifetime") return "lifetime";
+  if (raw === "pro") return "pro";
+  if (raw === "compare") return "compare";
+  if (raw === "single") return "single";
+  return "free";
+}
+
 export function accountLicenseForEmail(email: string): LicenseRecord | null {
   const linked = getLicenseByEmail(email);
   if (!linked) return null;
-  const tier = (
-    linked.tier === "lifetime"
-      ? "lifetime"
-      : linked.tier === "pro"
-        ? "pro"
-        : linked.tier === "single"
-          ? "single"
-          : "free"
-  ) as LicenseTier;
-  if (!licenseUnlocksSingle(tier, linked.status) && !licenseUnlocksPremium(tier, linked.status)) {
+  const tier = tierFromDb(linked.tier);
+  if (!licenseUnlocksAnyPaid(tier, linked.status)) {
     return null;
   }
   return {
@@ -33,6 +38,38 @@ export function accountLicenseForEmail(email: string): LicenseRecord | null {
     status: linked.status as LicenseRecord["status"],
     lastValidatedAt: Date.now(),
     expiresAt: null,
+  };
+}
+
+function statusFromAccountLicense(license: LicenseRecord, email: string | null, trialEndsAt: number | null): PremiumStatus {
+  const { tier, status } = license;
+  if (licenseUnlocksPremium(tier, status)) {
+    return {
+      premium: true,
+      subscribed: true,
+      source: "account_license",
+      tier,
+      trialEndsAt,
+      email,
+    };
+  }
+  if (licenseUnlocksComparePlan(tier, status)) {
+    return {
+      premium: false,
+      subscribed: true,
+      source: "account_license",
+      tier: "compare",
+      trialEndsAt,
+      email,
+    };
+  }
+  return {
+    premium: false,
+    subscribed: true,
+    source: "account_license",
+    tier: "single",
+    trialEndsAt,
+    email,
   };
 }
 
@@ -48,28 +85,11 @@ export function resolvePremium(options: {
   }
 
   const accountLicense = email ? accountLicenseForEmail(email) : null;
-  if (accountLicense && licenseUnlocksPremium(accountLicense.tier, accountLicense.status)) {
-    return {
-      premium: true,
-      subscribed: true,
-      source: "account_license",
-      tier: accountLicense.tier,
-      trialEndsAt,
-      email,
-    };
-  }
-  if (accountLicense && licenseUnlocksSingle(accountLicense.tier, accountLicense.status)) {
-    return {
-      premium: false,
-      subscribed: true,
-      source: "account_license",
-      tier: accountLicense.tier,
-      trialEndsAt,
-      email,
-    };
+  if (accountLicense) {
+    return statusFromAccountLicense(accountLicense, email, trialEndsAt);
   }
 
-  if (options.localLicense && licenseUnlocksPremium(options.localLicense.tier, options.localLicense.status)) {
+  if (options.localLicense && isPremiumActive(options.localLicense)) {
     return {
       premium: true,
       subscribed: true,
@@ -79,12 +99,22 @@ export function resolvePremium(options: {
       email,
     };
   }
-  if (options.localLicense && licenseUnlocksSingle(options.localLicense.tier, options.localLicense.status)) {
+  if (options.localLicense && licenseUnlocksComparePlan(options.localLicense.tier, options.localLicense.status)) {
     return {
       premium: false,
       subscribed: true,
       source: "local_license",
-      tier: options.localLicense.tier,
+      tier: "compare",
+      trialEndsAt,
+      email,
+    };
+  }
+  if (options.localLicense && licenseUnlocksSinglePlan(options.localLicense.tier, options.localLicense.status)) {
+    return {
+      premium: false,
+      subscribed: true,
+      source: "local_license",
+      tier: "single",
       trialEndsAt,
       email,
     };

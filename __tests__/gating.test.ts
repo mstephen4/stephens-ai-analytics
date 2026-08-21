@@ -1,24 +1,39 @@
 import { describe, expect, it } from "vitest";
-import { featureLocked, isPremiumActive } from "@/lib/gating";
+import { featureLocked, isPremiumActive, maxPodiumLanes } from "@/lib/gating";
 import { degradeToFree } from "@/lib/gating";
 
 describe("featureLocked", () => {
   it("locks all modes and Coach for Free Player", () => {
-    const free = { pro: false, subscribed: false };
+    const free = { pro: false, tier: "free" as const };
     expect(featureLocked("single", free)).toBe(true);
     expect(featureLocked("compare", free)).toBe(true);
     expect(featureLocked("podium", free)).toBe(true);
     expect(featureLocked("coach", free)).toBe(true);
   });
 
-  it("unlocks all modes for Single and Coach only for Pro", () => {
-    const single = { pro: false, subscribed: true };
-    const pro = { pro: true, subscribed: true };
+  it("unlocks only single mode on Single plan", () => {
+    const single = { pro: false, tier: "single" as const };
     expect(featureLocked("single", single)).toBe(false);
-    expect(featureLocked("compare", single)).toBe(false);
-    expect(featureLocked("podium", single)).toBe(false);
+    expect(featureLocked("compare", single)).toBe(true);
+    expect(featureLocked("podium", single)).toBe(true);
     expect(featureLocked("coach", single)).toBe(true);
+  });
+
+  it("unlocks compare and podium on Compare plan; Coach on Pro only", () => {
+    const compare = { pro: false, tier: "compare" as const };
+    const pro = { pro: true, tier: "pro" as const };
+    expect(featureLocked("compare", compare)).toBe(false);
+    expect(featureLocked("podium", compare)).toBe(false);
+    expect(featureLocked("coach", compare)).toBe(true);
     expect(featureLocked("coach", pro)).toBe(false);
+  });
+});
+
+describe("maxPodiumLanes", () => {
+  it("returns 2 for Compare and 6 for Pro", () => {
+    expect(maxPodiumLanes({ pro: false, tier: "compare" })).toBe(2);
+    expect(maxPodiumLanes({ pro: true, tier: "pro" })).toBe(6);
+    expect(maxPodiumLanes({ pro: false, tier: "single" })).toBe(0);
   });
 });
 
@@ -49,7 +64,7 @@ describe("degradeToFree", () => {
       lastValidatedAt: 0,
       expiresAt: null,
     });
-    expect(expired.tier).toBe("free");
+    expect(expired.tier).toBe("pro");
     expect(isPremiumActive(expired)).toBe(false);
   });
 });

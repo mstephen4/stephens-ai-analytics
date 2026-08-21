@@ -52,7 +52,25 @@ describe("resolvePremiumFromAccount", () => {
     expect(status.source).toBe("local_license");
   });
 
-  it("grants subscribed access from a single-tier local license", () => {
+  it("grants compare access from a compare-tier local license", () => {
+    const status = resolvePremiumFromAccount(
+      {
+        signedIn: false,
+        email: null,
+        premium: false,
+        subscribed: false,
+        source: null,
+        tier: "free",
+        trialEndsAt: null,
+      },
+      record({ tier: "compare", status: "active" }),
+    );
+    expect(status.premium).toBe(false);
+    expect(status.subscribed).toBe(true);
+    expect(status.tier).toBe("compare");
+  });
+
+  it("grants single-only access from a single-tier local license", () => {
     const status = resolvePremiumFromAccount(
       {
         signedIn: false,

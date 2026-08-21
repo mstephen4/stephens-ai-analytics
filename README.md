@@ -36,14 +36,15 @@ GitHub never receives your keys or conversations. Clearing site data in the brow
 | Plan | Price | Unlocks |
 | --- | --- | --- |
 | **Trial** | 3 days | Full Pro via email sign-in |
-| **Single** | $5/mo · $49/yr | Single, Compare, Podium (3 lanes) + vault UI |
-| **Pro** | $9/mo · $99/yr | + Coach + 6-lane Podium |
+| **Single** | $5/mo · $49/yr | Single-mode chat + vault UI |
+| **Compare** | $7/mo · $75/yr | Compare + Podium (2 lanes + Judge) |
+| **Pro** | $9/mo · $99/yr | All modes + Coach + 6-lane Podium |
 
 Configure Lemon Squeezy checkout URLs in `.env` (see `.env.example`). Prices are displayed from `lib/subscription.ts` and must match your store.
 
 ## Pro subscription (single user)
 
-Olympiad Pro is a **personal** subscription (one email, one browser vault) via [Lemon Squeezy](https://www.lemonsqueezy.com). **Single** unlocks all three chat modes; **Pro** adds Coach and 6-lane Podium — model usage stays **BYOK**.
+Olympiad is a **personal** subscription (one email, one browser vault) via [Lemon Squeezy](https://www.lemonsqueezy.com). **Single** unlocks chat; **Compare** adds 2-lane Podium; **Pro** adds Coach and 6 lanes — model usage stays **BYOK**.
 
 **Price is not hard-coded in this repo.** Set it in your Lemon Squeezy product, then configure:
 
