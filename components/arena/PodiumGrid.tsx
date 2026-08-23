@@ -2,10 +2,12 @@
 
 import { RotateCcw } from "lucide-react";
 import { ContenderCard } from "./ContenderCard";
+import { TrackLanes } from "./TrackLanes";
 import { useArena } from "./ArenaProvider";
 
 export default function PodiumGrid() {
-  const { activeEvent, retryAllFailedLanes, sending } = useArena();
+  const { activeEvent, mode, retryAllFailedLanes, sending } = useArena();
+  const trackMode = mode === "compare" ? "compare" : "podium";
   const last = [...(activeEvent?.messages ?? [])]
     .reverse()
     .find((message) => (message.contenders?.length ?? 0) >= 1);
@@ -44,34 +46,19 @@ export default function PodiumGrid() {
           </button>
         </div>
       ) : null}
-      <section
-        className={ranked ? "podium-grid ranked" : "podium-grid"}
-        style={{ gridTemplateColumns: `repeat(${Math.min(contenders.length, 3)}, minmax(0, 1fr))` }}
-      >
+      <TrackLanes mode={trackMode} ranked={ranked}>
         {ordered.map((contender, index) =>
           contender ? (
             <ContenderCard
               key={contender.athleteId}
               assistantMessageId={last?.id}
               contender={contender}
-              elevated={ranked ? contender.place === 1 : index === 1}
+              elevated={ranked ? contender.place === 1 : index === 1 && ordered.length === 3}
               defaultCollapsed={ranked && contender.place !== 1}
             />
           ) : null,
         )}
-      </section>
-      {contenders.length > 3 ? (
-        <section className="podium-grid overflow-row">
-          {contenders.slice(3).map((contender) => (
-            <ContenderCard
-              key={contender.athleteId}
-              assistantMessageId={last?.id}
-              contender={contender}
-              defaultCollapsed
-            />
-          ))}
-        </section>
-      ) : null}
+      </TrackLanes>
     </div>
   );
 }

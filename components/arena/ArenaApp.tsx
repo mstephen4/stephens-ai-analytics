@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, Fragment } from "react";
 import { ArenaProvider, useArena } from "./ArenaProvider";
 import { Composer } from "./Composer";
 import { EventRail } from "./EventRail";
@@ -74,14 +74,30 @@ function FloorSwitch() {
 
 function PodiumSkeleton() {
   return (
-    <div className="podium-grid podium-pending">
-      {["Silver", "Gold", "Bronze"].map((lane) => (
-        <div key={lane} className="contender-card contender-pending">
-          <div className="card-kicker">{lane} lane</div>
-          <div className="pulse-bar" />
-          <div className="pulse-bar short" />
+    <div className="floor-scroll">
+      <div className="track-surface track-podium track-pending" data-lanes={3} aria-hidden>
+        <div className="track-finish-line" />
+        <div className="track-lanes">
+          {["1", "2", "3"].map((lane, index) => (
+            <Fragment key={lane}>
+              {index > 0 ? <div className="track-lane-divider" /> : null}
+              <div className="track-lane" data-lane={lane}>
+                <div className="track-lane-mark">
+                  <span className="track-lane-number">{lane}</span>
+                </div>
+                <div className="track-lane-inner">
+                  <div className="contender-card contender-pending">
+                    <div className="card-kicker">Lane {lane}</div>
+                    <div className="pulse-bar" />
+                    <div className="pulse-bar short" />
+                  </div>
+                </div>
+              </div>
+            </Fragment>
+          ))}
         </div>
-      ))}
+        <div className="track-start-line" />
+      </div>
     </div>
   );
 }

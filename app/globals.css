@@ -639,6 +639,200 @@ h2,
   padding-top: 24px;
 }
 
+/* —— Olympic track lanes (Compare & Podium) —— */
+.track-surface {
+  --track-rubber: #9a4e22;
+  --track-rubber-dark: #7a3c18;
+  --track-line: #ffffff;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.35),
+    0 10px 36px rgba(0, 0, 0, 0.42);
+  background: linear-gradient(180deg, var(--track-rubber) 0%, var(--track-rubber-dark) 100%);
+}
+
+.track-finish-line,
+.track-start-line {
+  position: relative;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.track-finish-line {
+  background: repeating-linear-gradient(90deg, #fff 0, #fff 14px, #111 14px, #111 28px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.track-start-line {
+  height: 8px;
+  background: var(--track-line);
+  box-shadow: 0 -2px 10px rgba(255, 255, 255, 0.25);
+}
+
+.track-finish-line span,
+.track-start-line span {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+}
+
+.track-start-line span {
+  right: auto;
+  left: 14px;
+  color: #1a1d21;
+  text-shadow: none;
+}
+
+.track-lanes {
+  display: flex;
+  align-items: stretch;
+  min-height: 340px;
+}
+
+.track-ranked .track-lanes {
+  align-items: flex-end;
+  padding-top: 28px;
+}
+
+.track-lane {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0,
+      transparent 39px,
+      rgba(255, 255, 255, 0.05) 39px,
+      rgba(255, 255, 255, 0.05) 40px
+    ),
+    linear-gradient(180deg, #c06a32 0%, #a85527 48%, #8f4620 100%);
+}
+
+.track-lane:nth-child(odd) {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0,
+      transparent 39px,
+      rgba(255, 255, 255, 0.04) 39px,
+      rgba(255, 255, 255, 0.04) 40px
+    ),
+    linear-gradient(180deg, #b8622a 0%, #9f4f23 48%, #874019 100%);
+}
+
+.track-lane-mark {
+  flex-shrink: 0;
+  padding: 10px 0 8px;
+  text-align: center;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.28);
+}
+
+.track-lane-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--track-line);
+  color: var(--track-line);
+  font-weight: 700;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.track-lane-inner {
+  flex: 1;
+  min-height: 0;
+  padding: 10px 8px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.track-lane-inner .contender-card {
+  flex: 1;
+  margin: 0;
+  background: rgba(26, 29, 33, 0.9);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.track-lane-divider {
+  flex: 0 0 5px;
+  align-self: stretch;
+  margin: 10px 0;
+  background: var(--track-line);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.45),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 2;
+}
+
+.track-lane-divider::before,
+.track-lane-divider::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.track-lane-divider::before {
+  left: 1px;
+}
+
+.track-lane-divider::after {
+  right: 1px;
+}
+
+.track-compare .track-lanes {
+  min-height: 380px;
+}
+
+.track-compare[data-lanes="2"] .track-lane {
+  flex: 1 1 50%;
+}
+
+.track-surface[data-lanes="4"] .track-lanes,
+.track-surface[data-lanes="5"] .track-lanes,
+.track-surface[data-lanes="6"] .track-lanes {
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.track-surface[data-lanes="4"] .track-lane,
+.track-surface[data-lanes="5"] .track-lane,
+.track-surface[data-lanes="6"] .track-lane {
+  flex: 0 0 max(220px, calc(100% / var(--lane-count, 4)));
+  min-width: 220px;
+  scroll-snap-align: start;
+}
+
+.track-pending .contender-card.contender-pending {
+  animation: none;
+  box-shadow: none;
+}
+
 .composer {
   padding: 0 20px 20px;
 }
@@ -1056,6 +1250,49 @@ h2,
 
   .podium-grid {
     grid-template-columns: 1fr;
+  }
+
+  .track-lanes {
+    flex-direction: column;
+    min-height: 0;
+    overflow-x: visible;
+  }
+
+  .track-lane {
+    flex: 1 1 auto;
+    min-width: 0 !important;
+  }
+
+  .track-lane-divider {
+    flex: 0 0 5px;
+    width: 100%;
+    height: 5px;
+    margin: 0;
+  }
+
+  .track-lane-divider::before,
+  .track-lane-divider::after {
+    top: 1px;
+    bottom: 1px;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 1px;
+  }
+
+  .track-lane-divider::before {
+    top: 1px;
+    bottom: auto;
+  }
+
+  .track-lane-divider::after {
+    top: auto;
+    bottom: 1px;
+  }
+
+  .track-ranked .track-lanes {
+    align-items: stretch;
+    padding-top: 0;
   }
 
   .contender-card.elevated {
