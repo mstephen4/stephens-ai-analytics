@@ -1611,7 +1611,7 @@ h2,
 .olympiad-main > .input-section,
 .olympiad-main > .podium-section,
 .olympiad-main > .olympiad-pricing-section {
-  transform: translateY(calc(-3 * var(--hero-tagline-line)));
+  transform: translateY(calc(-2 * var(--hero-tagline-line)));
 }
 
 /* Torch input */
@@ -1815,7 +1815,7 @@ h2,
   }
 
   .input-section {
-    margin-top: max(0px, calc(clamp(1rem, 8vh, 4rem) - 3 * var(--hero-tagline-line)));
+    margin-top: max(0px, calc(clamp(1rem, 8vh, 4rem) - 2 * var(--hero-tagline-line)));
   }
 
   .podium-section {
