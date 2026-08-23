@@ -1070,6 +1070,11 @@ h2,
     font-size: 0.72rem;
     padding: 0.35rem 0.65rem;
   }
+
+  .header-plans-btn {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
+  }
 }
 
 /* —— Homepage (Olympiad landscape landing) —— */
@@ -1245,6 +1250,12 @@ h2,
 }
 
 .header-trial-btn {
+  font-size: 0.78rem;
+  padding: 0.4rem 0.85rem;
+  white-space: nowrap;
+}
+
+.header-plans-btn {
   font-size: 0.78rem;
   padding: 0.4rem 0.85rem;
   white-space: nowrap;
@@ -1569,15 +1580,37 @@ h2,
   padding: 0.45rem 0.95rem;
   white-space: nowrap;
 }
+
+.olympiad-trial-hero-secondary {
+  margin-top: 0.65rem;
 }
 
-/* —— About page —— */
-.about-page {
-  min-height: 100vh;
-  background: var(--obsidian);
-  color: var(--ink);
+.olympiad-pricing-section {
+  width: 100%;
+  max-width: 1100px;
+  margin: 1rem auto 0;
+  padding: 1.5rem 0 0.5rem;
 }
 
+.olympiad-pricing-copy {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.olympiad-pricing-copy h2 {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  margin: 0.35rem 0 0.65rem;
+  color: var(--text-main);
+}
+
+.olympiad-pricing-section .pricing-plans {
+  margin: 0 auto;
+}
+}
+
+/* —— Site header (About, Pricing) —— */
+.site-header,
 .about-page-header {
   display: flex;
   justify-content: space-between;
@@ -1588,6 +1621,7 @@ h2,
   backdrop-filter: blur(12px);
 }
 
+.site-header .logo-container,
 .about-page-header .logo-container {
   display: flex;
   align-items: center;
@@ -1596,12 +1630,14 @@ h2,
   color: inherit;
 }
 
+.site-header .logo-mark,
 .about-page-header .logo-mark {
   width: 2.4rem;
   height: 2.4rem;
   color: var(--gold);
 }
 
+.site-header .logo-text,
 .about-page-header .logo-text {
   color: var(--gold);
   font-weight: 700;
@@ -1610,19 +1646,44 @@ h2,
   text-transform: uppercase;
 }
 
+.site-nav,
 .about-page-nav {
   display: flex;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem 1.5rem;
 }
 
+.site-nav a,
 .about-page-nav a {
   color: var(--muted);
   text-decoration: none;
   font-size: 0.95rem;
 }
 
+.site-nav a:hover,
+.site-nav a[aria-current="page"],
 .about-page-nav a:hover,
 .about-page-nav a[aria-current="page"] {
+  color: var(--ink);
+}
+
+.site-nav-plans {
+  color: var(--gold) !important;
+  font-weight: 600;
+}
+
+.site-nav-trial {
+  font-size: 0.82rem;
+  padding: 0.45rem 0.9rem;
+  white-space: nowrap;
+}
+
+/* —— About page —— */
+.about-page {
+  min-height: 100vh;
+  background: var(--obsidian);
   color: var(--ink);
 }
 
@@ -1630,6 +1691,53 @@ h2,
   max-width: 760px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
+}
+
+/* —— Pricing page —— */
+.pricing-page {
+  min-height: 100vh;
+  background: var(--obsidian);
+  color: var(--ink);
+}
+
+.pricing-page-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.pricing-page-hero {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 2rem;
+}
+
+.pricing-page-hero h1 {
+  font-family: var(--font-outfit), sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  margin: 0.35rem 0 0.75rem;
+}
+
+.pricing-page-lede {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.pricing-page-lede a {
+  color: var(--gold);
+}
+
+.pricing-page-foot {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.pricing-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 .about-content.compact .about-section h2 {

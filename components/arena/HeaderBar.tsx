@@ -19,11 +19,13 @@ export function HeaderBar() {
     setMode,
     setLockerOpen,
     setRailOpen,
+    setPaywall,
     setTrialModalOpen,
   } = useArena();
 
   const access = { tier: premiumStatus.tier, pro: premiumStatus.premium };
-  const showTrial = !premiumStatus.subscribed && !account?.signedIn;
+  const showSubscribe = !premiumStatus.subscribed;
+  const showTrial = showSubscribe && !account?.signedIn;
 
   return (
     <header className="arena-header">
@@ -69,10 +71,19 @@ export function HeaderBar() {
       </div>
 
       <div className="header-actions">
+        {showSubscribe ? (
+          <button
+            type="button"
+            className="gold-btn header-plans-btn"
+            onClick={() => setPaywall("subscribe")}
+          >
+            Plans
+          </button>
+        ) : null}
         {showTrial ? (
           <button
             type="button"
-            className="gold-btn header-trial-btn"
+            className="ghost-btn header-trial-btn"
             onClick={() => setTrialModalOpen(true)}
           >
             Free trial

@@ -64,8 +64,8 @@ function SubscriptionPanel() {
   return (
     <div className="locker-body">
       <p>
-        Subscriptions are handled by <strong>Stripe</strong>. After checkout, sign in on <strong>Account</strong> with
-        the same email to unlock your plan on this device.
+        Subscribe via <strong>Stripe</strong> — no API keys required at checkout. After payment, sign in on{" "}
+        <strong>Account</strong> with the same email to unlock your plan on this device.
       </p>
       <PricingPlans email={account?.email} compact />
       {premiumStatus.subscribed && premiumStatus.source === "stripe" ? (

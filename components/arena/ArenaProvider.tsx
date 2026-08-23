@@ -238,12 +238,15 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
       if (accountInfo) setAccount(accountInfo);
 
+      const premiumNow = resolvePremiumFromAccount(accountInfo);
       let loadedKeys = emptyKeys();
       if (vault?.encrypted) {
         setVaultEncrypted(true);
         setVaultUnlocked(false);
-        setLockerOpenState(true);
-        setLockerTab("vault");
+        if (premiumNow.subscribed) {
+          setLockerOpenState(true);
+          setLockerTab("vault");
+        }
       } else if (vault && !vault.encrypted) {
         loadedKeys = vault.keys;
         setKeys(vault.keys);
@@ -256,7 +259,6 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         ? [...settings.podiumAthleteIds, ...DEFAULT_PODIUM].slice(0, PRO_PODIUM_MAX_LANES)
         : DEFAULT_PODIUM;
       setPodiumAthleteIds(reconcilePodiumLanes(initialPodium, loadedKeys, PRO_PODIUM_MAX_LANES));
-      const premiumNow = resolvePremiumFromAccount(accountInfo);
       setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow.premium));
       const savedMode = settings.mode ?? "single";
       if (savedMode === "podium" || savedMode === "compare" || savedMode === "single") {
@@ -364,7 +366,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ready || premiumStatus.subscribed || account?.signedIn) return;
     if (sessionStorage.getItem("olympiad.trialDismissed")) return;
-    const timer = window.setTimeout(() => setTrialModalOpen(true), 1200);
+    if (sessionStorage.getItem("olympiad.plansDismissed")) return;
+    const timer = window.setTimeout(() => setPaywall("subscribe"), 1500);
     return () => window.clearTimeout(timer);
   }, [ready, premiumStatus.subscribed, account?.signedIn]);
 
@@ -500,12 +503,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
     async (prompt: string) => {
       const trimmed = prompt.trim();
       if (!trimmed || sending) return false;
-      if (!hasAnyKey(keysRef.current)) {
-        setLockerOpen(true, "vault");
-        return false;
-      }
       if (featureLocked(mode, featureAccess)) {
         setPaywall("subscribe");
+        return false;
+      }
+      if (!hasAnyKey(keysRef.current)) {
+        setLockerOpen(true, "vault");
         return false;
       }
 

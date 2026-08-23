@@ -16,11 +16,11 @@ export function AboutContent({ compact = false }: AboutContentProps) {
             Compare models. Let the Coach route. Let the Judge decide. Your keys, your data, your costs.
           </p>
           <div className="about-cta-row">
-            <Link href="/events" className="gold-btn about-cta">
-              Enter the arena
+            <Link href="/pricing" className="gold-btn about-cta">
+              View plans
             </Link>
-            <Link href="/" className="ghost-btn about-cta">
-              Home
+            <Link href="/events" className="ghost-btn about-cta">
+              Enter the arena
             </Link>
           </div>
         </header>
@@ -162,7 +162,7 @@ export function AboutContent({ compact = false }: AboutContentProps) {
           </li>
         </ul>
         <p className="about-note">
-          Create matching monthly/yearly prices in Stripe and set the six <code>STRIPE_PRICE_*</code> env vars. One email, one browser vault — no team seats.
+          <Link href="/pricing">View plans &amp; checkout →</Link>
         </p>
       </section>
 

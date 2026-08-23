@@ -38,8 +38,8 @@ export function TrialModal() {
         <p className="brand-kicker">FREE PRO TRIAL</p>
         <h2>Try Podium &amp; Coach free</h2>
         <p>
-          Sign in with email for a Pro trial — ranked Podium judging and Coach routing. Your API keys stay in the local
-          Vault (BYOK). No hosted model credits.
+          Sign in with email for a Pro trial — ranked Podium judging and Coach routing. Prefer to pay now?{" "}
+          <a href="/pricing">View plans</a> — no API keys required at checkout.
         </p>
         <form
           className="stack"
