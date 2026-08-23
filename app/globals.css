@@ -1324,6 +1324,7 @@ h2,
   --text-sub: #b0b0b0;
   --bg-card: rgba(22, 24, 28, 0.82);
   --border-default: #333333;
+  --hero-tagline-line: calc(1.44rem * 1.45);
 
   position: relative;
   min-height: 100vh;
@@ -1607,6 +1608,12 @@ h2,
   font-weight: 700 !important;
 }
 
+.olympiad-main > .input-section,
+.olympiad-main > .podium-section,
+.olympiad-main > .olympiad-pricing-section {
+  transform: translateY(calc(-3 * var(--hero-tagline-line)));
+}
+
 /* Torch input */
 .input-section {
   width: 100%;
@@ -1808,7 +1815,7 @@ h2,
   }
 
   .input-section {
-    margin-top: clamp(1rem, 8vh, 4rem);
+    margin-top: max(0px, calc(clamp(1rem, 8vh, 4rem) - 3 * var(--hero-tagline-line)));
   }
 
   .podium-section {
