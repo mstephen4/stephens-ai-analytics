@@ -1572,6 +1572,31 @@ h2,
   box-shadow: 0 0 24px rgba(245, 183, 46, 0.35);
 }
 
+.olympiad-home button.olympiad-trial-hero-secondary {
+  margin-top: 0;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #0c0d10;
+  border: 2px solid rgb(0, 212, 255);
+  border-radius: 999px;
+  background: rgb(0, 212, 255);
+  box-shadow:
+    0 0 28px rgba(0, 212, 255, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: filter 160ms ease, box-shadow 160ms ease;
+}
+
+.olympiad-home button.olympiad-trial-hero-secondary:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 0 36px rgba(0, 212, 255, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
 .olympiad-trial-note {
   margin: calc(2.4em + 2lh) 0 0 !important;
   font-size: 1.44rem !important;
@@ -1802,50 +1827,6 @@ h2,
   color: var(--text-main);
 }
 
-@media (max-width: 900px) {
-  .olympiad-trial-banner {
-    padding: 0.55rem 1rem;
-  }
-
-  .olympiad-trial-banner p {
-    font-size: 0.75rem;
-  }
-
-  .olympiad-nav {
-    gap: 0.65rem 1rem;
-  }
-
-.olympiad-nav-plans-btn {
-  font-size: 0.82rem;
-  padding: 0.45rem 0.95rem;
-  white-space: nowrap;
-}
-
-.olympiad-trial-hero-secondary {
-  margin-top: 0;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: #0c0d10;
-  border: 2px solid rgb(0, 212, 255);
-  border-radius: 999px;
-  background: rgb(0, 212, 255);
-  box-shadow:
-    0 0 28px rgba(0, 212, 255, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  cursor: pointer;
-  transition: filter 160ms ease, box-shadow 160ms ease;
-}
-
-.olympiad-trial-hero-secondary:hover {
-  filter: brightness(1.06);
-  box-shadow:
-    0 0 36px rgba(0, 212, 255, 0.72),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42);
-}
-
 .olympiad-pricing-section {
   width: 100%;
   max-width: 1100px;
@@ -1868,6 +1849,25 @@ h2,
 .olympiad-pricing-section .pricing-plans {
   margin: 0 auto;
 }
+
+@media (max-width: 900px) {
+  .olympiad-trial-banner {
+    padding: 0.55rem 1rem;
+  }
+
+  .olympiad-trial-banner p {
+    font-size: 0.75rem;
+  }
+
+  .olympiad-nav {
+    gap: 0.65rem 1rem;
+  }
+
+  .olympiad-nav-plans-btn {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.95rem;
+    white-space: nowrap;
+  }
 }
 
 /* —— Site header (About, Pricing) —— */
