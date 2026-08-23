@@ -1,13 +1,6 @@
-import { isPremiumActive } from "./gating";
-import {
-  licenseUnlocksAnyPaid,
-  licenseUnlocksComparePlan,
-  licenseUnlocksPremium,
-  licenseUnlocksSinglePlan,
-} from "./license";
-import type { LicenseRecord, LicenseTier } from "./types";
+import type { LicenseTier } from "./types";
 
-export type PremiumSource = "trial" | "account_license" | "local_license" | null;
+export type PremiumSource = "trial" | "stripe" | null;
 
 export interface PremiumStatus {
   premium: boolean;
@@ -28,68 +21,16 @@ export interface AccountInfo {
   trialEndsAt: number | null;
 }
 
-function statusFromLicense(license: LicenseRecord): PremiumStatus {
-  const { tier, status } = license;
-  if (licenseUnlocksPremium(tier, status)) {
-    return {
-      premium: true,
-      subscribed: true,
-      source: "local_license",
-      tier,
-      trialEndsAt: null,
-      email: null,
-    };
-  }
-  if (licenseUnlocksComparePlan(tier, status)) {
-    return {
-      premium: false,
-      subscribed: true,
-      source: "local_license",
-      tier: "compare",
-      trialEndsAt: null,
-      email: null,
-    };
-  }
-  if (licenseUnlocksSinglePlan(tier, status)) {
-    return {
-      premium: false,
-      subscribed: true,
-      source: "local_license",
-      tier: "single",
-      trialEndsAt: null,
-      email: null,
-    };
-  }
-  return {
-    premium: false,
-    subscribed: false,
-    source: null,
-    tier: "free",
-    trialEndsAt: null,
-    email: null,
-  };
-}
-
-/** Client-side merge of /api/me account status with local license key. */
-export function resolvePremiumFromAccount(
-  account: AccountInfo | null,
-  localLicense: LicenseRecord | null,
-): PremiumStatus {
+/** Client-side view of /api/me account status. */
+export function resolvePremiumFromAccount(account: AccountInfo | null): PremiumStatus {
   const email = account?.email ?? null;
   const trialEndsAt = account?.trialEndsAt ?? null;
 
-  if (account?.signedIn && account.premium) {
-    return {
-      premium: true,
-      subscribed: true,
-      source: account.source,
-      tier: account.tier,
-      trialEndsAt,
-      email,
-    };
+  if (!account?.signedIn) {
+    return { premium: false, subscribed: false, source: null, tier: "free", trialEndsAt, email };
   }
 
-  if (account?.signedIn && account.trialEndsAt && account.trialEndsAt > Date.now()) {
+  if (account.trialEndsAt && account.trialEndsAt > Date.now()) {
     return {
       premium: true,
       subscribed: true,
@@ -100,9 +41,9 @@ export function resolvePremiumFromAccount(
     };
   }
 
-  if (account?.signedIn && account.subscribed) {
+  if (account.premium) {
     return {
-      premium: false,
+      premium: true,
       subscribed: true,
       source: account.source,
       tier: account.tier,
@@ -111,16 +52,15 @@ export function resolvePremiumFromAccount(
     };
   }
 
-  if (localLicense && isPremiumActive(localLicense)) {
-    return { ...statusFromLicense(localLicense), trialEndsAt, email };
-  }
-
-  if (localLicense && licenseUnlocksComparePlan(localLicense.tier, localLicense.status)) {
-    return { ...statusFromLicense(localLicense), trialEndsAt, email };
-  }
-
-  if (localLicense && licenseUnlocksSinglePlan(localLicense.tier, localLicense.status)) {
-    return { ...statusFromLicense(localLicense), trialEndsAt, email };
+  if (account.subscribed) {
+    return {
+      premium: false,
+      subscribed: true,
+      source: account.source,
+      tier: account.tier,
+      trialEndsAt,
+      email,
+    };
   }
 
   return { premium: false, subscribed: false, source: null, tier: "free", trialEndsAt, email };

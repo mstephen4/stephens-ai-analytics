@@ -15,7 +15,7 @@ This document lists ChatHub capabilities and what **AI Olympiad** adopts. Olympi
 | **Smart routing** | Model picker | **Coach** (heuristic + optional classifier) | Pro / Lifetime / Trial |
 | **Local history** | Cloud account | **IndexedDB** events on device | With subscription |
 | **PWA / install** | Installable PWA (`manifest` + service worker) | Free to install; chat requires pass |
-| **License gating** | Subscription | Lemon Squeezy license keys | Single / Compare / Pro / Lifetime |
+| **License gating** | Subscription | Stripe subscriptions | Single / Compare / Pro / Lifetime |
 
 ## Not adopted (out of scope for now)
 
@@ -53,6 +53,6 @@ Keys stay in **Local Storage** (optional AES-GCM). They are sent only as request
 | API keys | Browser Local Storage | **Never** |
 | Chat / events | Browser IndexedDB | **Never** |
 | License activation | Browser Local Storage | **Never** |
-| Lemon Squeezy secrets | Server `.env.local` | **Never** (gitignored) |
+| Stripe secrets + subscription rows | Server `.env.local` + SQLite | **Never** (gitignored) |
 
 GitHub holds **code only**, not your runtime chat or keys. Local browser storage persists on **your machine** until you clear site data.

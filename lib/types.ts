@@ -102,37 +102,8 @@ export interface LicenseRecord {
   instanceName: string;
   tier: LicenseTier;
   status: LicenseStatus;
-  productId?: number;
-  variantId?: number;
   lastValidatedAt: number;
   expiresAt: string | null;
-}
-
-export interface LemonLicenseMeta {
-  store_id: number;
-  product_id: number;
-  variant_id: number;
-  product_name?: string;
-  variant_name?: string;
-}
-
-export interface LemonLicenseKey {
-  id: number;
-  status: LicenseStatus | string;
-  key: string;
-  activation_limit: number | null;
-  activation_usage: number;
-  created_at: string;
-  expires_at: string | null;
-}
-
-export interface LemonLicenseResponse {
-  activated?: boolean;
-  valid?: boolean;
-  error: string | null;
-  license_key?: LemonLicenseKey;
-  instance?: { id: string; name: string; created_at: string } | null;
-  meta?: LemonLicenseMeta;
 }
 
 export interface ChatStreamDone {

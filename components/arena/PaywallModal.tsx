@@ -14,7 +14,7 @@ export function PaywallModal() {
   const detail =
     paywall === "coach"
       ? "Coach routing is an Olympiad Pro feature. Single unlocks one-on-one chat; Compare adds 2-lane Podium; Pro adds Coach and 6-lane Podium."
-      : "One UI, one vault for all your API keys. Single ($5) for chat, Compare ($7) for side-by-side + 2-lane Podium, or Pro ($9) for Coach and 6 lanes. Start with a free 3-day Pro trial.";
+      : "One UI, one vault for all your API keys. Subscribe via Stripe — Single for chat, Compare for 2-lane Podium, Pro for Coach and 6 lanes. Start with a free 3-day Pro trial.";
 
   return (
     <div className="modal-root">

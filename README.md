@@ -26,8 +26,9 @@ OpenAI · Anthropic · Google · DeepSeek · Groq (Llama/Mixtral) · xAI (Grok) 
 | What | Where |
 | --- | --- |
 | Source code | GitHub (when you push) |
-| API keys, license, settings | Browser Local Storage only |
+| API keys, settings | Browser Local Storage only |
 | Chat history | Browser IndexedDB only |
+| Stripe subscription link | Server SQLite (`license_by_email`) |
 
 GitHub never receives your keys or conversations. Clearing site data in the browser removes local history.
 
@@ -40,26 +41,34 @@ GitHub never receives your keys or conversations. Clearing site data in the brow
 | **Compare** | $7/mo · $75/yr | Compare + Podium (2 lanes + Judge) |
 | **Pro** | $9/mo · $99/yr | All modes + Coach + 6-lane Podium |
 
-Configure Lemon Squeezy checkout URLs in `.env` (see `.env.example`). Prices are displayed from `lib/subscription.ts` and must match your store.
+Configure Stripe price IDs in `.env` (see `.env.example`). Prices displayed in the app come from `lib/subscription.ts` and should match your Stripe products.
 
-## Pro subscription (single user)
+## Stripe subscription (single user)
 
-Olympiad is a **personal** subscription (one email, one browser vault) via [Lemon Squeezy](https://www.lemonsqueezy.com). **Single** unlocks chat; **Compare** adds 2-lane Podium; **Pro** adds Coach and 6 lanes — model usage stays **BYOK**.
+Olympiad is a **personal** subscription (one email, one browser vault) via [Stripe](https://stripe.com). **Single** unlocks chat; **Compare** adds 2-lane Podium; **Pro** adds Coach and 6 lanes — model usage stays **BYOK**.
 
-**Price is not hard-coded in this repo.** Set it in your Lemon Squeezy product, then configure:
+Set in `.env.local` (and your host):
 
 ```env
-NEXT_PUBLIC_LEMONSQUEEZY_CHECKOUT_PRO=https://…
-NEXT_PUBLIC_PRO_PRICE_LABEL=$X/mo   # display only — match your store
-NEXT_PUBLIC_LEMONSQUEEZY_CUSTOMER_PORTAL=https://…  # optional
+STRIPE_SECRET_KEY=sk_…
+STRIPE_WEBHOOK_SECRET=whsec_…
+STRIPE_PRICE_SINGLE_MONTHLY=price_…
+STRIPE_PRICE_SINGLE_YEARLY=price_…
+STRIPE_PRICE_COMPARE_MONTHLY=price_…
+STRIPE_PRICE_COMPARE_YEARLY=price_…
+STRIPE_PRICE_PRO_MONTHLY=price_…
+STRIPE_PRICE_PRO_YEARLY=price_…
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
 
-After checkout, the webhook links the license to the buyer’s email; sign in with that email on **Account** to activate Pro.
+Stripe webhook URL: `https://yourdomain.com/api/webhooks/stripe`
+
+After checkout, sign in on **Account** with the **same email** used at Stripe to activate the plan.
 
 ## Docs
 
 - [FEATURES.md](./FEATURES.md) — ChatHub alignment & tier matrix
-- `.env.example` — Lemon Squeezy IDs for Pro/Lifetime
+- `.env.example` — Stripe + auth env vars
 
 ```bash
 npm test

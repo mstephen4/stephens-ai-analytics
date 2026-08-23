@@ -8,9 +8,8 @@ import { PricingPlans } from "./PricingPlans";
 import { useArena } from "./ArenaProvider";
 
 export function AccountPanel() {
-  const { account, premiumStatus, requestSignIn, signOut, linkLicenseToAccount, licenseMessage } = useArena();
+  const { account, premiumStatus, requestSignIn, signOut, openBillingPortal } = useArena();
   const [email, setEmail] = useState("");
-  const [licenseKey, setLicenseKey] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [devLink, setDevLink] = useState<string | null>(null);
@@ -54,30 +53,15 @@ export function AccountPanel() {
         {tier === "compare" && !premium ? (
           <p className="hint">Compare plan active — upgrade to Pro for Coach and 6-lane Podium.</p>
         ) : null}
-        <form
-          className="stack"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setBusy(true);
-            void linkLicenseToAccount(licenseKey)
-              .then(() => setMessage("License linked to your account."))
-              .catch((err: unknown) => setMessage(err instanceof Error ? err.message : "Link failed."))
-              .finally(() => setBusy(false));
-          }}
-        >
-          <label>
-            Link license key to this account
-            <input value={licenseKey} onChange={(e) => setLicenseKey(e.target.value)} placeholder="XXXX-XXXX-XXXX" />
-          </label>
-          <button className="gold-btn" type="submit" disabled={busy || !licenseKey.trim()}>
-            Link license
+        {subscribed && premiumStatus.source === "stripe" ? (
+          <button className="ghost-btn" type="button" onClick={() => void openBillingPortal()}>
+            Manage subscription
           </button>
-        </form>
+        ) : null}
         <button className="ghost-btn" type="button" onClick={() => void signOut()}>
           <LogOut size={16} /> Sign out
         </button>
         {message ? <p className="hint">{message}</p> : null}
-        {licenseMessage ? <p className="hint">{licenseMessage}</p> : null}
         <p className="about-note">
           <Link href="/about">About AI Olympiad →</Link>
         </p>
@@ -131,8 +115,7 @@ export function AccountPanel() {
         </p>
       ) : null}
       <p className="about-note">
-        Already purchased? Sign in with the <strong>same email</strong> used at Lemon Squeezy checkout, or link a key
-        after sign-in.
+        Already purchased? Sign in with the <strong>same email</strong> used at Stripe checkout.
       </p>
     </div>
   );

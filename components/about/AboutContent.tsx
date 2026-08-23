@@ -162,8 +162,7 @@ export function AboutContent({ compact = false }: AboutContentProps) {
           </li>
         </ul>
         <p className="about-note">
-          Create matching monthly/yearly products in Lemon Squeezy and paste checkout URLs into <code>.env</code>. One
-          email, one browser vault — no team seats.
+          Create matching monthly/yearly prices in Stripe and set the six <code>STRIPE_PRICE_*</code> env vars. One email, one browser vault — no team seats.
         </p>
       </section>
 

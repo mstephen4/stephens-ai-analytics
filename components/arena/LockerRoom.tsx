@@ -7,6 +7,7 @@ import { AboutContent } from "@/components/about/AboutContent";
 import { cn } from "@/lib/utils";
 import { useArena } from "./ArenaProvider";
 import { AccountPanel } from "./AccountPanel";
+import { PricingPlans } from "./PricingPlans";
 import { VaultPanel } from "./VaultPanel";
 
 export function LockerRoom() {
@@ -36,7 +37,7 @@ export function LockerRoom() {
               {item === "vault"
                 ? "Vault"
                 : item === "pass"
-                  ? "Pro Pass"
+                  ? "Plan"
                   : item === "account"
                     ? "Account"
                     : "About"}
@@ -44,7 +45,7 @@ export function LockerRoom() {
           ))}
         </div>
         {lockerTab === "vault" ? <VaultPanel /> : null}
-        {lockerTab === "pass" ? <PassForm /> : null}
+        {lockerTab === "pass" ? <SubscriptionPanel /> : null}
         {lockerTab === "account" ? <AccountPanel /> : null}
         {lockerTab === "about" ? (
           <div className="locker-body locker-about">
@@ -56,51 +57,34 @@ export function LockerRoom() {
   );
 }
 
-function PassForm() {
-  const { license, premium, activate, clearLicense, licenseMessage } = useArena();
-  const [key, setKey] = useState(license?.licenseKey ?? "");
+function SubscriptionPanel() {
+  const { account, premiumStatus, openBillingPortal } = useArena();
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
 
   return (
     <div className="locker-body">
       <p>
-        Paste the alphanumeric license key emailed after Lemon Squeezy checkout. Works on this device without signing
-        in — or link it to your account after sign-in.
+        Subscriptions are handled by <strong>Stripe</strong>. After checkout, sign in on <strong>Account</strong> with
+        the same email to unlock your plan on this device.
       </p>
-      <form
-        className="stack"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setBusy(true);
-          setError(null);
-          void activate(key)
-            .catch((err: unknown) => setError(err instanceof Error ? err.message : "Activation failed."))
-            .finally(() => setBusy(false));
-        }}
-      >
-        <label>
-          License key
-          <input value={key} onChange={(e) => setKey(e.target.value)} placeholder="XXXX-XXXX-XXXX" />
-        </label>
-        <button className="gold-btn" type="submit" disabled={busy || !key.trim()}>
-          {busy ? "Checking tape…" : "Activate pass"}
+      <PricingPlans email={account?.email} compact />
+      {premiumStatus.subscribed && premiumStatus.source === "stripe" ? (
+        <button
+          className="ghost-btn"
+          type="button"
+          onClick={() => {
+            setError(null);
+            void openBillingPortal().catch((err: unknown) => {
+              setError(err instanceof Error ? err.message : "Could not open billing portal.");
+            });
+          }}
+        >
+          Manage subscription
         </button>
-      </form>
-      {premium ? (
-        <p className="hint gold">
-          Pass active · {license?.tier} · product {license?.productId} / variant {license?.variantId}
-        </p>
       ) : (
-        <p className="hint">No pass on this device — subscribe or start a trial. Single for chat; Compare for 2-lane Podium.</p>
+        <p className="hint">No active Stripe subscription linked to this account yet.</p>
       )}
       {error ? <p className="flag-copy">{error}</p> : null}
-      {licenseMessage ? <p className="hint">{licenseMessage}</p> : null}
-      {license ? (
-        <button className="ghost-btn" onClick={clearLicense}>
-          Remove pass from this device
-        </button>
-      ) : null}
       <p className="about-note">
         <Link href="/about">Full About page →</Link>
       </p>

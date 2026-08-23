@@ -1,108 +1,46 @@
 import { describe, expect, it } from "vitest";
 import { resolvePremiumFromAccount } from "@/lib/premium";
-import type { LicenseRecord } from "@/lib/types";
-
-function record(overrides: Partial<LicenseRecord>): LicenseRecord {
-  return {
-    licenseKey: "KEY",
-    instanceId: "inst",
-    instanceName: "Olympiad/test",
-    tier: "pro",
-    status: "active",
-    lastValidatedAt: 0,
-    expiresAt: null,
-    ...overrides,
-  };
-}
 
 describe("resolvePremiumFromAccount", () => {
-  it("prefers signed-in trial over local free", () => {
-    const status = resolvePremiumFromAccount(
-      {
-        signedIn: true,
-        email: "a@b.com",
-        premium: true,
-        subscribed: true,
-        source: "trial",
-        tier: "pro",
-        trialEndsAt: Date.now() + 86400000,
-      },
-      null,
-    );
+  it("returns trial when signed in with active trial", () => {
+    const status = resolvePremiumFromAccount({
+      signedIn: true,
+      email: "a@b.com",
+      premium: false,
+      subscribed: false,
+      source: null,
+      tier: "free",
+      trialEndsAt: Date.now() + 86400000,
+    });
     expect(status.premium).toBe(true);
-    expect(status.subscribed).toBe(true);
     expect(status.source).toBe("trial");
   });
 
-  it("falls back to local license when account is free", () => {
-    const status = resolvePremiumFromAccount(
-      {
-        signedIn: false,
-        email: null,
-        premium: false,
-        subscribed: false,
-        source: null,
-        tier: "free",
-        trialEndsAt: null,
-      },
-      record({ tier: "pro", status: "active" }),
-    );
+  it("returns stripe pro when account is premium", () => {
+    const status = resolvePremiumFromAccount({
+      signedIn: true,
+      email: "buyer@example.com",
+      premium: true,
+      subscribed: true,
+      source: "stripe",
+      tier: "pro",
+      trialEndsAt: null,
+    });
     expect(status.premium).toBe(true);
-    expect(status.subscribed).toBe(true);
-    expect(status.source).toBe("local_license");
+    expect(status.source).toBe("stripe");
   });
 
-  it("grants compare access from a compare-tier local license", () => {
-    const status = resolvePremiumFromAccount(
-      {
-        signedIn: false,
-        email: null,
-        premium: false,
-        subscribed: false,
-        source: null,
-        tier: "free",
-        trialEndsAt: null,
-      },
-      record({ tier: "compare", status: "active" }),
-    );
-    expect(status.premium).toBe(false);
+  it("returns compare tier for subscribed non-pro accounts", () => {
+    const status = resolvePremiumFromAccount({
+      signedIn: true,
+      email: "buyer@example.com",
+      premium: false,
+      subscribed: true,
+      source: "stripe",
+      tier: "compare",
+      trialEndsAt: null,
+    });
     expect(status.subscribed).toBe(true);
     expect(status.tier).toBe("compare");
-  });
-
-  it("grants single-only access from a single-tier local license", () => {
-    const status = resolvePremiumFromAccount(
-      {
-        signedIn: false,
-        email: null,
-        premium: false,
-        subscribed: false,
-        source: null,
-        tier: "free",
-        trialEndsAt: null,
-      },
-      record({ tier: "single", status: "active" }),
-    );
-    expect(status.premium).toBe(false);
-    expect(status.subscribed).toBe(true);
-    expect(status.tier).toBe("single");
-  });
-
-  it("uses account license when signed in with premium", () => {
-    const status = resolvePremiumFromAccount(
-      {
-        signedIn: true,
-        email: "buyer@example.com",
-        premium: true,
-        subscribed: true,
-        source: "account_license",
-        tier: "lifetime",
-        trialEndsAt: null,
-      },
-      null,
-    );
-    expect(status.premium).toBe(true);
-    expect(status.source).toBe("account_license");
-    expect(status.tier).toBe("lifetime");
   });
 });
