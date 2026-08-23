@@ -1133,6 +1133,8 @@ h2,
   padding: 1.25rem 2.5rem;
   box-sizing: border-box;
   background: transparent;
+  position: relative;
+  z-index: 3;
 }
 
 .logo-container {
@@ -1556,11 +1558,17 @@ h2,
     gap: 0.65rem 1rem;
   }
 
-  .olympiad-nav-trial-btn {
-    order: -1;
-    width: 100%;
-    justify-content: center;
-  }
+.olympiad-nav-trial-btn {
+  order: -1;
+  width: 100%;
+  justify-content: center;
+}
+
+.olympiad-nav-plans-btn {
+  font-size: 0.82rem;
+  padding: 0.45rem 0.95rem;
+  white-space: nowrap;
+}
 }
 
 /* —— About page —— */

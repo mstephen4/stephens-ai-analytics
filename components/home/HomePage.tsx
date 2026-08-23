@@ -12,11 +12,19 @@ export function HomePage() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
 
-  const launch = (mode?: "compare" | "podium" | "coach") => {
+  const launch = (mode?: "compare" | "podium" | "coach" | "plans") => {
+    if (mode === "plans") {
+      router.push("/events?subscribe=1");
+      return;
+    }
     const params = new URLSearchParams();
     if (prompt.trim()) params.set("q", prompt.trim());
-    if (mode) params.set("mode", mode);
-    if (mode === "coach") params.set("coach", "1");
+    if (mode === "podium") params.set("mode", "podium");
+    if (mode === "compare") params.set("mode", "compare");
+    if (mode === "coach") {
+      params.set("mode", "podium");
+      params.set("coach", "1");
+    }
     if (mode === "podium" || mode === "coach") params.set("trial", "1");
     const query = params.toString();
     router.push(`/events${query ? `?${query}` : ""}`);
@@ -50,6 +58,9 @@ export function HomePage() {
           <nav className="olympiad-nav">
             <button type="button" onClick={() => launch()}>
               Events
+            </button>
+            <button type="button" className="gold-btn olympiad-nav-plans-btn" onClick={() => launch("plans")}>
+              Plans
             </button>
             <button type="button" className="olympiad-nav-pro" onClick={() => launch("podium")}>
               Podium

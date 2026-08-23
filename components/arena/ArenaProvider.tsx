@@ -297,6 +297,31 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
         );
       }
 
+      const accessNow = {
+        tier: premiumNow.tier,
+        pro: premiumNow.premium,
+      };
+      if (params.get("subscribe") === "1") {
+        setPaywall("subscribe");
+        params.delete("subscribe");
+        const remaining = params.toString();
+        window.history.replaceState(
+          {},
+          "",
+          `${window.location.pathname}${remaining ? `?${remaining}` : ""}`,
+        );
+      } else if (
+        launchMode === "single" ||
+        launchMode === "compare" ||
+        launchMode === "podium"
+      ) {
+        if (featureLocked(launchMode, accessNow)) {
+          setPaywall("subscribe");
+        }
+      } else if (params.get("coach") === "1" && featureLocked("coach", accessNow)) {
+        setPaywall("coach");
+      }
+
       const checkout = params.get("checkout");
       if (checkout === "success") {
         setAuthMessage("Payment received — sign in with your checkout email to unlock your plan.");
