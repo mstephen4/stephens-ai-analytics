@@ -78,9 +78,6 @@ export function HomePage() {
             <Link href="/about" className="olympiad-nav-link">
               About
             </Link>
-            <button type="button" className="gold-btn olympiad-nav-trial-btn" onClick={startTrial}>
-              Free trial
-            </button>
           </nav>
         </header>
 
@@ -94,7 +91,7 @@ export function HomePage() {
               <Link href="/pricing" className="gold-btn olympiad-trial-hero-btn">
                 View plans
               </Link>
-              <button type="button" className="ghost-btn olympiad-trial-hero-secondary" onClick={startTrial}>
+              <button type="button" className="olympiad-trial-hero-secondary" onClick={startTrial}>
                 Free Pro trial
               </button>
               <p className="olympiad-trial-note">

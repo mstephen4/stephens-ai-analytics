@@ -1566,9 +1566,10 @@ h2,
 }
 
 .olympiad-trial-note {
-  margin: 2.4em 0 0 !important;
-  font-size: 0.72rem !important;
-  letter-spacing: 0.08em !important;
+  margin: calc(2.4em + 2lh) 0 0 !important;
+  font-size: 1.44rem !important;
+  line-height: 1.45 !important;
+  letter-spacing: 0.06em !important;
   text-transform: none !important;
   color: var(--gold-primary) !important;
   font-weight: 700 !important;
@@ -1806,12 +1807,6 @@ h2,
     gap: 0.65rem 1rem;
   }
 
-.olympiad-nav-trial-btn {
-  order: -1;
-  width: 100%;
-  justify-content: center;
-}
-
 .olympiad-nav-plans-btn {
   font-size: 0.82rem;
   padding: 0.45rem 0.95rem;
@@ -1820,6 +1815,27 @@ h2,
 
 .olympiad-trial-hero-secondary {
   margin-top: 0.65rem;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid #5eb3ff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #42a5ff 0%, #0081c8 100%);
+  box-shadow:
+    0 0 28px rgba(0, 163, 255, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  transition: filter 160ms ease, box-shadow 160ms ease;
+}
+
+.olympiad-trial-hero-secondary:hover {
+  filter: brightness(1.08);
+  box-shadow:
+    0 0 36px rgba(0, 163, 255, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .olympiad-pricing-section {
