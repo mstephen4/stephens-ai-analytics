@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { SupportChatRoot } from "@/components/support/SupportChatRoot";
 import { PRODUCT_NAME } from "@/lib/constants";
 import "./globals.css";
 
@@ -44,7 +45,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${outfit.variable} ${inter.variable} h-full antialiased`}>
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <SupportChatRoot />
+      </body>
     </html>
   );
 }

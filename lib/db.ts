@@ -42,6 +42,29 @@ function migrate(database: Database.Database) {
     );
 
     CREATE INDEX IF NOT EXISTS idx_magic_links_expires ON magic_links(expires_at);
+
+    CREATE TABLE IF NOT EXISTS support_threads (
+      id TEXT PRIMARY KEY,
+      visitor_id TEXT NOT NULL,
+      visitor_email TEXT,
+      page_path TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      escalated INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS support_messages (
+      id TEXT PRIMARY KEY,
+      thread_id TEXT NOT NULL,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      tags TEXT,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (thread_id) REFERENCES support_threads(id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_support_threads_visitor ON support_threads(visitor_id);
+    CREATE INDEX IF NOT EXISTS idx_support_messages_thread ON support_messages(thread_id);
   `);
 }
 
