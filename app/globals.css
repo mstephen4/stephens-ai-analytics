@@ -1598,7 +1598,7 @@ h2,
 }
 
 .olympiad-trial-note {
-  margin: calc(2.4em + 2lh) 0 0 !important;
+  margin: calc(2.4em - 1lh) 0 0 !important;
   font-size: 1.44rem !important;
   line-height: 1.45 !important;
   letter-spacing: 0.06em !important;
