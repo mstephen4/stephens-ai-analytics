@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { emptyKeys } from "@/lib/models";
 import { completeOnce } from "@/lib/providers";
 import { buildSupportSystemPrompt, tagSupportMessage } from "@/lib/support-context";
+import { appBaseUrl } from "@/lib/app-url";
 import type { ProviderKeys } from "@/lib/types";
 import { uid } from "@/lib/utils";
 
@@ -26,10 +27,6 @@ export function supportNotifyEmail(): string | null {
 function supportKeys(): ProviderKeys {
   const openai = process.env.SUPPORT_OPENAI_API_KEY?.trim() ?? "";
   return { ...emptyKeys(), openai };
-}
-
-export function appBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
 }
 
 export function getOrCreateThread(input: {

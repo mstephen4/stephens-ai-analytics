@@ -1,17 +1,10 @@
 import { sendMagicLinkEmail } from "@/lib/auth/email";
+import { appOriginFromRequest } from "@/lib/app-url";
 import { createMagicLinkToken, normalizeEmail, purgeExpiredMagicLinks, storeMagicLink } from "@/lib/auth/users";
 
 export const runtime = "nodejs";
 
 const MAGIC_LINK_TTL_MS = 15 * 60 * 1000;
-
-function appOrigin(request: Request): string {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-    request.headers.get("origin")?.trim() ||
-    "http://localhost:3000"
-  );
-}
 
 export async function POST(request: Request) {
   const body = (await request.json()) as { email?: string };
@@ -23,7 +16,7 @@ export async function POST(request: Request) {
   purgeExpiredMagicLinks();
   const token = createMagicLinkToken();
   storeMagicLink(email, token, MAGIC_LINK_TTL_MS);
-  const verifyUrl = `${appOrigin(request)}/api/auth/verify?token=${encodeURIComponent(token)}`;
+  const verifyUrl = `${appOriginFromRequest(request)}/api/auth/verify?token=${encodeURIComponent(token)}`;
 
   try {
     const mail = await sendMagicLinkEmail(email, verifyUrl);

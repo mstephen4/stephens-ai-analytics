@@ -1,8 +1,8 @@
 import "server-only";
 import Stripe from "stripe";
 import { upsertLicenseByEmail } from "./auth/users";
+import { appBaseUrl } from "./app-url";
 import {
-  appBaseUrl,
   mapStripeSubscriptionStatus,
   readStripePriceEnv,
   tierFromPriceId,

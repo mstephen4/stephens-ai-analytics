@@ -69,7 +69,3 @@ export function mapStripeSubscriptionStatus(status: string): "active" | "expired
   if (status === "canceled" || status === "incomplete_expired" || status === "unpaid") return "expired";
   return "disabled";
 }
-
-export function appBaseUrl(env: Record<string, string | undefined> = process.env): string {
-  return env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
-}
