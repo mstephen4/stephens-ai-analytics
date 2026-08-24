@@ -82,7 +82,6 @@ export function HomePage() {
             <Link href="/about" className="olympiad-nav-link">
               About
             </Link>
-            <LoginButton variant="nav" />
           </nav>
         </header>
 
