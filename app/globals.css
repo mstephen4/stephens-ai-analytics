@@ -1410,7 +1410,7 @@ h2,
   align-items: center;
   justify-content: flex-end;
   gap: 1rem 1.5rem;
-  max-width: min(100%, 640px);
+  max-width: min(100%, 760px);
   color: rgb(224, 238, 255);
 }
 
@@ -1444,12 +1444,19 @@ h2,
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 0.75rem 1.25rem;
   padding: 0.65rem 1.25rem;
   background: linear-gradient(90deg, rgba(245, 183, 46, 0.18), rgba(245, 183, 46, 0.08));
   border-bottom: 1px solid rgba(245, 183, 46, 0.35);
-  text-align: center;
+  text-align: left;
+}
+
+.olympiad-trial-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-left: auto;
 }
 
 .olympiad-trial-banner p {
@@ -1948,6 +1955,70 @@ h2,
   font-size: 0.82rem;
   padding: 0.45rem 0.9rem;
   white-space: nowrap;
+}
+
+.login-btn {
+  font-size: 0.82rem;
+  padding: 0.45rem 0.9rem;
+  white-space: nowrap;
+}
+
+.olympiad-nav .login-btn,
+.site-nav .login-btn {
+  border: 1px solid rgba(245, 183, 46, 0.65);
+  background: rgba(42, 46, 53, 0.85);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+}
+
+.olympiad-nav .login-btn:hover,
+.site-nav .login-btn:hover {
+  border-color: var(--gold-primary, #f5b72e);
+  color: #fff;
+}
+
+.login-btn-banner {
+  font-size: 0.82rem;
+  padding: 0.45rem 1rem;
+}
+
+.login-modal-root {
+  z-index: 60;
+}
+
+.login-card {
+  text-align: left;
+}
+
+.login-card h2 {
+  text-align: left;
+}
+
+.login-card label,
+.paywall-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.login-card input,
+.paywall-card input {
+  background: #121417;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.login-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
 /* —— About page —— */

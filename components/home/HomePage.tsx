@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PricingPlans } from "@/components/arena/PricingPlans";
+import { LoginButton } from "@/components/auth/LoginPopup";
 import { ColiseumBackdrop } from "./ColiseumBackdrop";
 import { LogoMark } from "./LogoMark";
 import { TorchIcon } from "./TorchIcon";
@@ -47,9 +48,12 @@ export function HomePage() {
             {PLAN_PRICING.compare.yearly.label} · Pro {PLAN_PRICING.pro.monthly.label} /{" "}
             {PLAN_PRICING.pro.yearly.label}. Or try Pro free for 3 days.
           </p>
-          <Link href="/pricing" className="gold-btn olympiad-trial-banner-btn">
-            View plans
-          </Link>
+          <div className="olympiad-trial-banner-actions">
+            <Link href="/pricing" className="gold-btn olympiad-trial-banner-btn">
+              View plans
+            </Link>
+            <LoginButton variant="banner" />
+          </div>
         </div>
 
         <header className="olympiad-header">
@@ -78,6 +82,7 @@ export function HomePage() {
             <Link href="/about" className="olympiad-nav-link">
               About
             </Link>
+            <LoginButton variant="nav" />
           </nav>
         </header>
 

@@ -6,6 +6,7 @@ import { PRODUCT_NAME } from "@/lib/constants";
 import { featureLocked } from "@/lib/gating";
 import { displayPremiumTier } from "@/lib/premium";
 import { cn } from "@/lib/utils";
+import { LoginButton } from "@/components/auth/LoginPopup";
 import { useArena } from "./ArenaProvider";
 
 export function HeaderBar() {
@@ -89,6 +90,7 @@ export function HeaderBar() {
             Free trial
           </button>
         ) : null}
+        <LoginButton variant="header" />
         <span className="tier-chip">{displayPremiumTier(premiumStatus)}</span>
         <button
           className={cn("torch-btn", coachEnabled ? "lit" : "off")}
