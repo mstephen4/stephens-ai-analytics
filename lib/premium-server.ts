@@ -8,6 +8,7 @@ import {
 import type { LicenseTier } from "./types";
 import { getLicenseByEmail, getUserById, type DbUser } from "./auth/users";
 import type { PremiumStatus } from "./premium";
+import { lookupAndSyncLicenseByEmail } from "./stripe-server";
 
 export function isTrialActive(user: DbUser | null): boolean {
   if (!user?.trialEndsAt) return false;
@@ -87,5 +88,20 @@ export function resolvePremium(user: DbUser | null): PremiumStatus {
 
 export async function resolvePremiumForUser(userId: string): Promise<PremiumStatus> {
   const user = getUserById(userId);
-  return resolvePremium(user);
+  const local = resolvePremium(user);
+  if (local.subscribed || local.premium) return local;
+
+  const email = user?.email?.trim().toLowerCase();
+  if (!email) return local;
+
+  const stripeLicense = await lookupAndSyncLicenseByEmail(email);
+  if (!stripeLicense) return local;
+
+  const resolved = statusFromStripeSubscription(
+    stripeLicense.tier,
+    stripeLicense.status,
+    email,
+    user?.trialEndsAt ?? null,
+  );
+  return resolved ?? local;
 }

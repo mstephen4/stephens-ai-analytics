@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { priceIdForPlan, readStripePriceEnv, tierFromPriceId } from "@/lib/stripe-config";
+import { priceIdForPlan, pickBestStripeLicense, readStripePriceEnv, tierFromPriceId } from "@/lib/stripe-config";
 
 const prices = {
   singleMonthly: "price_single_m",
@@ -26,6 +26,32 @@ describe("priceIdForPlan", () => {
     expect(priceIdForPlan("single", "monthly", prices)).toBe("price_single_m");
     expect(priceIdForPlan("compare", "yearly", prices)).toBe("price_compare_y");
     expect(priceIdForPlan("pro", "monthly", prices)).toBe("price_pro_m");
+  });
+});
+
+describe("pickBestStripeLicense", () => {
+  it("prefers the highest active tier", () => {
+    const best = pickBestStripeLicense([
+      {
+        licenseKey: "sub_single",
+        tier: "single",
+        status: "active",
+        customerId: "cus_1",
+      },
+      {
+        licenseKey: "sub_pro",
+        tier: "pro",
+        status: "active",
+        customerId: "cus_1",
+      },
+      {
+        licenseKey: "sub_compare",
+        tier: "compare",
+        status: "disabled",
+        customerId: "cus_1",
+      },
+    ]);
+    expect(best?.licenseKey).toBe("sub_pro");
   });
 });
 
