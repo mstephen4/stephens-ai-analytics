@@ -946,12 +946,22 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
-    const json = (await response.json()) as {
+    const raw = await response.text();
+    let json: {
       ok: boolean;
       error?: string;
       message?: string;
       devLink?: string;
     };
+    try {
+      json = raw ? (JSON.parse(raw) as typeof json) : { ok: false, error: "Empty server response." };
+    } catch {
+      throw new Error(
+        response.ok
+          ? "Invalid server response."
+          : `Sign-in failed (${response.status}). Check AUTH_SECRET and RESEND on Vercel.`,
+      );
+    }
     if (!json.ok) throw new Error(json.error || "Could not send sign-in link.");
     return { message: json.message, devLink: json.devLink };
   }, []);

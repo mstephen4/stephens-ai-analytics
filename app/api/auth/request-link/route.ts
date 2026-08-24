@@ -1,24 +1,23 @@
 import { sendMagicLinkEmail } from "@/lib/auth/email";
+import { createSignedMagicLinkToken } from "@/lib/auth/magic-link";
 import { appOriginFromRequest } from "@/lib/app-url";
-import { createMagicLinkToken, normalizeEmail, purgeExpiredMagicLinks, storeMagicLink } from "@/lib/auth/users";
+import { normalizeEmail } from "@/lib/auth/users";
 
 export const runtime = "nodejs";
 
 const MAGIC_LINK_TTL_MS = 15 * 60 * 1000;
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as { email?: string };
-  const email = normalizeEmail(body.email ?? "");
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return Response.json({ ok: false, error: "Valid email required." }, { status: 400 });
-  }
-
-  purgeExpiredMagicLinks();
-  const token = createMagicLinkToken();
-  storeMagicLink(email, token, MAGIC_LINK_TTL_MS);
-  const verifyUrl = `${appOriginFromRequest(request)}/api/auth/verify?token=${encodeURIComponent(token)}`;
-
   try {
+    const body = (await request.json()) as { email?: string };
+    const email = normalizeEmail(body.email ?? "");
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return Response.json({ ok: false, error: "Valid email required." }, { status: 400 });
+    }
+
+    const token = createSignedMagicLinkToken(email, MAGIC_LINK_TTL_MS);
+    const verifyUrl = `${appOriginFromRequest(request)}/api/auth/verify?token=${encodeURIComponent(token)}`;
+
     const mail = await sendMagicLinkEmail(email, verifyUrl);
     return Response.json({
       ok: true,
@@ -31,9 +30,13 @@ export async function POST(request: Request) {
           : "Sign-in link created.",
     });
   } catch (error) {
+    console.error("[auth request-link]", error);
     return Response.json(
-      { ok: false, error: error instanceof Error ? error.message : "Could not send email." },
-      { status: 502 },
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : "Could not send sign-in link.",
+      },
+      { status: 500 },
     );
   }
 }

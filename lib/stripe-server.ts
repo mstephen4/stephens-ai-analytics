@@ -186,7 +186,11 @@ export async function lookupAndSyncLicenseByEmail(
 
   const best = pickBestStripeLicense(candidates);
   if (best) {
-    upsertLicenseByEmail(normalized, best.licenseKey, best.tier, best.status);
+    try {
+      upsertLicenseByEmail(normalized, best.licenseKey, best.tier, best.status);
+    } catch (error) {
+      console.error("[stripe] license cache write failed", error);
+    }
   }
 
   writeCachedStripeLicense(normalized, best);
