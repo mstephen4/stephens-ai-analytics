@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -74,8 +75,11 @@ export function LoginButton({
   className?: string;
 }) {
   const { account, openLogin } = useLoginPopup();
-  const signedIn = Boolean(account?.signedIn);
-  const label = signedIn ? "Account" : "Login";
+  const signedIn = Boolean(account?.signedIn && account.email);
+
+  if (signedIn) {
+    return <AccountEmailMenu email={account!.email!} variant={variant} className={className} />;
+  }
 
   return (
     <button
@@ -87,10 +91,85 @@ export function LoginButton({
       )}
       onClick={openLogin}
       aria-haspopup="dialog"
-      aria-label={signedIn ? "Open account" : "Open login"}
+      aria-label="Open login"
     >
-      {label}
+      Login
     </button>
+  );
+}
+
+function AccountEmailMenu({
+  email,
+  variant,
+  className,
+}: {
+  email: string;
+  variant: "nav" | "banner" | "header";
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!wrapRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  const handleSignOut = () => {
+    setBusy(true);
+    void signOutAccount()
+      .then(() => setOpen(false))
+      .finally(() => setBusy(false));
+  };
+
+  return (
+    <div className={cn("account-menu-wrap", className)} ref={wrapRef}>
+      <button
+        type="button"
+        className={cn(
+          "account-menu-trigger",
+          variant === "banner" && "account-menu-trigger-banner",
+          variant === "header" && "account-menu-trigger-header",
+          variant === "nav" && "account-menu-trigger-nav",
+        )}
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={`Account menu for ${email}`}
+      >
+        <span className="account-menu-email">{email}</span>
+      </button>
+      {open ? (
+        <div className="account-menu" role="menu">
+          <button
+            type="button"
+            className="account-menu-item"
+            role="menuitem"
+            onClick={handleSignOut}
+            disabled={busy}
+          >
+            <LogOut size={16} aria-hidden />
+            {busy ? "Signing out…" : "Sign out"}
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
 

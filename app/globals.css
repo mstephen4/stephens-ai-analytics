@@ -1983,6 +1983,94 @@ h2,
   padding: 0.45rem 1rem;
 }
 
+.login-btn-header {
+  font-size: 0.78rem;
+  padding: 0.4rem 0.75rem;
+  max-width: 11rem;
+}
+
+.account-menu-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.account-menu-trigger {
+  border: 1px solid rgba(245, 183, 46, 0.45);
+  background: rgba(42, 46, 53, 0.85);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  cursor: pointer;
+  max-width: 14rem;
+}
+
+.account-menu-trigger:hover,
+.account-menu-trigger[aria-expanded="true"] {
+  border-color: var(--gold-primary, #f5b72e);
+}
+
+.account-menu-trigger-banner {
+  border-color: rgba(245, 183, 46, 0.65);
+  background: rgba(26, 29, 33, 0.92);
+}
+
+.account-menu-trigger-header {
+  font-size: 0.78rem;
+  padding: 0.4rem 0.75rem;
+  max-width: 11rem;
+}
+
+.account-menu-trigger-nav {
+  border: 1px solid rgba(245, 183, 46, 0.65);
+}
+
+.account-menu-email {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 70;
+  min-width: 10.5rem;
+  padding: 0.35rem;
+  border-radius: 10px;
+  border: 1px solid rgba(245, 183, 46, 0.35);
+  background: rgba(26, 29, 33, 0.98);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.account-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.account-menu-item:hover:not(:disabled) {
+  background: rgba(245, 183, 46, 0.12);
+}
+
+.account-menu-item:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
 .login-modal-root {
   z-index: 60;
 }
