@@ -1,11 +1,13 @@
 import "server-only";
 import Stripe from "stripe";
 import { upsertLicenseByEmail } from "./auth/users";
+import { appBaseUrl } from "./app-url";
 import {
-  appBaseUrl,
   mapStripeSubscriptionStatus,
+  pickBestStripeLicense,
   readStripePriceEnv,
   tierFromPriceId,
+  type StripeLicenseRecord,
 } from "./stripe-config";
 import type { LicenseTier } from "./types";
 
@@ -101,6 +103,103 @@ export function checkoutCancelUrl(): string {
 
 export function billingPortalReturnUrl(): string {
   return `${appBaseUrl()}/events`;
+}
+
+const STRIPE_LICENSE_CACHE_TTL_MS = 5 * 60 * 1000;
+const stripeLicenseCache = new Map<
+  string,
+  { record: StripeLicenseRecord | null; expiresAt: number }
+>();
+
+function readCachedStripeLicense(email: string): StripeLicenseRecord | null | undefined {
+  const cached = stripeLicenseCache.get(email);
+  if (!cached) return undefined;
+  if (cached.expiresAt <= Date.now()) {
+    stripeLicenseCache.delete(email);
+    return undefined;
+  }
+  return cached.record;
+}
+
+function writeCachedStripeLicense(email: string, record: StripeLicenseRecord | null) {
+  stripeLicenseCache.set(email, {
+    record,
+    expiresAt: Date.now() + STRIPE_LICENSE_CACHE_TTL_MS,
+  });
+}
+
+/** Resolve paid access from Stripe when local SQLite is empty (e.g. Vercel serverless). */
+export async function lookupAndSyncLicenseByEmail(
+  email: string,
+): Promise<StripeLicenseRecord | null> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return null;
+
+  const cached = readCachedStripeLicense(normalized);
+  if (cached !== undefined) return cached;
+
+  const stripe = getStripe();
+  const prices = readStripePriceEnv();
+  if (!stripe || !prices) {
+    writeCachedStripeLicense(normalized, null);
+    return null;
+  }
+
+  const candidates: StripeLicenseRecord[] = [];
+  let startingAfter: string | undefined;
+
+  do {
+    const page = await stripe.customers.list({
+      email: normalized,
+      limit: 100,
+      starting_after: startingAfter,
+    });
+
+    for (const customer of page.data) {
+      if ("deleted" in customer && customer.deleted) continue;
+
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customer.id,
+        limit: 20,
+        status: "all",
+      });
+
+      for (const subscription of subscriptions.data) {
+        const priceId = primaryPriceId(subscription);
+        if (!priceId) continue;
+
+        const tier = tierFromPriceId(priceId, prices);
+        if (!tier) continue;
+
+        candidates.push({
+          licenseKey: subscription.id,
+          tier,
+          status: mapStripeSubscriptionStatus(subscription.status),
+          customerId: customer.id,
+        });
+      }
+    }
+
+    if (!page.has_more) break;
+    startingAfter = page.data.at(-1)?.id;
+  } while (startingAfter);
+
+  const best = pickBestStripeLicense(candidates);
+  if (best) {
+    try {
+      upsertLicenseByEmail(normalized, best.licenseKey, best.tier, best.status);
+    } catch (error) {
+      console.error("[stripe] license cache write failed", error);
+    }
+  }
+
+  writeCachedStripeLicense(normalized, best);
+  return best;
+}
+
+export async function lookupStripeCustomerIdByEmail(email: string): Promise<string | null> {
+  const linked = await lookupAndSyncLicenseByEmail(email);
+  return linked?.customerId ?? null;
 }
 
 export function tierLabel(tier: LicenseTier): string {

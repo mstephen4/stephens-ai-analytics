@@ -3,7 +3,7 @@ import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
 
-const DB_DIR = path.join(process.cwd(), "data");
+const DB_DIR = process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "data");
 const DB_PATH = path.join(DB_DIR, "olympiad.sqlite");
 
 let db: Database.Database | null = null;
@@ -70,7 +70,7 @@ function migrate(database: Database.Database) {
 
 export function getDb(): Database.Database {
   if (db) return db;
-  if (!fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
+  if (!process.env.VERCEL && !fs.existsSync(DB_DIR)) fs.mkdirSync(DB_DIR, { recursive: true });
   db = new Database(DB_PATH);
   db.pragma("journal_mode = WAL");
   migrate(db);

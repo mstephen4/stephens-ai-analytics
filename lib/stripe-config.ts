@@ -70,6 +70,36 @@ export function mapStripeSubscriptionStatus(status: string): "active" | "expired
   return "disabled";
 }
 
-export function appBaseUrl(env: Record<string, string | undefined> = process.env): string {
-  return env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
+/** Higher rank wins when a customer has multiple active subscriptions. */
+export function tierRank(tier: LicenseTier): number {
+  switch (tier) {
+    case "lifetime":
+      return 4;
+    case "pro":
+      return 3;
+    case "compare":
+      return 2;
+    case "single":
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+export interface StripeLicenseRecord {
+  licenseKey: string;
+  tier: LicenseTier;
+  status: "active" | "expired" | "disabled";
+  customerId: string;
+}
+
+export function pickBestStripeLicense(candidates: StripeLicenseRecord[]): StripeLicenseRecord | null {
+  let best: StripeLicenseRecord | null = null;
+  for (const candidate of candidates) {
+    if (candidate.status !== "active") continue;
+    if (!best || tierRank(candidate.tier) > tierRank(best.tier)) {
+      best = candidate;
+    }
+  }
+  return best;
 }

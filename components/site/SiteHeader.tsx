@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoMark } from "@/components/home/LogoMark";
+import { LoginButton } from "@/components/auth/LoginPopup";
 
 type SitePage = "home" | "events" | "pricing" | "about";
 
@@ -23,6 +24,7 @@ export function SiteHeader({ current }: { current?: SitePage }) {
         <Link href="/events?trial=1" className="gold-btn site-nav-trial">
           Free trial
         </Link>
+        <LoginButton variant="nav" />
       </nav>
     </header>
   );

@@ -24,6 +24,7 @@ import {
   laneIndexForCoachPick,
   reconcilePodiumLanes,
 } from "@/lib/models";
+import { ACCOUNT_CHANGED_EVENT, fetchAccount, requestSignInLink, signOutAccount } from "@/lib/auth/client";
 import {
   resolvePremiumFromAccount,
   type AccountInfo,
@@ -188,13 +189,19 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
 
   const refreshAccount = useCallback(async () => {
     try {
-      const response = await fetch("/api/me", { cache: "no-store" });
-      const json = (await response.json()) as AccountInfo;
-      setAccount(json);
+      setAccount(await fetchAccount());
     } catch {
       // keep cached account state
     }
   }, []);
+
+  useEffect(() => {
+    const onChange = () => {
+      void refreshAccount();
+    };
+    window.addEventListener(ACCOUNT_CHANGED_EVENT, onChange);
+    return () => window.removeEventListener(ACCOUNT_CHANGED_EVENT, onChange);
+  }, [refreshAccount]);
 
   const commitEvents = useCallback((next: ArenaEvent[], persistId?: string) => {
     eventsRef.current = next;
@@ -229,8 +236,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       const storedEvents = await listEvents();
       let accountInfo: AccountInfo | null = null;
       try {
-        const response = await fetch("/api/me", { cache: "no-store" });
-        accountInfo = (await response.json()) as AccountInfo;
+        accountInfo = await fetchAccount();
       } catch {
         accountInfo = null;
       }
@@ -941,23 +947,11 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const requestSignIn = useCallback(async (email: string) => {
-    const response = await fetch("/api/auth/request-link", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    const json = (await response.json()) as {
-      ok: boolean;
-      error?: string;
-      message?: string;
-      devLink?: string;
-    };
-    if (!json.ok) throw new Error(json.error || "Could not send sign-in link.");
-    return { message: json.message, devLink: json.devLink };
+    return requestSignInLink(email);
   }, []);
 
   const signOut = useCallback(async () => {
-    await fetch("/api/auth/signout", { method: "POST" });
+    await signOutAccount();
     const signedOut: AccountInfo = {
       signedIn: false,
       email: null,
