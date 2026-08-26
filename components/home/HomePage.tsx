@@ -1,6 +1,5 @@
 "use client";
 
-import { PLAN_PRICING } from "@/lib/subscription";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,12 +34,6 @@ export function HomePage() {
 
       <div className="olympiad-overlay">
         <div className="olympiad-trial-banner">
-          <p>
-            <strong>Subscribe first</strong> — no API keys at checkout. Single {PLAN_PRICING.single.monthly.label} /{" "}
-            {PLAN_PRICING.single.yearly.label} · Compare {PLAN_PRICING.compare.monthly.label} /{" "}
-            {PLAN_PRICING.compare.yearly.label} · Pro {PLAN_PRICING.pro.monthly.label} /{" "}
-            {PLAN_PRICING.pro.yearly.label}. Or try Pro free for 3 days.
-          </p>
           <div className="olympiad-trial-banner-actions">
             <Link href="/pricing" className="gold-btn olympiad-trial-banner-btn">
               View plans
@@ -62,7 +55,7 @@ export function HomePage() {
               Plans
             </button>
             <Link href="/about" className="olympiad-nav-link">
-              About
+              Tutorial
             </Link>
           </nav>
         </header>
