@@ -4,7 +4,6 @@ import { PLAN_PRICING } from "@/lib/subscription";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PricingPlans } from "@/components/arena/PricingPlans";
 import { LoginButton } from "@/components/auth/LoginPopup";
 import { ColiseumBackdrop } from "./ColiseumBackdrop";
 import { LogoMark } from "./LogoMark";
@@ -14,20 +13,14 @@ export function HomePage() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
 
-  const launch = (mode?: "compare" | "podium" | "coach" | "plans") => {
+  const launch = (mode?: "compare" | "plans") => {
     if (mode === "plans") {
       router.push("/pricing");
       return;
     }
     const params = new URLSearchParams();
     if (prompt.trim()) params.set("q", prompt.trim());
-    if (mode === "podium") params.set("mode", "podium");
     if (mode === "compare") params.set("mode", "compare");
-    if (mode === "coach") {
-      params.set("mode", "podium");
-      params.set("coach", "1");
-    }
-    if (mode === "podium" || mode === "coach") params.set("subscribe", "1");
     const query = params.toString();
     router.push(`/events${query ? `?${query}` : ""}`);
   };
@@ -68,17 +61,6 @@ export function HomePage() {
             <button type="button" className="gold-btn olympiad-nav-plans-btn" onClick={() => launch("plans")}>
               Plans
             </button>
-            <Link href="/pricing" className="olympiad-nav-link">
-              Pricing
-            </Link>
-            <button type="button" className="olympiad-nav-pro" onClick={() => launch("podium")}>
-              Podium
-              <span className="pro-badge">Pro</span>
-            </button>
-            <button type="button" className="olympiad-nav-pro" onClick={() => launch("coach")}>
-              Coach
-              <span className="pro-badge">Pro</span>
-            </button>
             <Link href="/about" className="olympiad-nav-link">
               About
             </Link>
@@ -98,9 +80,6 @@ export function HomePage() {
               <button type="button" className="olympiad-trial-hero-secondary" onClick={startTrial}>
                 Free Pro trial
               </button>
-              <p className="olympiad-trial-note">
-                <strong>Subscribe first · add API keys after · one vault · keys stay local</strong>
-              </p>
             </div>
           </section>
 
@@ -136,18 +115,6 @@ export function HomePage() {
             <div className="card bronze">
               <h2>Bronze</h2>
             </div>
-          </section>
-
-          <section className="olympiad-pricing-section" aria-label="Subscription plans">
-            <div className="olympiad-pricing-copy">
-              <p className="brand-kicker">OLYMPIC PASS</p>
-              <h2>Pick a plan — no API keys required</h2>
-              <p className="hint">
-                Checkout via Stripe, then sign in on Events with the same email. Add keys in the Vault when you&apos;re
-                ready to chat.
-              </p>
-            </div>
-            <PricingPlans />
           </section>
         </main>
       </div>
