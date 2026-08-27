@@ -42,36 +42,37 @@ export function HowItWorksModal({ open, onClose }: { open: boolean; onClose: () 
           outputs. With AI Olympiad, your keys, your data, and your costs remain entirely in your control.
         </p>
 
-        <section className="how-it-works-section">
-          <h3>The Olympic Metaphor</h3>
-          <p>We use a sports metaphor to make managing multiple AI models intuitive and fun:</p>
-          <ul className="how-it-works-list">
-            <li>
-              <strong>Event:</strong> A chat session.
-            </li>
-            <li>
-              <strong>Athlete:</strong> An AI model.
-            </li>
-            <li>
-              <strong>Lanes:</strong> Side-by-side model generations.
-            </li>
-            <li>
-              <strong>Podium + Judge&apos;s Citation:</strong> The final ranking and evaluation of the models&apos;
-              answers.
-            </li>
-            <li>
-              <strong>Coach:</strong> The intelligent model picker.
-            </li>
-            <li>
-              <strong>Vault:</strong> Where your API keys are stored safely.
-            </li>
-          </ul>
-        </section>
+        <div className="how-it-works-columns">
+          <section className="how-it-works-section">
+            <h3>The Olympic Metaphor</h3>
+            <p>We use a sports metaphor to make managing multiple AI models intuitive and fun:</p>
+            <ul className="how-it-works-list">
+              <li>
+                <strong>Event:</strong> A chat session.
+              </li>
+              <li>
+                <strong>Athlete:</strong> An AI model.
+              </li>
+              <li>
+                <strong>Lanes:</strong> Side-by-side model generations.
+              </li>
+              <li>
+                <strong>Podium + Judge&apos;s Citation:</strong> The final ranking and evaluation of the models&apos;
+                answers.
+              </li>
+              <li>
+                <strong>Coach:</strong> The intelligent model picker.
+              </li>
+              <li>
+                <strong>Vault:</strong> Where your API keys are stored safely.
+              </li>
+            </ul>
+          </section>
 
-        <section className="how-it-works-section">
-          <h3>Get Started in Five Minutes</h3>
-          <p>Follow these steps to set up your Vault and run your first Event.</p>
-          <ol className="how-it-works-steps">
+          <section className="how-it-works-section">
+            <h3>Get Started in Five Minutes</h3>
+            <p>Follow these steps to set up your Vault and run your first Event.</p>
+            <ol className="how-it-works-steps how-it-works-steps-grid">
             <li>
               <strong>Sign In and Choose a Plan</strong>
               <span>
@@ -108,7 +109,8 @@ export function HowItWorksModal({ open, onClose }: { open: boolean; onClose: () 
               </span>
             </li>
           </ol>
-        </section>
+          </section>
+        </div>
 
         <div className="how-it-works-actions">
           <Link href="/pricing" className="gold-btn" onClick={onClose}>
