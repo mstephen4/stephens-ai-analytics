@@ -42,7 +42,16 @@ export function HomePage() {
             <span className="logo-text">AI Olympiad</span>
           </Link>
 
-          <nav className="olympiad-nav olympiad-nav-banner" aria-label="Site">
+          <div className="olympiad-banner-actions">
+            <button type="button" className="gold-btn olympiad-banner-how-btn" onClick={howItWorks.openModal}>
+              How It Works
+            </button>
+            <LoginButton variant="banner" />
+          </div>
+        </header>
+
+        <header className="olympiad-header olympiad-header-nav-only">
+          <nav className="olympiad-nav" aria-label="Site">
             <button type="button" onClick={() => launch()}>
               Events
             </button>
@@ -53,13 +62,6 @@ export function HomePage() {
               About
             </Link>
           </nav>
-
-          <div className="olympiad-banner-actions">
-            <button type="button" className="gold-btn olympiad-banner-how-btn" onClick={howItWorks.openModal}>
-              How It Works
-            </button>
-            <LoginButton variant="banner" />
-          </div>
         </header>
 
         <main className="olympiad-main">

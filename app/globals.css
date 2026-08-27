@@ -1186,8 +1186,40 @@ h2,
 }
 
 .how-it-works-card {
-  width: min(640px, calc(100% - 32px));
+  width: min(1280px, calc(100% - 32px));
+  max-width: none;
   text-align: left;
+}
+
+.how-it-works-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.how-it-works-steps-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem 1.25rem;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: how-step;
+}
+
+.how-it-works-steps-grid li {
+  counter-increment: how-step;
+  position: relative;
+  padding-left: 1.75rem;
+}
+
+.how-it-works-steps-grid li::before {
+  content: counter(how-step) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+  color: var(--gold);
 }
 
 .how-it-works-card h2 {
@@ -1504,32 +1536,41 @@ h2,
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 0.75rem 1.25rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(90deg, rgba(245, 183, 46, 0.72), rgba(245, 183, 46, 0.08));
+  padding: 0.3rem 1.5rem;
+  background: linear-gradient(
+    90deg,
+    rgba(12, 13, 16, 1) 0%,
+    rgba(12, 13, 16, 0.88) 35%,
+    rgba(12, 13, 16, 0.45) 65%,
+    transparent 100%
+  );
   border-bottom: 1px solid rgba(245, 183, 46, 0.35);
   position: relative;
   z-index: 3;
 }
 
+.banner-logo {
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .banner-logo .logo-mark {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: clamp(2.75rem, 5.5vh, 3.75rem);
+  height: clamp(2.75rem, 5.5vh, 3.75rem);
 }
 
 .banner-logo .logo-text {
-  font-size: 1.35rem;
+  font-size: clamp(1.85rem, 4.5vh, 2.65rem);
+  letter-spacing: 0.12em;
 }
 
-.olympiad-nav-banner {
-  justify-content: center;
+.olympiad-header-nav-only {
+  justify-content: flex-end;
+  padding: 0.65rem 2.5rem 0.35rem;
 }
 
-.olympiad-nav-banner button,
-.olympiad-nav-banner .olympiad-nav-link,
-.olympiad-nav-banner .olympiad-nav-plans-btn {
-  font-size: 1.425rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.olympiad-header-nav-only .olympiad-nav {
+  max-width: none;
 }
 
 .olympiad-banner-actions {
@@ -1887,31 +1928,28 @@ h2,
 @media (max-width: 900px) {
   .olympiad-top-banner {
     grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    padding: 0.75rem 1rem;
+    padding: 0.35rem 1rem;
   }
 
-  .olympiad-top-banner .banner-logo {
-    grid-column: 1;
-    grid-row: 1;
+  .banner-logo .logo-mark {
+    width: 2.5rem;
+    height: 2.5rem;
   }
 
-  .olympiad-top-banner .olympiad-banner-actions {
-    grid-column: 2;
-    grid-row: 1;
+  .banner-logo .logo-text {
+    font-size: 1.5rem;
   }
 
-  .olympiad-top-banner .olympiad-nav-banner {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-content: flex-start;
-    gap: 0.75rem 1rem;
+  .olympiad-header-nav-only {
+    padding: 0.5rem 1.25rem 0.25rem;
   }
 
-  .olympiad-nav-banner button,
-  .olympiad-nav-banner .olympiad-nav-link,
-  .olympiad-nav-banner .olympiad-nav-plans-btn {
-    font-size: 1.15rem;
+  .how-it-works-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .how-it-works-steps-grid {
+    grid-template-columns: 1fr;
   }
 
   .olympiad-header {
@@ -2250,9 +2288,17 @@ h2,
 }
 
 .about-page-main {
-  max-width: 760px;
+  max-width: 1900px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
+  text-align: justify;
+}
+
+.about-page-main .about-lede,
+.about-page-main .about-section p,
+.about-page-main .about-list,
+.about-page-main .about-list li {
+  text-align: justify;
 }
 
 /* —— Pricing page —— */
@@ -2802,10 +2848,16 @@ h2,
 
 .legal-page-main {
   flex: 1;
-  max-width: 720px;
+  max-width: 1900px;
   margin: 0 auto;
   padding: 2rem 1.5rem 3rem;
   line-height: 1.65;
+  text-align: justify;
+}
+
+.legal-page-main p,
+.legal-page-main li {
+  text-align: justify;
 }
 
 .legal-page-main h1 {
