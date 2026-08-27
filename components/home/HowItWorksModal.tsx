@@ -37,53 +37,78 @@ export function HowItWorksModal({ open, onClose }: { open: boolean; onClose: () 
         <p className="brand-kicker">HOW IT WORKS</p>
         <h2 id="how-title">How AI Olympiad works</h2>
         <p className="how-it-works-lede">
-          Subscribe first — no API keys at checkout. Sign in, add keys in the Vault when you&apos;re ready, then run
-          events in Single, Compare, or Podium mode.
+          AI Olympiad goes beyond standard side-by-side model comparison. It is a local-first, Bring Your Own Key (BYOK)
+          platform that lets you compare top AI models, route prompts intelligently, and objectively judge the best
+          outputs. With AI Olympiad, your keys, your data, and your costs remain entirely in your control.
         </p>
 
-        <ol className="how-it-works-steps">
-          <li>
-            <strong>Pick a plan</strong>
-            <span>
-              Choose Single, Compare, or Pro on the{" "}
-              <Link href="/pricing" onClick={onClose}>
-                Plans page
-              </Link>
-              . Stripe checkout does not require API keys.
-            </span>
-          </li>
-          <li>
-            <strong>Sign in with email</strong>
-            <span>
-              Use the same email you used at checkout. We send a magic link — no password. Your plan unlocks on{" "}
-              <Link href="/events" onClick={onClose}>
-                Events
-              </Link>
-              .
-            </span>
-          </li>
-          <li>
-            <strong>Add keys in the Vault</strong>
-            <span>
-              Open the Locker Room → Vault. Paste provider API keys locally on your device. You pay OpenAI, Google,
-              Anthropic, and others directly — Olympiad does not resell model credits.
-            </span>
-          </li>
-          <li>
-            <strong>Run an event</strong>
-            <span>
-              <strong>Single</strong> — one athlete, one thread. <strong>Compare</strong> — two models side-by-side.
-              <strong> Podium</strong> — up to six lanes; an impartial Judge ranks gold, silver, and bronze.
-            </span>
-          </li>
-          <li>
-            <strong>Pro extras</strong>
-            <span>
-              <strong>Coach</strong> recommends a cost-efficient model while you type. Live metrics show time, tok/s, and
-              estimated cost per lane.
-            </span>
-          </li>
-        </ol>
+        <section className="how-it-works-section">
+          <h3>The Olympic Metaphor</h3>
+          <p>We use a sports metaphor to make managing multiple AI models intuitive and fun:</p>
+          <ul className="how-it-works-list">
+            <li>
+              <strong>Event:</strong> A chat session.
+            </li>
+            <li>
+              <strong>Athlete:</strong> An AI model.
+            </li>
+            <li>
+              <strong>Lanes:</strong> Side-by-side model generations.
+            </li>
+            <li>
+              <strong>Podium + Judge&apos;s Citation:</strong> The final ranking and evaluation of the models&apos;
+              answers.
+            </li>
+            <li>
+              <strong>Coach:</strong> The intelligent model picker.
+            </li>
+            <li>
+              <strong>Vault:</strong> Where your API keys are stored safely.
+            </li>
+          </ul>
+        </section>
+
+        <section className="how-it-works-section">
+          <h3>Get Started in Five Minutes</h3>
+          <p>Follow these steps to set up your Vault and run your first Event.</p>
+          <ol className="how-it-works-steps">
+            <li>
+              <strong>Sign In and Choose a Plan</strong>
+              <span>
+                Free trial available. Log in using your email address to activate your free Pro trial, or select the
+                Single, Compare, or Pro subscription plan that fits your needs.
+              </span>
+            </li>
+            <li>
+              <strong>Enter the Locker Room</strong>
+              <span>
+                Navigate to the Locker Room on the Events screen. This is where you manage your local API Vault.
+              </span>
+            </li>
+            <li>
+              <strong>Add Your First Provider</strong>
+              <span>
+                Only one key is required to start. Choose a starter provider (such as Google, Groq, or OpenAI). Paste
+                your API key into the designated field.
+              </span>
+            </li>
+            <li>
+              <strong>Test and Save</strong>
+              <span>
+                Tap Test key to ensure the connection works, then save it to your Vault. You can enable AES-GCM
+                encryption for added security.
+              </span>
+            </li>
+            <li>
+              <strong>Enter the Arena</strong>
+              <span>
+                Start a new Event. If you are on the Pro plan, type your prompt and watch The Coach recommend the best
+                model. Tap &quot;Use model&quot; to apply it, or switch to Podium mode to race multiple models
+                side-by-side.
+              </span>
+            </li>
+          </ol>
+        </section>
 
         <div className="how-it-works-actions">
           <Link href="/pricing" className="gold-btn" onClick={onClose}>

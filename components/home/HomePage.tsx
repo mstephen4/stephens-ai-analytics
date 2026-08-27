@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LoginButton } from "@/components/auth/LoginPopup";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { ColiseumBackdrop } from "./ColiseumBackdrop";
 import { HowItWorksModal, useHowItWorksModal } from "./HowItWorksModal";
 import { LogoMark } from "./LogoMark";
@@ -111,6 +112,7 @@ export function HomePage() {
             </div>
           </section>
         </main>
+        <SiteFooter />
       </div>
 
       <HowItWorksModal open={howItWorks.open} onClose={howItWorks.closeModal} />
