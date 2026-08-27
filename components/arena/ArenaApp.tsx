@@ -23,7 +23,7 @@ export function ArenaApp() {
 }
 
 function ArenaShell() {
-  const { ready, railOpen, setRailOpen } = useArena();
+  const { ready, railOpen, setRailOpen, theme } = useArena();
   if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -34,7 +34,7 @@ function ArenaShell() {
   }
 
   return (
-    <div className="arena-shell">
+    <div className="arena-shell" data-theme={theme}>
       <div className="stadium-lights" aria-hidden />
       <HeaderBar />
       <div className="arena-body">

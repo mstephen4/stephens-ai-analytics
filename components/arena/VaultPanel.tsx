@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ExternalLink, Lock, Unlock } from "lucide-react";
 import { STARTER_PROVIDERS, type StarterProviderId } from "@/lib/provider-guides";
 import { emptyKeys, providerLabel } from "@/lib/models";
 import type { ProviderId, ProviderKeys } from "@/lib/types";
 import { keyHeaders } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { ReturnToOlympiadHint } from "@/components/vault/ReturnToOlympiadHint";
+import { tagVaultWindow } from "@/lib/return-to-olympiad";
 import { useArena } from "./ArenaProvider";
 
 type VaultView = "wizard" | "advanced";
@@ -14,6 +16,10 @@ type VaultView = "wizard" | "advanced";
 export function VaultPanel() {
   const { keys, vaultEncrypted, vaultUnlocked, saveKeys, unlock, lock } = useArena();
   const [view, setView] = useState<VaultView>(() => (hasAnyStoredKey(keys) ? "advanced" : "wizard"));
+
+  useEffect(() => {
+    tagVaultWindow();
+  }, []);
 
   return (
     <div className="locker-body">
@@ -135,10 +141,9 @@ function VaultWizard({ onAdvanced }: { onAdvanced: () => void }) {
         ))}
       </ol>
 
+      <ReturnToOlympiadHint href={guide.keyUrl} />
+
       <div className="vault-links">
-        <a href={guide.keyUrl} target="_blank" rel="noopener noreferrer" className="ghost-btn">
-          <ExternalLink size={14} /> Get API key
-        </a>
         <a href={guide.docsUrl} target="_blank" rel="noopener noreferrer" className="ghost-btn">
           <ExternalLink size={14} /> Docs
         </a>

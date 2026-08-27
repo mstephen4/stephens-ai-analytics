@@ -2,6 +2,8 @@ import { decryptJson, encryptJson, isEncryptedBlob, type EncryptedBlob } from ".
 import { emptyKeys } from "./models";
 import type { ArenaEvent, LicenseRecord, ProviderKeys } from "./types";
 
+import type { ArenaTheme } from "./arena-theme";
+
 const KEYS_STORAGE = "arena.vault.keys";
 const LICENSE_STORAGE = "arena.license";
 const SETTINGS_STORAGE = "arena.settings";
@@ -16,6 +18,7 @@ export interface ArenaSettings {
   podiumAthleteIds: string[];
   coachEnabled: boolean;
   mode: "single" | "compare" | "podium";
+  theme?: ArenaTheme;
 }
 
 export type VaultState =

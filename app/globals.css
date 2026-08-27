@@ -1185,6 +1185,54 @@ h2,
   max-width: none;
 }
 
+.how-it-works-card {
+  width: min(640px, calc(100% - 32px));
+  text-align: left;
+}
+
+.how-it-works-card h2 {
+  text-align: left;
+}
+
+.how-it-works-lede {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 1rem;
+  text-align: left;
+}
+
+.how-it-works-steps {
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: left;
+}
+
+.how-it-works-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.how-it-works-steps strong {
+  color: var(--ink);
+}
+
+.how-it-works-steps a {
+  color: var(--gold);
+}
+
+.how-it-works-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-start;
+}
+
 .locker label {
   display: flex;
   flex-direction: column;
@@ -1451,6 +1499,52 @@ h2,
   white-space: nowrap;
 }
 
+.olympiad-top-banner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(90deg, rgba(245, 183, 46, 0.72), rgba(245, 183, 46, 0.08));
+  border-bottom: 1px solid rgba(245, 183, 46, 0.35);
+  position: relative;
+  z-index: 3;
+}
+
+.banner-logo .logo-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.banner-logo .logo-text {
+  font-size: 1.35rem;
+}
+
+.olympiad-nav-banner {
+  justify-content: center;
+}
+
+.olympiad-nav-banner button,
+.olympiad-nav-banner .olympiad-nav-link,
+.olympiad-nav-banner .olympiad-nav-plans-btn {
+  font-size: 1.425rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.olympiad-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  justify-content: flex-end;
+}
+
+.olympiad-banner-how-btn {
+  font-size: 0.82rem;
+  padding: 0.45rem 1rem;
+  white-space: nowrap;
+}
+
 .olympiad-trial-banner {
   display: flex;
   flex-wrap: wrap;
@@ -1458,7 +1552,7 @@ h2,
   justify-content: flex-end;
   gap: 0.75rem 1.25rem;
   padding: 0.65rem 1.25rem;
-  background: linear-gradient(90deg, rgba(245, 183, 46, 0.18), rgba(245, 183, 46, 0.08));
+  background: linear-gradient(90deg, rgba(245, 183, 46, 0.72), rgba(245, 183, 46, 0.08));
   border-bottom: 1px solid rgba(245, 183, 46, 0.35);
   text-align: left;
 }
@@ -1791,6 +1885,35 @@ h2,
 }
 
 @media (max-width: 900px) {
+  .olympiad-top-banner {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    padding: 0.75rem 1rem;
+  }
+
+  .olympiad-top-banner .banner-logo {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .olympiad-top-banner .olympiad-banner-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .olympiad-top-banner .olympiad-nav-banner {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-start;
+    gap: 0.75rem 1rem;
+  }
+
+  .olympiad-nav-banner button,
+  .olympiad-nav-banner .olympiad-nav-link,
+  .olympiad-nav-banner .olympiad-nav-plans-btn {
+    font-size: 1.15rem;
+  }
+
   .olympiad-header {
     padding: 1rem 1.25rem;
   }
@@ -2143,6 +2266,26 @@ h2,
   max-width: 1100px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
+  font-size: 1.5rem;
+}
+
+.pricing-page-main .brand-kicker {
+  font-size: calc(0.72rem * 1.5);
+}
+
+.pricing-page-main .hint,
+.pricing-page-main .pricing-blurb,
+.pricing-page-main .pricing-unconfigured {
+  font-size: 1em;
+}
+
+.pricing-page-main .pricing-kicker {
+  font-size: calc(11px * 1.5);
+}
+
+.pricing-page-main .gold-btn,
+.pricing-page-main .ghost-btn {
+  font-size: 1rem;
 }
 
 .pricing-page-hero {
@@ -2153,7 +2296,7 @@ h2,
 
 .pricing-page-hero h1 {
   font-family: var(--font-outfit), sans-serif;
-  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-size: clamp(2.625rem, 6vw, 3.525rem);
   margin: 0.35rem 0 0.75rem;
 }
 
@@ -2618,4 +2761,205 @@ h2,
   .support-chat-panel {
     width: min(360px, calc(100vw - 16px));
   }
+}
+
+/* —— Homepage footer —— */
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  padding: 1rem 1.5rem 1.25rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(245, 183, 46, 0.2);
+  color: var(--text-sub, #8b95a8);
+  font-size: 0.85rem;
+}
+
+.site-footer nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.site-footer a {
+  color: rgb(224, 238, 255);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: #fff;
+}
+
+/* —— Legal pages —— */
+.legal-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--obsidian);
+  color: var(--ink);
+}
+
+.legal-page-main {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  line-height: 1.65;
+}
+
+.legal-page-main h1 {
+  font-family: var(--font-outfit), sans-serif;
+  margin: 0 0 0.5rem;
+}
+
+.legal-updated {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem;
+}
+
+.legal-page-main section {
+  margin-bottom: 1.5rem;
+}
+
+.legal-page-main h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.5rem;
+}
+
+.legal-page-main ul {
+  padding-left: 1.25rem;
+}
+
+/* —— Return to Olympiad —— */
+.return-to-olympiad {
+  margin: 0.75rem 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 183, 46, 0.35);
+  background: rgba(245, 183, 46, 0.08);
+}
+
+.return-to-olympiad-title {
+  margin: 0 0 0.35rem;
+}
+
+.return-to-olympiad-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.return-to-olympiad-bookmarklet {
+  text-decoration: none;
+}
+
+.return-to-olympiad-tip {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+}
+
+/* —— How It Works modal sections —— */
+.how-it-works-section {
+  margin-bottom: 1.1rem;
+  text-align: left;
+}
+
+.how-it-works-section h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+  color: var(--gold);
+}
+
+.how-it-works-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  text-align: left;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.how-it-works-list li {
+  margin-bottom: 0.35rem;
+}
+
+.about-content h3 {
+  font-size: 1.05rem;
+  margin: 1rem 0 0.5rem;
+  color: var(--gold);
+}
+
+/* —— Events light theme —— */
+.arena-shell[data-theme="light"] {
+  --obsidian: #eef1f6;
+  --slate: #dde4ec;
+  --ink: #1a1d21;
+  --muted: #5c6570;
+  background: var(--obsidian);
+  color: var(--ink);
+}
+
+.arena-shell[data-theme="light"] .stadium-lights {
+  background: linear-gradient(180deg, rgba(245, 183, 46, 0.14), transparent);
+}
+
+.arena-shell[data-theme="light"] .arena-header {
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom-color: rgba(212, 175, 55, 0.35);
+}
+
+.arena-shell[data-theme="light"] .event-rail,
+.arena-shell[data-theme="light"] .composer-card,
+.arena-shell[data-theme="light"] .contender-card,
+.arena-shell[data-theme="light"] .locker,
+.arena-shell[data-theme="light"] .paywall-card {
+  background: #ffffff;
+  border-color: rgba(26, 29, 33, 0.12);
+  color: var(--ink);
+}
+
+.arena-shell[data-theme="light"] .arena-floor {
+  background: linear-gradient(180deg, #eef1f6 0%, #e4e9f0 100%);
+}
+
+.arena-shell[data-theme="light"] .mode-btn,
+.arena-shell[data-theme="light"] .ghost-btn,
+.arena-shell[data-theme="light"] .icon-btn,
+.arena-shell[data-theme="light"] .torch-btn {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(26, 29, 33, 0.14);
+  color: var(--ink);
+}
+
+.arena-shell[data-theme="light"] .torch-btn.lit {
+  color: #8a6d00;
+}
+
+.arena-shell[data-theme="light"] .composer-card textarea,
+.arena-shell[data-theme="light"] .locker input,
+.arena-shell[data-theme="light"] .paywall-card input {
+  background: #f7f9fc;
+  border-color: rgba(26, 29, 33, 0.14);
+  color: var(--ink);
+}
+
+.arena-shell[data-theme="light"] .track-surface {
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.08),
+    0 10px 36px rgba(0, 0, 0, 0.12);
+}
+
+.arena-shell[data-theme="light"] .modal-backdrop {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.arena-shell[data-theme="light"] .tier-chip {
+  color: #8a6d00;
+  border-color: rgba(212, 175, 55, 0.55);
+}
+
+.theme-toggle-btn {
+  flex-shrink: 0;
 }

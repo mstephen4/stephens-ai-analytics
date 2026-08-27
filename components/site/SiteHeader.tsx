@@ -19,7 +19,7 @@ export function SiteHeader({ current }: { current?: SitePage }) {
           Plans
         </Link>
         <Link href="/about" aria-current={current === "about" ? "page" : undefined}>
-          Tutorial
+          About
         </Link>
         <Link href="/events?trial=1" className="gold-btn site-nav-trial">
           Free trial

@@ -10,155 +10,138 @@ export function AboutContent({ compact = false }: AboutContentProps) {
     <article className={compact ? "about-content compact" : "about-content"}>
       {!compact ? (
         <header className="about-hero">
-          <p className="about-kicker">Beyond side-by-side compare</p>
-          <h1>AI Olympiad</h1>
+          <p className="about-kicker">About AI Olympiad</p>
+          <h1>About AI Olympiad</h1>
           <p className="about-lede">
-            Compare models. Let the Coach route. Let the Judge decide. Your keys, your data, your costs.
+            AI Olympiad goes beyond standard side-by-side model comparison. It is a local-first, Bring Your Own Key
+            (BYOK) platform that lets you compare top AI models, route prompts intelligently, and objectively judge the
+            best outputs. With AI Olympiad, your keys, your data, and your costs remain entirely in your control.
           </p>
           <div className="about-cta-row">
             <Link href="/pricing" className="gold-btn about-cta">
               View plans
             </Link>
             <Link href="/events" className="ghost-btn about-cta">
-              Enter the arena
+              Enter Events
             </Link>
           </div>
         </header>
       ) : null}
 
       <section className="about-section">
-        <h2>Where we go beyond ChatHub</h2>
-        <p>
-          <a href="https://chathub.gg">ChatHub</a> is a hosted all-in-one hub — one subscription, many models, many
-          tools. AI Olympiad keeps the core compare workflow but adds a <strong>Judge</strong>, a{" "}
-          <strong>Coach</strong>, and an Olympic metaphor on a <strong>BYOK, local-first</strong> stack.
-        </p>
-      </section>
-
-      <section className="about-section">
-        <h2>The Podium &amp; Judge</h2>
-        <p>
-          In <strong>Podium mode</strong>, one prompt fans out to up to six models. When every lane finishes, a
-          separate <strong>Judge</strong> ranks 1st, 2nd, and 3rd — gold, silver, bronze — plus a one-sentence{" "}
-          <strong>Judge&apos;s Citation</strong>.
-        </p>
+        <h2>The Olympic Metaphor</h2>
+        <p>We use a sports metaphor to make managing multiple AI models intuitive and fun:</p>
         <ul className="about-list">
-          <li>The Judge is <strong>never</strong> one of the competitors.</li>
           <li>
-            We pick an impartial, cost-efficient model from your vault (typically Gemini Flash, GPT-4o Mini, or Claude
-            Haiku).
+            <strong>Event:</strong> A chat session.
           </li>
           <li>
-            Scoring criteria: accuracy, instruction-following, formatting, and completeness — brand prestige ignored.
+            <strong>Athlete:</strong> An AI model.
+          </li>
+          <li>
+            <strong>Lanes:</strong> Side-by-side model generations.
+          </li>
+          <li>
+            <strong>Podium + Judge&apos;s Citation:</strong> The final ranking and evaluation of the models&apos;
+            answers.
+          </li>
+          <li>
+            <strong>Coach:</strong> The intelligent model picker.
+          </li>
+          <li>
+            <strong>Vault:</strong> Where your API keys are stored safely.
           </li>
         </ul>
       </section>
 
       <section className="about-section">
-        <h2>The Coach</h2>
+        <h2>Core Features</h2>
+        <h3>The Podium &amp; Judge</h3>
         <p>
-          <strong>The Coach</strong> (Pro / Lifetime) is a cost-aware model router. It reads your prompt and recommends
-          the cheapest athlete that can still win the event — not the most famous model.
-        </p>
-        <ol className="about-list ordered">
-          <li>
-            <strong>Heuristic (instant, local)</strong> — detects intent (code, math, creative, translation, etc.) and
-            complexity, then picks from your available keys.
-          </li>
-          <li>
-            <strong>Classifier (optional)</strong> — a cheap model confirms the pick in JSON; falls back to the heuristic
-            if the call fails.
-          </li>
-        </ol>
-        <p className="about-note">
-          The Coach advises while you type. In Single mode, tap <strong>Use model</strong> to apply it. Compare and
-          Podium lanes stay under your control.
-        </p>
-      </section>
-
-      <section className="about-section">
-        <h2>Metrics</h2>
-        <p>Every finished lane shows a live scoreboard:</p>
-        <div className="about-metrics-grid">
-          <div>
-            <h3>Time</h3>
-            <p>Wall-clock generation from first token to done.</p>
-          </div>
-          <div>
-            <h3>Tok/s</h3>
-            <p>Output tokens per second — stream speed.</p>
-          </div>
-          <div>
-            <h3>Cost</h3>
-            <p>Estimated USD from token usage × published per-million rates. Your provider bills you — not Olympiad.</p>
-          </div>
-        </div>
-        <p className="about-note">Roadmap: event totals, personal bests, podium win rates, and Coach vs Judge accuracy.</p>
-      </section>
-
-      <section className="about-section">
-        <h2>The Olympiad metaphor</h2>
-        <table className="about-table">
-          <thead>
-            <tr>
-              <th>ChatHub-ish</th>
-              <th>AI Olympiad</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Chat session</td>
-              <td>Event</td>
-            </tr>
-            <tr>
-              <td>Model</td>
-              <td>Athlete</td>
-            </tr>
-            <tr>
-              <td>Side-by-side answers</td>
-              <td>Lanes</td>
-            </tr>
-            <tr>
-              <td>Pick your favorite</td>
-              <td>Podium + Judge&apos;s Citation</td>
-            </tr>
-            <tr>
-              <td>Model picker</td>
-              <td>Coach</td>
-            </tr>
-            <tr>
-              <td>API keys</td>
-              <td>Vault</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section className="about-section">
-        <h2>Olympiad Pro — single-user subscription</h2>
-        <p>
-          AI Olympiad is a <strong>personal API vault</strong> with the convenience of <strong>one UI at a time</strong>{" "}
-          on your device. You store provider keys locally, then pick a plan: Single for chat, Compare for side-by-side + 2-lane Podium, or Pro for Coach and 6-lane Podium.
+          In Podium mode, a single prompt fans out to up to six different models (Lanes). Once all models finish
+          generating their responses, an impartial Judge ranks them 1st, 2nd, and 3rd (Gold, Silver, and Bronze) and
+          provides a one-sentence &quot;Judge&apos;s Citation&quot; explaining the decision.
         </p>
         <ul className="about-list">
           <li>
-            <strong>One person</strong> — subscription is tied to your email; vault and history stay on this browser.
+            <strong>Impartiality:</strong> The Judge is never one of the competitors. It uses a cost-efficient model
+            from your vault (typically Gemini Flash, GPT-4o Mini, or Claude Haiku).
           </li>
           <li>
-            <strong>BYOK</strong> — Olympiad does not sell model credits. You pay OpenAI, Anthropic, Google, etc.
-            directly.
+            <strong>Scoring Criteria:</strong> Models are judged strictly on accuracy, instruction-following,
+            formatting, and completeness. Brand prestige is ignored.
+          </li>
+        </ul>
+
+        <h3>The Coach (Pro / Lifetime)</h3>
+        <p>
+          The Coach is your cost-aware model router. It analyzes your prompt while you type and recommends the cheapest
+          &quot;athlete&quot; capable of winning the event—saving you money without sacrificing quality.
+        </p>
+        <ul className="about-list">
+          <li>
+            <strong>Heuristic (Instant, Local):</strong> Detects the prompt&apos;s intent (code, math, creative,
+            translation, etc.) and complexity, then selects the best option from your available keys.
           </li>
           <li>
-            <strong>Single</strong> — {PLAN_PRICING.single.monthly.label} or {PLAN_PRICING.single.yearly.label}: Single-mode chat + vault UI.
+            <strong>Classifier (Optional):</strong> Uses a highly affordable model to confirm the pick in JSON, falling
+            back to the heuristic if needed.
+          </li>
+        </ul>
+
+        <h3>Live Metrics</h3>
+        <p>Every finished lane features a live scoreboard displaying:</p>
+        <ul className="about-list">
+          <li>
+            <strong>Time:</strong> Wall-clock generation time from the first token to completion.
           </li>
           <li>
-            <strong>Compare</strong> — {PLAN_PRICING.compare.monthly.label} or {PLAN_PRICING.compare.yearly.label}: Compare mode + Podium (2 lanes + Judge).
+            <strong>Tok/s:</strong> Output tokens per second (stream speed).
           </li>
           <li>
-            <strong>Pro</strong> — {PLAN_PRICING.pro.monthly.label} or {PLAN_PRICING.pro.yearly.label}: All modes + Coach + 6-lane Podium.
+            <strong>Cost:</strong> Estimated USD based on token usage multiplied by the provider&apos;s published
+            per-million rates. (Your provider bills you directly, not AI Olympiad.)
+          </li>
+        </ul>
+      </section>
+
+      <section className="about-section">
+        <h2>Your Keys, Your Data</h2>
+        <p>AI Olympiad is built on a privacy-first architecture.</p>
+        <ul className="about-list">
+          <li>Your API keys live exclusively in your device&apos;s Vault (with optional AES-GCM encryption).</li>
+          <li>
+            Your chat history is stored locally in IndexedDB and is never synced to the cloud or a third-party account.
           </li>
           <li>
-            <strong>Free trial</strong> — sign in with email for a short full Pro trial before you subscribe.
+            You can install AI Olympiad as a Progressive Web App (PWA) directly from your browser&apos;s &quot;Add to
+            Home Screen&quot; prompt.
+          </li>
+          <li>See Lane Congestion info below.</li>
+        </ul>
+      </section>
+
+      <section className="about-section">
+        <h2>Plans &amp; Pricing</h2>
+        <p>
+          AI Olympiad is a single-user subscription tied to your email. We do not sell model credits; you pay your
+          chosen AI providers (OpenAI, Anthropic, Google, Groq, etc.) directly.
+        </p>
+        <ul className="about-list">
+          <li>
+            <strong>Free Trial:</strong> Sign in with your email for a short, full Pro trial before subscribing.
+          </li>
+          <li>
+            <strong>Single</strong> ({PLAN_PRICING.single.monthly.label} or {PLAN_PRICING.single.yearly.label}):
+            Single-mode chat + Vault UI.
+          </li>
+          <li>
+            <strong>Compare</strong> ({PLAN_PRICING.compare.monthly.label} or {PLAN_PRICING.compare.yearly.label}):
+            Compare mode + Podium (2 lanes + Judge).
+          </li>
+          <li>
+            <strong>Pro</strong> ({PLAN_PRICING.pro.monthly.label} or {PLAN_PRICING.pro.yearly.label}): All modes +
+            Coach + 6-lane Podium.
           </li>
         </ul>
         <p className="about-note">
@@ -166,26 +149,31 @@ export function AboutContent({ compact = false }: AboutContentProps) {
         </p>
       </section>
 
-      <section className="about-section">
-        <h2>Your keys, your data</h2>
-        <ul className="about-list">
-          <li>API keys live in the <strong>Vault</strong> on this device (optional AES-GCM encryption).</li>
-          <li>Chat history lives in <strong>IndexedDB</strong> — never synced to GitHub or a cloud account.</li>
-          <li>
-            Single unlocks chat; Compare adds side-by-side + 2-lane Podium; Pro adds Coach and 6 lanes. Vault setup stays local.
-          </li>
-          <li>Install as a PWA from your browser&apos;s Add to Home Screen prompt.</li>
-        </ul>
-      </section>
-
       {!compact ? (
         <section className="about-section">
-          <h2>Get started in five minutes</h2>
-          <p>
-            Open the Locker Room on <Link href="/events">Events</Link>, choose a starter provider (Google, Groq, or
-            OpenAI), paste one API key, tap <strong>Test key</strong>, and save. You do not need all seven providers on
-            day one.
-          </p>
+          <h2>Get Started in Five Minutes</h2>
+          <ol className="about-list ordered">
+            <li>
+              <strong>Sign In and Choose a Plan:</strong> Free trial available. Log in using your email address to
+              activate your free Pro trial, or select the plan that fits your needs.
+            </li>
+            <li>
+              <strong>Enter the Locker Room:</strong> Navigate to the Locker Room on the Events screen to manage your
+              local API Vault.
+            </li>
+            <li>
+              <strong>Add Your First Provider:</strong> Only one key is required to start. Choose Google, Groq, or
+              OpenAI and paste your API key.
+            </li>
+            <li>
+              <strong>Test and Save:</strong> Tap Test key, then save to your Vault. Optional AES-GCM encryption
+              available.
+            </li>
+            <li>
+              <strong>Enter the Arena:</strong> Start a new Event. On Pro, use Coach recommendations or switch to Podium
+              mode.
+            </li>
+          </ol>
         </section>
       ) : (
         <p className="about-note">
@@ -194,18 +182,109 @@ export function AboutContent({ compact = false }: AboutContentProps) {
       )}
 
       <section className="about-section">
-        <h2>FAQ</h2>
+        <h2>Frequently Asked Questions (FAQ)</h2>
         <dl className="about-faq">
-          <dt>Which AI judges?</dt>
-          <dd>A cheap judge-eligible model from your vault — never a podium competitor.</dd>
-          <dt>What does Coach do?</dt>
-          <dd>Classifies your prompt and recommends the most cost-effective capable model.</dd>
-          <dt>How do metrics work?</dt>
-          <dd>Per-lane time, tok/s, and estimated cost from token usage.</dd>
-          <dt>Do I need every provider?</dt>
-          <dd>No. One key is enough to start compare with models from that provider.</dd>
+          <dt>Do I need an API key for every single provider on day one?</dt>
+          <dd>
+            No. A single key is enough to get started. If you add one provider, you can immediately begin comparing
+            different models offered by that specific provider.
+          </dd>
+          <dt>Which AI acts as the Judge?</dt>
+          <dd>
+            The system selects a cheap, judge-eligible model from your own Vault (like Gemini Flash or GPT-4o Mini). The
+            Judge will never be one of the competitors in that specific Podium race.
+          </dd>
+          <dt>What exactly does the Coach do?</dt>
+          <dd>
+            The Coach classifies your prompt&apos;s intent (e.g., coding, creative writing, math) and complexity, then
+            recommends the most cost-effective model in your Vault capable of handling that task.
+          </dd>
+          <dt>How do the metrics and cost estimates work?</dt>
+          <dd>
+            The scoreboard tracks real-time performance: wall-clock time and tokens per second. Cost is estimated from
+            token usage × the provider&apos;s published API rates.
+          </dd>
+          <dt>Where is my chat history and data stored?</dt>
+          <dd>
+            Everything stays on your device. API keys are kept in your local Vault; chat logs are saved to IndexedDB. We
+            never sync your data to a cloud account.
+          </dd>
+          <dt>What does the &quot;Lane Congestion&quot; message mean?</dt>
+          <dd>
+            Lane Congestion means an athlete&apos;s stream is being throttled or delayed—often from provider rate limits
+            (HTTP 429), browser connection limits, or running many lanes from the same provider at once.
+          </dd>
         </dl>
       </section>
+
+      {!compact ? (
+        <section className="about-section">
+          <h2>Understanding &quot;Lane Congestion&quot;</h2>
+          <p>
+            When running multi-model events in Compare or Podium mode, you may occasionally see a Lane Congestion warning
+            on one or more lanes. Because AI Olympiad runs client-side and fans out prompts to multiple AI APIs
+            simultaneously, congestion occurs when a lane experiences throughput bottlenecks, stream delays, or API rate
+            throttling.
+          </p>
+          <h3>Why Lane Congestion Occurs</h3>
+          <table className="about-table">
+            <thead>
+              <tr>
+                <th>Cause</th>
+                <th>What&apos;s Happening</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Provider Rate Limits (RPM / TPM)</td>
+                <td>
+                  Multiple lanes from the same provider may hit Requests-Per-Minute or Tokens-Per-Minute caps, triggering
+                  HTTP 429 Too Many Requests.
+                </td>
+              </tr>
+              <tr>
+                <td>Browser Connection Limits</td>
+                <td>
+                  Browsers cap concurrent HTTP/2 and SSE streams per domain (typically 6). Six heavy streams can
+                  saturate network sockets.
+                </td>
+              </tr>
+              <tr>
+                <td>Main-Thread Rendering Load</td>
+                <td>
+                  Hundreds of tokens per second across multiple streams, written to IndexedDB, can briefly overload
+                  browser rendering.
+                </td>
+              </tr>
+              <tr>
+                <td>Provider Queue Latency</td>
+                <td>High-demand frontier models may experience server-side queue delays during peak usage hours.</td>
+              </tr>
+            </tbody>
+          </table>
+          <h3>How to Prevent and Resolve Lane Congestion</h3>
+          <ol className="about-list ordered">
+            <li>
+              <strong>Diversify Your Athlete Roster (Multi-Provider):</strong> Mix providers across lanes (e.g., Google,
+              Anthropic, OpenAI, Groq) to distribute API limits.
+            </li>
+            <li>
+              <strong>Check Your Provider Account Tiers:</strong> Free-tier keys have strict concurrency caps; upgrading
+              increases TPM/RPM thresholds.
+            </li>
+            <li>
+              <strong>Reduce Concurrent Lanes:</strong> On mobile or low bandwidth, scale back from 6 lanes to 2–3.
+            </li>
+            <li>
+              <strong>Lower Output Token Length:</strong> Shorter max output keeps streams open for less time.
+            </li>
+            <li>
+              <strong>Enable Auto-Backoff / Staggered Start:</strong> When available in settings, staggered fan-out sends
+              prompts in micro-intervals rather than all at once.
+            </li>
+          </ol>
+        </section>
+      ) : null}
     </article>
   );
 }

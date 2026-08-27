@@ -49,6 +49,8 @@ import type {
   ProviderKeys,
 } from "@/lib/types";
 import { keyHeaders, titleFromPrompt, uid } from "@/lib/utils";
+import type { ArenaTheme } from "@/lib/arena-theme";
+import { isArenaTheme } from "@/lib/arena-theme";
 
 const LANE_STAGGER_MS = 450;
 
@@ -99,6 +101,7 @@ interface ArenaContextValue {
   sending: boolean;
   authMessage: string | null;
   trialModalOpen: boolean;
+  theme: ArenaTheme;
   setSelectedAthleteId: (id: string) => void;
   setCompareAthlete: (index: 0 | 1, id: string) => void;
   setPodiumAthlete: (index: number, id: string) => void;
@@ -125,6 +128,7 @@ interface ArenaContextValue {
   signOut: () => Promise<void>;
   openBillingPortal: () => Promise<void>;
   refreshAccount: () => Promise<void>;
+  setTheme: (theme: ArenaTheme) => void;
 }
 
 const ArenaContext = createContext<ArenaContextValue | null>(null);
@@ -163,6 +167,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [trialModalOpen, setTrialModalOpen] = useState(false);
+  const [theme, setThemeState] = useState<ArenaTheme>("dark");
   const eventsRef = useRef(events);
   const keysRef = useRef(keys);
   const activeIdRef = useRef(activeEventId);
@@ -267,11 +272,12 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       setPodiumAthleteIds(reconcilePodiumLanes(initialPodium, loadedKeys, PRO_PODIUM_MAX_LANES));
       setCoachEnabledState(Boolean(settings.coachEnabled && premiumNow.premium));
       const savedMode = settings.mode ?? "single";
-      if (savedMode === "podium" || savedMode === "compare" || savedMode === "single") {
+      if (settings.mode === "podium" || settings.mode === "compare" || settings.mode === "single") {
         setModeState(savedMode);
       } else {
         setModeState("single");
       }
+      if (isArenaTheme(settings.theme)) setThemeState(settings.theme);
 
       const params = new URLSearchParams(window.location.search);
       const q = params.get("q");
@@ -385,8 +391,13 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       podiumAthleteIds,
       coachEnabled,
       mode,
+      theme,
     });
-  }, [ready, selectedAthleteId, compareAthleteIds, podiumAthleteIds, coachEnabled, mode]);
+  }, [ready, selectedAthleteId, compareAthleteIds, podiumAthleteIds, coachEnabled, mode, theme]);
+
+  const setTheme = useCallback((next: ArenaTheme) => {
+    setThemeState(next);
+  }, []);
 
   const setCoachEnabled = useCallback(
     (on: boolean) => {
@@ -1004,6 +1015,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       sending,
       authMessage,
       trialModalOpen,
+      theme,
       setSelectedAthleteId,
       setPodiumAthlete: (index, id) => {
         setPodiumAthleteIds((current) => {
@@ -1044,6 +1056,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       signOut,
       openBillingPortal,
       refreshAccount,
+      setTheme,
     }),
     [
       account,
@@ -1056,6 +1069,7 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       lockerOpen,
       lockerTab,
       mode,
+      theme,
       newEvent,
       openBillingPortal,
       paywall,
@@ -1084,6 +1098,8 @@ export function ArenaProvider({ children }: { children: ReactNode }) {
       setLockerOpen,
       setMode,
       signOut,
+      theme,
+      setTheme,
       trialModalOpen,
       unlock,
       vaultEncrypted,

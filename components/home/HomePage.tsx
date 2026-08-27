@@ -4,13 +4,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LoginButton } from "@/components/auth/LoginPopup";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { ColiseumBackdrop } from "./ColiseumBackdrop";
+import { HowItWorksModal, useHowItWorksModal } from "./HowItWorksModal";
 import { LogoMark } from "./LogoMark";
 import { TorchIcon } from "./TorchIcon";
 
 export function HomePage() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
+  const howItWorks = useHowItWorksModal();
 
   const launch = (mode?: "compare" | "plans") => {
     if (mode === "plans") {
@@ -33,31 +36,30 @@ export function HomePage() {
       <ColiseumBackdrop />
 
       <div className="olympiad-overlay">
-        <div className="olympiad-trial-banner">
-          <div className="olympiad-trial-banner-actions">
-            <Link href="/pricing" className="gold-btn olympiad-trial-banner-btn">
-              View plans
-            </Link>
-            <LoginButton variant="banner" />
-          </div>
-        </div>
-
-        <header className="olympiad-header">
-          <Link href="/" className="logo-container">
+        <header className="olympiad-top-banner">
+          <Link href="/" className="logo-container banner-logo">
             <LogoMark />
             <span className="logo-text">AI Olympiad</span>
           </Link>
-          <nav className="olympiad-nav">
+
+          <nav className="olympiad-nav olympiad-nav-banner" aria-label="Site">
             <button type="button" onClick={() => launch()}>
               Events
             </button>
-            <button type="button" className="gold-btn olympiad-nav-plans-btn" onClick={() => launch("plans")}>
+            <button type="button" className="olympiad-nav-plans-btn" onClick={() => launch("plans")}>
               Plans
             </button>
             <Link href="/about" className="olympiad-nav-link">
-              Tutorial
+              About
             </Link>
           </nav>
+
+          <div className="olympiad-banner-actions">
+            <button type="button" className="gold-btn olympiad-banner-how-btn" onClick={howItWorks.openModal}>
+              How It Works
+            </button>
+            <LoginButton variant="banner" />
+          </div>
         </header>
 
         <main className="olympiad-main">
@@ -110,7 +112,10 @@ export function HomePage() {
             </div>
           </section>
         </main>
+        <SiteFooter />
       </div>
+
+      <HowItWorksModal open={howItWorks.open} onClose={howItWorks.closeModal} />
     </div>
   );
 }

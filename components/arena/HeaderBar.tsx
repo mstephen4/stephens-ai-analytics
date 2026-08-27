@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Flame, KeyRound, Menu, Trophy } from "lucide-react";
+import { Flame, KeyRound, Menu, Moon, Sun, Trophy } from "lucide-react";
 import { PRODUCT_NAME } from "@/lib/constants";
 import { featureLocked } from "@/lib/gating";
 import { displayPremiumTier } from "@/lib/premium";
@@ -22,6 +22,8 @@ export function HeaderBar() {
     setRailOpen,
     setPaywall,
     setTrialModalOpen,
+    theme,
+    setTheme,
   } = useArena();
 
   const access = { tier: premiumStatus.tier, pro: premiumStatus.premium };
@@ -91,6 +93,15 @@ export function HeaderBar() {
           </button>
         ) : null}
         <LoginButton variant="header" />
+        <button
+          type="button"
+          className="icon-btn theme-toggle-btn"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
+        >
+          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
         <span className="tier-chip">{displayPremiumTier(premiumStatus)}</span>
         <button
           className={cn("torch-btn", coachEnabled ? "lit" : "off")}
