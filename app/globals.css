@@ -1185,6 +1185,54 @@ h2,
   max-width: none;
 }
 
+.how-it-works-card {
+  width: min(640px, calc(100% - 32px));
+  text-align: left;
+}
+
+.how-it-works-card h2 {
+  text-align: left;
+}
+
+.how-it-works-lede {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 1rem;
+  text-align: left;
+}
+
+.how-it-works-steps {
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: left;
+}
+
+.how-it-works-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.how-it-works-steps strong {
+  color: var(--ink);
+}
+
+.how-it-works-steps a {
+  color: var(--gold);
+}
+
+.how-it-works-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-start;
+}
+
 .locker label {
   display: flex;
   flex-direction: column;
@@ -1451,6 +1499,52 @@ h2,
   white-space: nowrap;
 }
 
+.olympiad-top-banner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(90deg, rgba(245, 183, 46, 0.72), rgba(245, 183, 46, 0.08));
+  border-bottom: 1px solid rgba(245, 183, 46, 0.35);
+  position: relative;
+  z-index: 3;
+}
+
+.banner-logo .logo-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.banner-logo .logo-text {
+  font-size: 1.35rem;
+}
+
+.olympiad-nav-banner {
+  justify-content: center;
+}
+
+.olympiad-nav-banner button,
+.olympiad-nav-banner .olympiad-nav-link,
+.olympiad-nav-banner .olympiad-nav-plans-btn {
+  font-size: 1.425rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.olympiad-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  justify-content: flex-end;
+}
+
+.olympiad-banner-how-btn {
+  font-size: 0.82rem;
+  padding: 0.45rem 1rem;
+  white-space: nowrap;
+}
+
 .olympiad-trial-banner {
   display: flex;
   flex-wrap: wrap;
@@ -1458,7 +1552,7 @@ h2,
   justify-content: flex-end;
   gap: 0.75rem 1.25rem;
   padding: 0.65rem 1.25rem;
-  background: linear-gradient(90deg, rgba(245, 183, 46, 0.18), rgba(245, 183, 46, 0.08));
+  background: linear-gradient(90deg, rgba(245, 183, 46, 0.72), rgba(245, 183, 46, 0.08));
   border-bottom: 1px solid rgba(245, 183, 46, 0.35);
   text-align: left;
 }
@@ -1791,6 +1885,35 @@ h2,
 }
 
 @media (max-width: 900px) {
+  .olympiad-top-banner {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    padding: 0.75rem 1rem;
+  }
+
+  .olympiad-top-banner .banner-logo {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .olympiad-top-banner .olympiad-banner-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .olympiad-top-banner .olympiad-nav-banner {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-start;
+    gap: 0.75rem 1rem;
+  }
+
+  .olympiad-nav-banner button,
+  .olympiad-nav-banner .olympiad-nav-link,
+  .olympiad-nav-banner .olympiad-nav-plans-btn {
+    font-size: 1.15rem;
+  }
+
   .olympiad-header {
     padding: 1rem 1.25rem;
   }
@@ -2143,6 +2266,26 @@ h2,
   max-width: 1100px;
   margin: 0 auto;
   padding: 2.5rem 1.5rem 4rem;
+  font-size: 1.5rem;
+}
+
+.pricing-page-main .brand-kicker {
+  font-size: calc(0.72rem * 1.5);
+}
+
+.pricing-page-main .hint,
+.pricing-page-main .pricing-blurb,
+.pricing-page-main .pricing-unconfigured {
+  font-size: 1em;
+}
+
+.pricing-page-main .pricing-kicker {
+  font-size: calc(11px * 1.5);
+}
+
+.pricing-page-main .gold-btn,
+.pricing-page-main .ghost-btn {
+  font-size: 1rem;
 }
 
 .pricing-page-hero {
@@ -2153,7 +2296,7 @@ h2,
 
 .pricing-page-hero h1 {
   font-family: var(--font-outfit), sans-serif;
-  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-size: clamp(2.625rem, 6vw, 3.525rem);
   margin: 0.35rem 0 0.75rem;
 }
 

@@ -6,7 +6,7 @@ import { PRODUCT_NAME } from "@/lib/constants";
 export const metadata: Metadata = {
   title: `About — ${PRODUCT_NAME}`,
   description:
-    "How AI Olympiad goes beyond ChatHub: Podium judging, Coach routing, live metrics, and BYOK privacy.",
+    "About AI Olympiad — BYOK multi-model compare, Podium judging, Coach routing, and local-first privacy.",
 };
 
 export default function AboutPage() {
