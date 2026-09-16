@@ -127,8 +127,10 @@ export function SupportChat() {
 
   if (enabled === null) return null;
 
+  const onEventsPage = pathname === "/events" || pathname?.startsWith("/events/");
+
   return (
-    <div className="support-chat-root" aria-live="polite">
+    <div className={cn("support-chat-root", onEventsPage && "support-chat-root-mid")} aria-live="polite">
       {open ? (
         <section className="support-chat-panel" role="dialog" aria-label="Support chat">
           <header className="support-chat-head">

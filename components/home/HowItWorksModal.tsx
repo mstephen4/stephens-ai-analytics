@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { HowItWorksVideo } from "@/components/home/HowItWorksVideo";
 
 const DISMISS_KEY = "olympiad.howItWorksDismissed";
 
@@ -67,6 +68,7 @@ export function HowItWorksModal({ open, onClose }: { open: boolean; onClose: () 
                 <strong>Vault:</strong> Where your API keys are stored safely.
               </li>
             </ul>
+            <HowItWorksVideo />
           </section>
 
           <section className="how-it-works-section">

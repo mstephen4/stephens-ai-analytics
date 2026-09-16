@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LoginButton } from "@/components/auth/LoginPopup";
+import { PeerPushBadge } from "./PeerPushBadge";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { ColiseumBackdrop } from "./ColiseumBackdrop";
 import { HowItWorksModal, useHowItWorksModal } from "./HowItWorksModal";
@@ -114,6 +115,7 @@ export function HomePage() {
             </div>
           </section>
         </main>
+        <PeerPushBadge />
         <SiteFooter />
       </div>
 
