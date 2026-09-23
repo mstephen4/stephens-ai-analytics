@@ -480,7 +480,7 @@ h2,
   gap: 8px;
 }
 
-.lane-close-btn {
+.lane-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -494,10 +494,31 @@ h2,
   flex-shrink: 0;
 }
 
-.lane-close-btn:hover {
+.lane-icon-btn:hover:not(:disabled) {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.08);
+}
+
+.lane-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.lane-copy-btn.copied {
+  color: var(--gold);
+  border-color: rgba(245, 183, 46, 0.45);
+}
+
+.arena-shell[data-theme="light"] .lane-icon-btn {
+  border-color: rgba(26, 29, 33, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(26, 29, 33, 0.65);
+}
+
+.arena-shell[data-theme="light"] .lane-icon-btn:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: rgba(26, 29, 33, 0.28);
 }
 
 .card-title {

@@ -73,8 +73,9 @@ describe("reconcilePodiumLanes", () => {
     expect(lanes).toEqual(["openai:gpt-4o-mini", "", "google:gemini-3.6-flash", ""]);
   });
 
-  it("keeps Gemini 2.5 Pro on the roster until Google retires it", () => {
-    expect(getAthlete("google:gemini-2.5-pro")?.apiModel).toBe("gemini-2.5-pro");
+  it("routes retired Gemini 2.5 ids to current Google models", () => {
+    expect(getAthlete("google:gemini-2.5-flash")?.apiModel).toBe("gemini-3.6-flash");
+    expect(getAthlete("google:gemini-2.5-pro")?.apiModel).toBe("gemini-3.1-pro-preview");
   });
 
   it("uses current Anthropic API model ids", () => {
@@ -85,7 +86,6 @@ describe("reconcilePodiumLanes", () => {
 
   it("routes legacy Gemini 2.0 Flash lane ids to gemini-3.6-flash", () => {
     expect(getAthlete("google:gemini-2.0-flash")?.apiModel).toBe("gemini-3.6-flash");
-    expect(getAthlete("google:gemini-2.5-flash")?.apiModel).toBe("gemini-2.5-flash");
   });
 
   it("routes retired Groq and xAI ids to current models", () => {

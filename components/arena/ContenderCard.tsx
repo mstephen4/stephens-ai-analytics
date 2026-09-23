@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Flag, Medal, RotateCcw, X } from "lucide-react";
+import { Check, Copy, Flag, Medal, RotateCcw, X } from "lucide-react";
 import { formatDuration, formatUsd } from "@/lib/cost";
 import { getAthlete, providerLabel } from "@/lib/models";
 import type { ContenderResult } from "@/lib/types";
@@ -24,7 +24,21 @@ export function ContenderCard({
   const { retryLane, closeLane, sending } = useArena();
   const athlete = getAthlete(contender.athleteId);
   const [collapsed, setCollapsed] = useState(defaultCollapsed && contender.content.length > 900);
+  const [copied, setCopied] = useState(false);
   const flagged = contender.status === "false_start" || contender.status === "dq";
+  const copyText = flagged ? contender.error ?? "" : contender.content;
+
+  const copyResponse = async () => {
+    const text = copyText.trim();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard blocked */
+    }
+  };
   const medal =
     contender.place === 1 ? "gold" : contender.place === 2 ? "silver" : contender.place === 3 ? "bronze" : null;
 
@@ -59,7 +73,7 @@ export function ContenderCard({
         {assistantMessageId ? (
           <button
             type="button"
-            className="lane-close-btn"
+            className="lane-icon-btn"
             aria-label="Close lane"
             title="Close lane"
             onClick={() => void closeLane(assistantMessageId, contender.athleteId)}
@@ -67,6 +81,16 @@ export function ContenderCard({
             <X size={14} />
           </button>
         ) : null}
+        <button
+          type="button"
+          className={cn("lane-icon-btn lane-copy-btn", copied && "copied")}
+          aria-label={copied ? "Copied" : "Copy response"}
+          title={copied ? "Copied" : "Copy response"}
+          disabled={!copyText.trim() || contender.status === "streaming"}
+          onClick={() => void copyResponse()}
+        >
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+        </button>
         </div>
       </header>
 

@@ -199,32 +199,6 @@ export const ATHLETES: Athlete[] = [
     judgeEligible: false,
     classifierEligible: false,
   },
-  {
-    id: "google:gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
-    shortName: "2.5 Flash",
-    provider: "google",
-    apiModel: "gemini-2.5-flash",
-    role: "sprinter",
-    inputCostPer1M: 0.3,
-    outputCostPer1M: 2.5,
-    strengths: ["legacy flash lane", "cheap compare"],
-    judgeEligible: true,
-    classifierEligible: true,
-  },
-  {
-    id: "google:gemini-2.5-pro",
-    name: "Gemini 2.5 Pro",
-    shortName: "2.5 Pro",
-    provider: "google",
-    apiModel: "gemini-2.5-pro",
-    role: "heavy",
-    inputCostPer1M: 1.25,
-    outputCostPer1M: 10,
-    strengths: ["legacy pro lane", "STEM reasoning"],
-    judgeEligible: false,
-    classifierEligible: false,
-  },
   // DeepSeek
   {
     id: "deepseek:deepseek-chat",
@@ -434,6 +408,8 @@ export const DEFAULT_PODIUM: string[] = [
 /** Map retired athlete ids saved in local settings to current catalog entries. */
 const LEGACY_ATHLETE_IDS: Record<string, string> = {
   "google:gemini-2.0-flash": "google:gemini-3.6-flash",
+  "google:gemini-2.5-flash": "google:gemini-3.6-flash",
+  "google:gemini-2.5-pro": "google:gemini-3.1-pro-preview",
   "groq:mixtral-8x7b-32768": "groq:gpt-oss-120b",
   "groq:llama-3.1-8b-instant": "groq:gpt-oss-20b",
   "groq:llama-3.3-70b-versatile": "groq:gpt-oss-120b",
