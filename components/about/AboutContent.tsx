@@ -65,7 +65,7 @@ export function AboutContent({ compact = false }: AboutContentProps) {
         <ul className="about-list">
           <li>
             <strong>Impartiality:</strong> The Judge is never one of the competitors. It uses a cost-efficient model
-            from your vault (typically Gemini Flash, GPT-4o Mini, or Claude Haiku).
+            from your vault (typically Gemini Flash, GPT-5 Mini, or Claude Haiku).
           </li>
           <li>
             <strong>Scoring Criteria:</strong> Models are judged strictly on accuracy, instruction-following,

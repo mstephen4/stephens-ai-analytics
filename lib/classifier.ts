@@ -72,18 +72,20 @@ export function heuristicClassify(prompt: string): HeuristicResult {
 const INTENT_PREFERENCES: Record<Intent, string[]> = {
   simple_qa: [
     "google:gemini-3.6-flash",
+    "openai:gpt-5-mini",
     "openai:gpt-4o-mini",
-    "google:gemini-3.6-flash",
     "anthropic:claude-haiku-3.5",
+    "groq:gpt-oss-20b",
   ],
   summarize: [
     "google:gemini-3.6-flash",
+    "openai:gpt-5-mini",
     "openai:gpt-4o-mini",
     "anthropic:claude-haiku-3.5",
-    "google:gemini-3.6-flash",
   ],
   translation: [
     "google:gemini-3.6-flash",
+    "openai:gpt-5-mini",
     "openai:gpt-4o-mini",
     "anthropic:claude-haiku-3.5",
   ],
@@ -95,13 +97,15 @@ const INTENT_PREFERENCES: Record<Intent, string[]> = {
   ],
   code: [
     "anthropic:claude-sonnet-4",
+    "openai:gpt-5.2",
     "openai:gpt-4.1",
     "openai:gpt-4o",
     "google:gemini-3.1-pro-preview",
     "anthropic:claude-opus-4",
   ],
   math: [
-    "openai:o4-mini",
+    "openai:gpt-5-mini",
+    "openai:gpt-5.2-pro",
     "google:gemini-3.1-pro-preview",
     "anthropic:claude-opus-4",
     "openai:gpt-4.1",
@@ -115,8 +119,8 @@ const INTENT_PREFERENCES: Record<Intent, string[]> = {
 };
 
 const HIGH_COMPLEXITY_UPGRADE: Partial<Record<Intent, string[]>> = {
-  code: ["anthropic:claude-opus-4", "openai:gpt-4.1"],
-  math: ["anthropic:claude-opus-4", "openai:o4-mini"],
+  code: ["anthropic:claude-opus-4", "openai:gpt-5.2-pro"],
+  math: ["anthropic:claude-opus-4", "openai:gpt-5.2-pro"],
   analysis: ["anthropic:claude-opus-4", "google:gemini-3.1-pro-preview"],
 };
 
