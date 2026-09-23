@@ -33,12 +33,7 @@ export function AboutContent({ compact = false }: AboutContentProps) {
         <p>We use a sports metaphor to make managing multiple AI models intuitive and fun:</p>
         <ul className="about-list">
           <li>
-<<<<<<< Updated upstream
             <strong>Event:</strong> A chat session.
-=======
-            We pick an impartial, cost-efficient model from your vault (typically Gemini Flash, GPT-5 Mini, or Claude
-            Haiku).
->>>>>>> Stashed changes
           </li>
           <li>
             <strong>Athlete:</strong> An AI model.
@@ -70,7 +65,7 @@ export function AboutContent({ compact = false }: AboutContentProps) {
         <ul className="about-list">
           <li>
             <strong>Impartiality:</strong> The Judge is never one of the competitors. It uses a cost-efficient model
-            from your vault (typically Gemini Flash, GPT-4o Mini, or Claude Haiku).
+            from your vault (typically Gemini Flash, GPT-5 Mini, or Claude Haiku).
           </li>
           <li>
             <strong>Scoring Criteria:</strong> Models are judged strictly on accuracy, instruction-following,
