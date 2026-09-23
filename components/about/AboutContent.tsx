@@ -33,7 +33,12 @@ export function AboutContent({ compact = false }: AboutContentProps) {
         <p>We use a sports metaphor to make managing multiple AI models intuitive and fun:</p>
         <ul className="about-list">
           <li>
+<<<<<<< Updated upstream
             <strong>Event:</strong> A chat session.
+=======
+            We pick an impartial, cost-efficient model from your vault (typically Gemini Flash, GPT-5 Mini, or Claude
+            Haiku).
+>>>>>>> Stashed changes
           </li>
           <li>
             <strong>Athlete:</strong> An AI model.
